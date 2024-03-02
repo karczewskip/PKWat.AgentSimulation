@@ -4,10 +4,14 @@ using System.Collections.Generic;
 
 internal class SimulationContext
 {
-    public IReadOnlyList<IAgent> Agents;
-
-    public SimulationContext(List<IAgent> agents)
+    public SimulationContext(List<IAgent> agents, List<Func<Task>> callbacks)
     {
         Agents = agents;
+        Callbacks = callbacks;
+        WaitingTimeBetweenSteps = TimeSpan.FromMilliseconds(2);
     }
+
+    public IReadOnlyList<IAgent> Agents { get; }
+    public IReadOnlyList<Func<Task>> Callbacks { get; }
+    public TimeSpan WaitingTimeBetweenSteps { get; }
 }

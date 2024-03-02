@@ -21,6 +21,13 @@
                 await Parallel.ForEachAsync(
                     _context.Agents, 
                     (x, c) => new ValueTask(Task.Run( () => x.Act())));
+
+                foreach (var callback in _context.Callbacks)
+                {
+                    await callback();
+                }
+
+                await Task.Delay(_context.WaitingTimeBetweenSteps);
             }
         }
     }

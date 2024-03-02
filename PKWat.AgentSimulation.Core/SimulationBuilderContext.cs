@@ -3,12 +3,14 @@
 public interface ISimulationBuilderContext
 {
     ISimulationBuilderContext AddAgent(IAgent agent);
+    ISimulationBuilderContext AddCallback(Func<Task> callback);
     ISimulation Build();
 }
 
 internal class SimulationBuilderContext : ISimulationBuilderContext
 {
     private List<IAgent> _agents = new List<IAgent>();
+    private List<Func<Task>> _callbacks = new List<Func<Task>>();
 
     public ISimulationBuilderContext AddAgent(IAgent agent)
     {
@@ -17,8 +19,15 @@ internal class SimulationBuilderContext : ISimulationBuilderContext
         return this;
     }
 
+    public ISimulationBuilderContext AddCallback(Func<Task> callback)
+    {
+        _callbacks.Add(callback);
+
+        return this;
+    }
+
     public ISimulation Build()
     {
-        return new Simulation(new SimulationContext(_agents));
+        return new Simulation(new SimulationContext(_agents, _callbacks));
     }
 }
