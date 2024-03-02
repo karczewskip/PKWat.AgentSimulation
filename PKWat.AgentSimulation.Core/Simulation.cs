@@ -2,14 +2,26 @@
 {
     public interface ISimulation
     {
-        void Start(Action act);
+        Task StartAsync();
     }
 
-    public class Simulation : ISimulation
+    internal class Simulation : ISimulation
     {
-        public void Start(Action act)
+        private readonly SimulationContext _context;
+
+        public Simulation(SimulationContext context)
         {
-            act();
+            _context = context;
+        }
+
+        public async Task StartAsync()
+        {
+            while (true)
+            {
+                await Parallel.ForEachAsync(
+                    _context.Agents, 
+                    (x, c) => new ValueTask(Task.Run( () => x.Act())));
+            }
         }
     }
 }
