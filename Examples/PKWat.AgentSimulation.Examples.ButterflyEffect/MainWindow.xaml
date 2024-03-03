@@ -12,7 +12,12 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
         <Button Grid.Row="0" Name="startSimulationButton" Content="Start Simulation" Click="startSimulationButton_Click" />
-        <Canvas Grid.Row="1" Name="simulationCanvas" Background="White" />
+        <Button Grid.Row="0" Grid.Column="1" Name="stopSimulationButton" Content="Stop Simulation" Click="stopSimulationButton_Click" />
+        <Canvas Grid.Row="1" Grid.ColumnSpan="2" Name="simulationCanvas" Background="White" />
     </Grid>
 </Window>

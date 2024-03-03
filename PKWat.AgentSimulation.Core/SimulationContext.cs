@@ -8,7 +8,7 @@ internal class SimulationContext
     {
         Agents = agents;
         Callbacks = callbacks;
-        WaitingTimeBetweenSteps = TimeSpan.FromMilliseconds(2);
+        WaitingTimeBetweenSteps = TimeSpan.FromMilliseconds(20);
     }
 
     public IReadOnlyList<IAgent> Agents { get; }

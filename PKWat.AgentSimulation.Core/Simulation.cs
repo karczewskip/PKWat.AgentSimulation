@@ -3,10 +3,13 @@
     public interface ISimulation
     {
         Task StartAsync();
+        Task StopAsync();
     }
 
     internal class Simulation : ISimulation
     {
+        private bool _stopped = false;
+
         private readonly SimulationContext _context;
 
         public Simulation(SimulationContext context)
@@ -16,7 +19,7 @@
 
         public async Task StartAsync()
         {
-            while (true)
+            while (_stopped is false)
             {
                 await Parallel.ForEachAsync(
                     _context.Agents, 
@@ -29,6 +32,11 @@
 
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
             }
+        }
+
+        public async Task StopAsync()
+        {
+            _stopped = true;
         }
     }
 }
