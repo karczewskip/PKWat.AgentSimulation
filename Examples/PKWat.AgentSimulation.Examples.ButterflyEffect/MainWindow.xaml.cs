@@ -11,15 +11,17 @@ public partial class MainWindow : Window
     private const int _radius = 400;
 
     private TranslateTransform _centerTransform;
-    private BouncingBall _ball;
+    private BouncingBall[] _bouncingBalls;
 
     private ISimulation _simulation;
 
     private readonly ISimulationBuilder _simulationBuilder;
+    private readonly ColorsGenerator _colorsGenerator;
 
-    public MainWindow(ISimulationBuilder simulationBuilder)
+    public MainWindow(ISimulationBuilder simulationBuilder, ColorsGenerator colorsGenerator)
     {
         _simulationBuilder = simulationBuilder;
+        _colorsGenerator = colorsGenerator;
 
         InitializeComponent();
     }
@@ -33,13 +35,20 @@ public partial class MainWindow : Window
         };
         simulationCanvas.Background = Brushes.Black;
 
-        _ball = new BouncingBall(100, 0, 1, 2, _radius);
+        int ballsCount = 100;
+
+        var colors = _colorsGenerator.Generate(ballsCount);
+        _bouncingBalls = Enumerable.Range(1, ballsCount).Select(x =>
+        {
+            var color = colors[x - 1];
+            return new BouncingBall(((ballsCount / 2 - x)*0.001) / ballsCount, -_radius/2, 10, 0, 0, _radius, 1, new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B)));
+        }).ToArray();
 
         _simulation
             = _simulationBuilder
                 .CreateNewSimulation()
-                .AddAgent(_ball)
-                .AddCallback(() => RenderAsync())
+                .AddAgents(_bouncingBalls)
+                .AddCallback(RenderAsync)
                 .Build();
 
         await _simulation.StartAsync();
@@ -55,62 +64,17 @@ public partial class MainWindow : Window
         await Application.Current.Dispatcher.InvokeAsync(() =>
         {
             var circle = CreateCircle(new Point(0,0) ,_radius, Brushes.White);
-            var ball = CreateCircle(new Point(_ball.X, _ball.Y), _ball.Radius, Brushes.Blue);
+            var balls = _bouncingBalls.Select(x => CreateCircle(new Point(x.X, x.Y), x.Radius, x.Brush));
             var center = CreateCircle(new Point(0, 0), 10, Brushes.Black);
-            var ballVelocity = new Line()
-            {
-                X1 = -_radius,
-                Y1 = _ball.VelocityDirection * (-_radius - _ball.X) + _ball.Y,
-                X2 = _radius,
-                Y2 = _ball.VelocityDirection * (_radius - _ball.X) + _ball.Y,
-                Stroke = Brushes.Green,
-                StrokeThickness = 1,
-                RenderTransform = _centerTransform
-            };
-            var normal = new Line()
-            {
-                X1 = -_radius,
-                Y1 = _ball.NormalDirection * (-_radius),
-                X2 = _radius,
-                Y2 = _ball.NormalDirection * _radius,
-                Stroke = Brushes.Blue,
-                StrokeThickness = 1,
-                RenderTransform = _centerTransform
-            };
-            var newDirection = Math.Tan(2* _ball.NormalRadian - _ball.VelocityRadian);
-            var newDirectionLine = new Line()
-            {
-                X1 = -_radius,
-                Y1 = newDirection * (-_radius - _ball.X) + _ball.Y,
-                X2 = _radius,
-                Y2 = newDirection * (_radius - _ball.X) + _ball.Y,
-                Stroke = Brushes.Red,
-                StrokeThickness = 1,
-                RenderTransform = _centerTransform
-            };
-            //var tangentDirection = -1 / normalDirection;
-            //var startTangentX = _ball.X - 50;
-            //var endTangentX = _ball.X + 50;
-            //var tangent = new Line()
-            //{
-            //    X1 = startTangentX,
-            //    Y1 = tangentDirection * (startTangentX - _ball.X) + _ball.Y,
-            //    X2 = endTangentX,
-            //    Y2 = tangentDirection * (endTangentX - _ball.X) + _ball.Y,
-            //    Stroke = Brushes.Red,
-            //    StrokeThickness = 1,
-            //    RenderTransform = _centerTransform
-            //};
 
             simulationCanvas.Children.Clear();
 
             simulationCanvas.Children.Add(circle);
-            simulationCanvas.Children.Add(ball);
-            simulationCanvas.Children.Add(center);
-            simulationCanvas.Children.Add(ballVelocity);
-            simulationCanvas.Children.Add(normal);
-            simulationCanvas.Children.Add(newDirectionLine);
-            //simulationCanvas.Children.Add(tangent);
+            foreach (var b in balls)
+            {
+                simulationCanvas.Children.Add(b);
+            }
+            //simulationCanvas.Children.Add(center);
         });
     }
 
@@ -143,19 +107,26 @@ public partial class MainWindow : Window
     private class BouncingBall : IAgent
     {
         private readonly double _maxDistanceFromCenter;
+        private readonly double _gravity;
 
         public BouncingBall(
             double startX,
             double startY,
+            double radius,
             double startDeltaX,
             double startDeltaY,
-            double maxDistanceFromCenter)
+            double maxDistanceFromCenter,
+            double gravity,
+            Brush brush)
         {
             X = startX;
             Y = startY;
+            Radius = radius;
             DeltaX = startDeltaX;
             DeltaY = startDeltaY;
+            Brush = brush;
             _maxDistanceFromCenter = maxDistanceFromCenter;
+            _gravity = gravity;
         }
 
         public double X { get; private set; } = 0;
@@ -165,6 +136,7 @@ public partial class MainWindow : Window
         public double DeltaY { get; private set; } = 1;
 
         public double Radius { get; private set; } = 10;
+        public Brush Brush { get; }
 
         public double VelocityRadian => Math.Atan2(DeltaY, DeltaX);
         public double VelocityDirection => Math.Tan(VelocityRadian);
@@ -173,6 +145,7 @@ public partial class MainWindow : Window
 
         public void Act()
         {
+            DeltaY += _gravity;
             var newX = X + DeltaX;
             var newY = Y + DeltaY;
             if(_maxDistanceFromCenter > Math.Sqrt(newX * newX + newY * newY) + Radius)
@@ -182,8 +155,6 @@ public partial class MainWindow : Window
             }
             else
             {
-                //double bouncingRadian = velocityRadian - normalRadian;
-                //double newDirectionRadian = normalRadian - bouncingRadian;
                 double newDirectionRadian = 2 * NormalRadian - VelocityRadian;
                 double speed = Math.Sqrt(DeltaX * DeltaX + DeltaY * DeltaY);
                 DeltaX = - Math.Cos(newDirectionRadian) * speed;

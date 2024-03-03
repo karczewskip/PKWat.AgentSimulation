@@ -3,6 +3,7 @@
 public interface ISimulationBuilderContext
 {
     ISimulationBuilderContext AddAgent(IAgent agent);
+    ISimulationBuilderContext AddAgents(IEnumerable<IAgent> agents);
     ISimulationBuilderContext AddCallback(Func<Task> callback);
     ISimulation Build();
 }
@@ -15,6 +16,13 @@ internal class SimulationBuilderContext : ISimulationBuilderContext
     public ISimulationBuilderContext AddAgent(IAgent agent)
     {
         _agents.Add(agent);
+
+        return this;
+    }
+
+    public ISimulationBuilderContext AddAgents(IEnumerable<IAgent> agents)
+    {
+        _agents.AddRange(agents);
 
         return this;
     }
