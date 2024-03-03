@@ -35,13 +35,21 @@ public partial class MainWindow : Window
         };
         simulationCanvas.Background = Brushes.Black;
 
-        int ballsCount = 100;
+        int ballsCount = 50;
 
         var colors = _colorsGenerator.Generate(ballsCount);
-        _bouncingBalls = Enumerable.Range(1, ballsCount).Select(x =>
+        _bouncingBalls = Enumerable.Range(0, ballsCount).Select(x =>
         {
-            var color = colors[x - 1];
-            return new BouncingBall(((ballsCount / 2 - x)*0.001) / ballsCount, -_radius/2, 10, 0, 0, _radius, 1, new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B)));
+            var color = colors[x];
+            var startX = ((ballsCount / 2 - x) * 0.00001) / ballsCount;
+            var radius = 10;
+            var startY = -(_radius - radius);
+            var startDeltaX = 0;
+            var startDeltaY = 0;
+            var maxDistanceFromTheCenter = _radius;
+            var gravity = 1;
+            var brush = new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B));
+            return new BouncingBall(startX, startY, radius, startDeltaX, startDeltaY, maxDistanceFromTheCenter, gravity, brush);
         }).ToArray();
 
         _simulation
@@ -49,6 +57,7 @@ public partial class MainWindow : Window
                 .CreateNewSimulation()
                 .AddAgents(_bouncingBalls)
                 .AddCallback(RenderAsync)
+                .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(16))
                 .Build();
 
         await _simulation.StartAsync();
