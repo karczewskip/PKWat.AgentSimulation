@@ -1,14 +1,15 @@
 ﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect;
 
 using PKWat.AgentSimulation.Core;
+using System.Diagnostics.Metrics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 public partial class MainWindow : Window
 {
     private const int _radius = 400;
+    private int counter = 0;
 
     private TranslateTransform _centerTransform;
     private BouncingBall[] _bouncingBalls;
@@ -17,25 +18,32 @@ public partial class MainWindow : Window
 
     private readonly ISimulationBuilder _simulationBuilder;
     private readonly ColorsGenerator _colorsGenerator;
+    private readonly PictureRenderer _pictureRenderer;
 
-    public MainWindow(ISimulationBuilder simulationBuilder, ColorsGenerator colorsGenerator)
+    public MainWindow(ISimulationBuilder simulationBuilder, ColorsGenerator colorsGenerator, PictureRenderer pictureRenderer)
     {
         _simulationBuilder = simulationBuilder;
         _colorsGenerator = colorsGenerator;
+        _pictureRenderer = pictureRenderer;
 
         InitializeComponent();
     }
 
     private async void startSimulationButton_Click(object sender, RoutedEventArgs e)
     {
-        _centerTransform = new TranslateTransform()
-        {
-            X = simulationCanvas.ActualWidth / 2,
-            Y = simulationCanvas.ActualHeight / 2
-        };
-        simulationCanvas.Background = Brushes.Black;
+        //_centerTransform = new TranslateTransform()
+        //{
+        //    X = simulationCanvas.ActualWidth / 2,
+        //    Y = simulationCanvas.ActualHeight / 2
+        //};
+        //simulationCanvas.Background = Brushes.Black;
+        //var bitmapImage = new BitmapImage();
+        //bitmapImage.SetValue()
+        //simulationImage.Source = new BitmapImage();
 
-        int ballsCount = 50;
+        //var bitmap = new Bitmap()
+
+        int ballsCount = 1000;
 
         var colors = _colorsGenerator.Generate(ballsCount);
         _bouncingBalls = Enumerable.Range(0, ballsCount).Select(x =>
@@ -70,21 +78,27 @@ public partial class MainWindow : Window
 
     private async Task RenderAsync()
     {
-        await Application.Current.Dispatcher.InvokeAsync(() =>
-        {
-            var circle = CreateCircle(new Point(0,0) ,_radius, Brushes.White);
-            var balls = _bouncingBalls.Select(x => CreateCircle(new Point(x.X, x.Y), x.Radius, x.Brush));
-            var center = CreateCircle(new Point(0, 0), 10, Brushes.Black);
+        simulationImage.Source = _pictureRenderer.Render(_radius, _bouncingBalls);
+        //counter = (counter + 1) % 4;
+        //if(counter == 0)
+        //{
+        //    simulationImage.Source = _pictureRenderer.Render(_radius, _bouncingBalls);
+        //}
+        //await Application.Current.Dispatcher.InvokeAsync(() =>
+        //{
+        //    var circle = CreateCircle(new Point(0,0) ,_radius, Brushes.White);
+        //    var balls = _bouncingBalls.Select(x => CreateCircle(new Point(x.X, x.Y), x.Radius, x.Brush));
+        //    var center = CreateCircle(new Point(0, 0), 10, Brushes.Black);
 
-            simulationCanvas.Children.Clear();
+        //    simulationCanvas.Children.Clear();
 
-            simulationCanvas.Children.Add(circle);
-            foreach (var b in balls)
-            {
-                simulationCanvas.Children.Add(b);
-            }
-            //simulationCanvas.Children.Add(center);
-        });
+        //    simulationCanvas.Children.Add(circle);
+        //    foreach (var b in balls)
+        //    {
+        //        simulationCanvas.Children.Add(b);
+        //    }
+        //    //simulationCanvas.Children.Add(center);
+        //});
     }
 
     private Path CreateCircle(Point center, double radius, Brush brush)
@@ -106,97 +120,10 @@ public partial class MainWindow : Window
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        _centerTransform = new TranslateTransform()
-        {
-            X = simulationCanvas.ActualWidth / 2,
-            Y = simulationCanvas.ActualHeight / 2
-        };
-    }
-
-    private class BouncingBall : IAgent
-    {
-        private readonly double _maxDistanceFromCenter;
-        private readonly double _gravity;
-
-        public BouncingBall(
-            double startX,
-            double startY,
-            double radius,
-            double startDeltaX,
-            double startDeltaY,
-            double maxDistanceFromCenter,
-            double gravity,
-            Brush brush)
-        {
-            X = startX;
-            Y = startY;
-            Radius = radius;
-            DeltaX = startDeltaX;
-            DeltaY = startDeltaY;
-            Brush = brush;
-            _maxDistanceFromCenter = maxDistanceFromCenter;
-            _gravity = gravity;
-        }
-
-        public double X { get; private set; } = 0;
-        public double Y { get; private set; } = 0;
-
-        public double DeltaX { get; private set; } = 0;
-        public double DeltaY { get; private set; } = 1;
-
-        public double Radius { get; private set; } = 10;
-        public Brush Brush { get; }
-
-        public double VelocityRadian => Math.Atan2(DeltaY, DeltaX);
-        public double VelocityDirection => Math.Tan(VelocityRadian);
-        public double NormalRadian => Math.Atan2(Y, X);
-        public double NormalDirection => Math.Tan(NormalRadian);
-
-        public void Act()
-        {
-            DeltaY += _gravity;
-            var newX = X + DeltaX;
-            var newY = Y + DeltaY;
-            if(_maxDistanceFromCenter > Math.Sqrt(newX * newX + newY * newY) + Radius)
-            {
-                X = newX;
-                Y = newY;
-            }
-            else
-            {
-                double newDirectionRadian = 2 * NormalRadian - VelocityRadian;
-                double speed = Math.Sqrt(DeltaX * DeltaX + DeltaY * DeltaY);
-                DeltaX = - Math.Cos(newDirectionRadian) * speed;
-                DeltaY = - Math.Sin(newDirectionRadian) * speed;
-            }
-        }
-    }
-
-    private class MovingRectangleAgent : IAgent
-    {
-        private int _counter = 0;
-        private readonly Canvas _canvas;
-
-        public MovingRectangleAgent(Canvas canvas)
-        {
-            _canvas = canvas;
-        }
-
-        public void Act()
-        {
-            _counter = (_counter + 1) % 100;
-            Application.Current.Dispatcher.Invoke(() => {
-                var movingRectangle = new Polygon();
-                movingRectangle.Points.Add(new Point(_counter, _counter));
-                movingRectangle.Points.Add(new Point(_counter + 10, _counter));
-                movingRectangle.Points.Add(new Point(_counter + 10, _counter + 10));
-                movingRectangle.Points.Add(new Point(_counter, _counter + 10));
-                movingRectangle.Fill = Brushes.Blue;
-
-                _canvas.Children.Clear();
-
-                _canvas.Children.Add(movingRectangle);
-            });
-        }
+        //_centerTransform = new TranslateTransform()
+        //{
+        //    X = simulationCanvas.ActualWidth / 2,
+        //    Y = simulationCanvas.ActualHeight / 2
+        //};
     }
 }

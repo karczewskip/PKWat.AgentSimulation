@@ -14,7 +14,7 @@
     {
         public Color[] Generate(int count)
         {
-            var step = 360 / count;
+            var step = 360f / count;
             return Enumerable.Range(0, count).Select(x => FromAhsb(255, x*step, 1, 0.5f)).ToArray();
         }
 

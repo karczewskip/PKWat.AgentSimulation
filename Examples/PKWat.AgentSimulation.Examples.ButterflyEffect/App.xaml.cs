@@ -16,6 +16,7 @@ public partial class App : Application
             {
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<ColorsGenerator>();
+                services.AddSingleton<PictureRenderer>();
                 services.AddAgentSimulation();
             })
             .Build();

@@ -27,7 +27,7 @@
 
                 foreach (var callback in _context.Callbacks)
                 {
-                    await callback();
+                    callback();
                 }
 
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
