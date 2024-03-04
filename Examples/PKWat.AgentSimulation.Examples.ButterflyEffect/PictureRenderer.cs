@@ -1,5 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect
 {
+    using System.Drawing;
     using System.Reflection;
     using System.Windows;
     using System.Windows.Media;
@@ -7,39 +8,68 @@
 
     public class PictureRenderer
     {
-        public RenderTargetBitmap Render(double radius, BouncingBall[] bouncingBalls)
-        {
-            var imageSize = (int)radius * 2;
+        private int _imageSize;
+        private double _radius;
+        private DrawingVisual _drawingVisual = new DrawingVisual();
+        private DrawingContext _drawingContext;
+        private System.Drawing.Bitmap _bmp;
+        private Graphics g;
 
-            DrawingVisual drawingVisual = new DrawingVisual();
-            drawingVisual.Transform = new TranslateTransform()
+        public void Initialize(double radius)
+        {
+            _imageSize = (int)radius * 2;
+            _radius = radius;
+
+            _drawingVisual.Transform = new TranslateTransform()
             {
                 X = radius,
                 Y = radius
             };
-            using DrawingContext drawingContext = drawingVisual.RenderOpen();
+            _bmp = new System.Drawing.Bitmap(
+                _imageSize,
+                _imageSize
+            );
+            g = Graphics.FromImage(_bmp);
+            _drawingContext = _drawingVisual.RenderOpen();
+        }
 
-            drawingContext.DrawEllipse(Brushes.White, new Pen(Brushes.White, 1), new Point(0,0), radius, radius);
-
-            var pen = new Pen(Brushes.White, 0);
+        public BitmapSource Render(BouncingBall[] bouncingBalls)
+        {
+            g.FillEllipse(System.Drawing.Brushes.White, new Rectangle(0, 0, _imageSize, _imageSize));
 
             foreach (var b in bouncingBalls)
             {
-                drawingContext.DrawEllipse(b.Brush, null, new Point(b.X, b.Y), b.Radius, b.Radius);
+                g.FillEllipse(System.Drawing.Brushes.Red, (float)(_radius + b.X), (float)(_radius + b.Y), (float)b.Radius, (float)b.Radius);
+                //_drawingContext.DrawEllipse(b.Brush, null, new Point(b.X, b.Y), b.Radius, b.Radius);
             }
 
-            drawingContext.Close();
+            System.Windows.Media.Imaging.BitmapSource bitmapSource =
+              System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+              _bmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
+              System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
 
-            var dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
-            var dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
+            return bitmapSource;
 
-            var dpiX = (int)dpiXProperty.GetValue(null, null);
-            var dpiY = (int)dpiYProperty.GetValue(null, null);
+            //_drawingContext = _drawingVisual.RenderOpen();
+            //_drawingContext.DrawEllipse(Brushes.White, null, new Point(0,0), _radius, _radius);
 
-            RenderTargetBitmap bmp = new RenderTargetBitmap(imageSize, imageSize, dpiX, dpiY, PixelFormats.Pbgra32);
-            bmp.Render(drawingVisual);
+            //foreach (var b in bouncingBalls)
+            //{
+            //    _drawingContext.DrawEllipse(b.Brush, null, new Point(b.X, b.Y), b.Radius, b.Radius);
+            //}
 
-            return bmp;
+            //var dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
+            //var dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
+
+            //var dpiX = (int)dpiXProperty.GetValue(null, null);
+            //var dpiY = (int)dpiYProperty.GetValue(null, null);
+
+            //_bmp.Clear();
+            //_bmp.Render(_drawingVisual);
+            //writableBitmap.
+            //_drawingContext.Close();
+
+            //return _bmp;
         }
     }
 }

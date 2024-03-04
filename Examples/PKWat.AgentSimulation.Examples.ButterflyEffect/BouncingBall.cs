@@ -44,24 +44,30 @@ public class BouncingBall : IAgent
     public double NormalRadian => Math.Atan2(Y, X);
     public double NormalDirection => Math.Tan(NormalRadian);
 
+    private double _distanceFromCenter;
+    private double _distanceExceeded;
+    private double _previousVelocityRadian;
+    private double _newDirectionRadian;
+    private double _speed;
+
     public void Act()
     {
         DeltaY += _gravity;
         X = X + DeltaX;
         Y = Y + DeltaY;
-        var distanceFromCenter = Math.Sqrt(X * X + Y * Y);
-        var distanceExceeded = distanceFromCenter + Radius - _maxDistanceFromCenter;
+        _distanceFromCenter = Math.Sqrt(X * X + Y * Y);
+        _distanceExceeded = _distanceFromCenter + Radius - _maxDistanceFromCenter;
 
-        if (distanceExceeded > 0)
+        if (_distanceExceeded > 0)
         {
-            var previousVelocityRadian = VelocityRadian;
-            double newDirectionRadian = 2 * NormalRadian - VelocityRadian;
-            double speed = Math.Sqrt(DeltaX * DeltaX + DeltaY * DeltaY);
-            DeltaX = -Math.Cos(newDirectionRadian) * speed;
-            DeltaY = -Math.Sin(newDirectionRadian) * speed;
+            _previousVelocityRadian = VelocityRadian;
+            _newDirectionRadian = 2 * NormalRadian - _previousVelocityRadian;
+            _speed = Math.Sqrt(DeltaX * DeltaX + DeltaY * DeltaY);
+            DeltaX = -Math.Cos(_newDirectionRadian) * _speed;
+            DeltaY = -Math.Sin(_newDirectionRadian) * _speed;
 
-            X = X - distanceExceeded * (Math.Cos(previousVelocityRadian) + Math.Cos(newDirectionRadian));
-            Y = Y - distanceExceeded * (Math.Sin(previousVelocityRadian) + Math.Sin(newDirectionRadian));
+            X = X - _distanceExceeded * (Math.Cos(_previousVelocityRadian) + Math.Cos(_newDirectionRadian));
+            Y = Y - _distanceExceeded * (Math.Sin(_previousVelocityRadian) + Math.Sin(_newDirectionRadian));
 
             //var ek = 0.5 * speed * speed;
             //var ep = _gravity * (_maxDistanceFromCenter - Y);
