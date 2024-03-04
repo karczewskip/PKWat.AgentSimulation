@@ -1,6 +1,8 @@
 ﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect;
 
 using PKWat.AgentSimulation.Core;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Media;
 
 public class BouncingBall : IAgent
@@ -45,19 +47,26 @@ public class BouncingBall : IAgent
     public void Act()
     {
         DeltaY += _gravity;
-        var newX = X + DeltaX;
-        var newY = Y + DeltaY;
-        if (_maxDistanceFromCenter > Math.Sqrt(newX * newX + newY * newY) + Radius)
+        X = X + DeltaX;
+        Y = Y + DeltaY;
+        var distanceFromCenter = Math.Sqrt(X * X + Y * Y);
+        var distanceExceeded = distanceFromCenter + Radius - _maxDistanceFromCenter;
+
+        if (distanceExceeded > 0)
         {
-            X = newX;
-            Y = newY;
-        }
-        else
-        {
+            var previousVelocityRadian = VelocityRadian;
             double newDirectionRadian = 2 * NormalRadian - VelocityRadian;
             double speed = Math.Sqrt(DeltaX * DeltaX + DeltaY * DeltaY);
             DeltaX = -Math.Cos(newDirectionRadian) * speed;
             DeltaY = -Math.Sin(newDirectionRadian) * speed;
+
+            X = X - distanceExceeded * (Math.Cos(previousVelocityRadian) + Math.Cos(newDirectionRadian));
+            Y = Y - distanceExceeded * (Math.Sin(previousVelocityRadian) + Math.Sin(newDirectionRadian));
+
+            //var ek = 0.5 * speed * speed;
+            //var ep = _gravity * (_maxDistanceFromCenter - Y);
+            //var et = ek + ep;
+            //Debug.WriteLine($"Bounced with speed {speed}, energy: {et} = {ek} + {ep}");
         }
     }
 }

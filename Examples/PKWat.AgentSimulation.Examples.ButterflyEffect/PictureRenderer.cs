@@ -27,19 +27,28 @@
             var imageSize = (int)radius * 2;
 
             DrawingVisual drawingVisual = new DrawingVisual();
+            drawingVisual.Transform = new TranslateTransform()
+            {
+                X = radius,
+                Y = radius
+            };
             using DrawingContext drawingContext = drawingVisual.RenderOpen();
 
-            drawingContext.DrawRectangle(Brushes.Black, new Pen(Brushes.Black, 1), new Rect(new Size(imageSize, imageSize)));
-            drawingContext.DrawEllipse(Brushes.White, new Pen(Brushes.White, 1), new Point(radius, radius), radius, radius);
+            //drawingContext.DrawRectangle(Brushes.Black, new Pen(Brushes.Black, 1), new Rect(new Point(-radius, -radius),new Size(imageSize, imageSize)));
+            drawingContext.DrawEllipse(Brushes.Black, new Pen(Brushes.White, 1), new Point(0,0), radius, radius);
+
+            var pen = new Pen(Brushes.White, 0);
 
             foreach (var b in bouncingBalls)
             {
-                drawingContext.DrawEllipse(b.Brush, new Pen(b.Brush, 1), new Point(radius + b.X, radius + b.Y), b.Radius, b.Radius);
+                drawingContext.DrawEllipse(b.Brush, null, new Point(b.X, b.Y), b.Radius, b.Radius);
+                //drawingContext.DrawGeometry(b.Brush, null, b.EllipseGeometry);
             }
+
 
             drawingContext.Close();
 
-            RenderTargetBitmap bmp = new RenderTargetBitmap(imageSize, imageSize, 100, 100, PixelFormats.Pbgra32);
+            RenderTargetBitmap bmp = new RenderTargetBitmap(imageSize, imageSize, 75, 75, PixelFormats.Pbgra32);
             bmp.Render(drawingVisual);
 
             return bmp;
