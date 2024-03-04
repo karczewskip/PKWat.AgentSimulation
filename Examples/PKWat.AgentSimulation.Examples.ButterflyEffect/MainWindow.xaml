@@ -18,6 +18,10 @@
         </Grid.ColumnDefinitions>
         <Button Grid.Row="0" Name="startSimulationButton" Content="Start Simulation" Click="startSimulationButton_Click" />
         <Button Grid.Row="0" Grid.Column="1" Name="stopSimulationButton" Content="Stop Simulation" Click="stopSimulationButton_Click" />
-        <Image Grid.Row="1" Grid.ColumnSpan="2" Name="simulationImage" />
+        <Grid Grid.Row="1" Grid.ColumnSpan="2"  Background="Black">
+            <Border  Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Top"  BorderBrush="White" BorderThickness="2" >
+                <Image Name="simulationImage" Stretch="Uniform" />
+            </Border>
+        </Grid>
     </Grid>
 </Window>
