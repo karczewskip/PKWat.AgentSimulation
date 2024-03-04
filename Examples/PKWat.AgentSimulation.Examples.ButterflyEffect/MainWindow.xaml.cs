@@ -38,7 +38,7 @@ public partial class MainWindow : Window
         {
             var color = colors[x];
             var startX = ((ballsCount / 2 - x) * 0.00001) / ballsCount;
-            var radius = (1 + random.NextDouble())*5;
+            var radius = (1 + random.NextDouble())*10;
             var startY = -(_radius/2);
             var startDeltaX = 0;
             var startDeltaY = 0;
