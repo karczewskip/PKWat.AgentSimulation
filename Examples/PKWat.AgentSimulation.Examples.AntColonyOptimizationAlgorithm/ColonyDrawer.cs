@@ -8,6 +8,7 @@
     public class ColonyDrawer
     {
         private const int AntSize = 10;
+        private const int AntHillSize = 20;
 
         private Bitmap _bmp;
 
@@ -26,6 +27,9 @@
             {
                 graphic.FillEllipse(Brushes.Red, ant.Coordinates.X, ant.Coordinates.Y, AntSize, AntSize);
             }
+
+            var anthillCoordinates = context.SimulationEnvironment.AntHill.Coordinates;
+            graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), anthillCoordinates.X, anthillCoordinates.Y, AntHillSize, AntHillSize);
 
             return _bmp.ConvertToBitmapSource();
         }

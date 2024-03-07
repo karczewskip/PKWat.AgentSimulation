@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public interface ISimulationContext<U>
 {
+    U SimulationEnvironment { get; }
     IEnumerable<T> GetAgents<T>() where T : IAgent<U>;
 }
 
