@@ -1,6 +1,8 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm
 {
+    using PKWat.AgentSimulation.Core;
     using System.Text;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
@@ -16,26 +18,50 @@
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ISimulation _simulation;
+
+        private readonly ISimulationBuilder _simulationBuilder;
         private readonly ColonyDrawer _colonyDrawer;
 
-        public MainWindow(ColonyDrawer colonyDrawer)
+        public MainWindow(ISimulationBuilder simulationBuilder, ColonyDrawer colonyDrawer)
         {
+            _simulationBuilder = simulationBuilder;
             _colonyDrawer = colonyDrawer;
+            _colonyDrawer.Initialize(500, 500);
 
             InitializeComponent();
         }
 
-        private void startSimulationButton_Click(object sender, RoutedEventArgs e)
+        private async void startSimulationButton_Click(object sender, RoutedEventArgs e)
         {
-            var ants = Enumerable.Range(0, 10).Select(x => new Ant(x * 10, x * 20)).ToArray();
-            _colonyDrawer.Initialize(500, 500);
+            if(_simulation?.Running ?? false)
+            {
+                await _simulation.StopAsync();
+            }
+
+            _simulation = _simulationBuilder
+                .CreateNewSimulation()
+                .AddAgents(Enumerable.Range(0, 10).Select(x => new Ant(x * 10, x * 20)).ToArray())
+                .AddCallback(RenderAsync)
+                .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
+                .Build();
+
+            await _simulation.StartAsync();
+        }
+
+        private async Task RenderAsync(ISimulationContext context)
+        {
+            var ants = context.GetAgents<Ant>().ToArray();
 
             simulationImage.Source = _colonyDrawer.Draw(ants);
         }
 
-        private void stopSimulationButton_Click(object sender, RoutedEventArgs e)
+        private async void stopSimulationButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (_simulation?.Running ?? false)
+            {
+                await _simulation.StopAsync();
+            }
         }
     }
 }

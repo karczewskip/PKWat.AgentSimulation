@@ -2,33 +2,39 @@
 {
     public interface ISimulation
     {
+        public bool Running { get; }
+
         Task StartAsync();
         Task StopAsync();
     }
 
     internal class Simulation : ISimulation
     {
-        private bool _stopped = false;
-
         private readonly SimulationContext _context;
+        private readonly IReadOnlyList<Func<SimulationContext, Task>> _callbacks;
 
-        public Simulation(SimulationContext context)
+        public bool Running { get; private set; } = false;
+
+        public Simulation(SimulationContext context, IReadOnlyList<Func<SimulationContext,Task>> callbacks)
         {
             _context = context;
+            _callbacks = callbacks;
         }
 
         public async Task StartAsync()
         {
-            while (_stopped is false)
+            Running = true;
+
+            while (Running)
             {
                 await Parallel.ForEachAsync(
                     _context.Agents, 
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
                     (x, c) => new ValueTask(Task.Run( () => x.Act())));
 
-                foreach (var callback in _context.Callbacks)
+                foreach (var callback in _callbacks)
                 {
-                    await callback();
+                    await callback(_context);
                 }
 
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
@@ -37,7 +43,7 @@
 
         public async Task StopAsync()
         {
-            _stopped = true;
+            Running = false;
         }
     }
 }

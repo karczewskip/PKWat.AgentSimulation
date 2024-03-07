@@ -19,6 +19,7 @@
         public BitmapSource Draw(Ant[] ants)
         {
             using var graphic = Graphics.FromImage(_bmp);
+            graphic.Clear(Color.White);
 
             foreach (Ant ant in ants)
             {

@@ -11,7 +11,6 @@ public partial class MainWindow : Window
     private const int _radius = 400;
 
     private TranslateTransform _centerTransform;
-    private BouncingBall[] _bouncingBalls;
 
     private ISimulation _simulation;
 
@@ -34,7 +33,7 @@ public partial class MainWindow : Window
         var random = new Random();
 
         var colors = _colorsGenerator.Generate(ballsCount);
-        _bouncingBalls = Enumerable.Range(0, ballsCount).Select(x =>
+        var bouncingBalls = Enumerable.Range(0, ballsCount).Select(x =>
         {
             var color = colors[x];
             var startX = ((ballsCount / 2 - x) * 0.00001) / ballsCount;
@@ -51,7 +50,7 @@ public partial class MainWindow : Window
         _simulation
             = _simulationBuilder
                 .CreateNewSimulation()
-                .AddAgents(_bouncingBalls)
+                .AddAgents(bouncingBalls)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
                 .Build();
@@ -64,9 +63,11 @@ public partial class MainWindow : Window
         await _simulation.StopAsync();
     }
 
-    private async Task RenderAsync()
+    private async Task RenderAsync(ISimulationContext simulationContext)
     {
-        simulationImage.Source = _pictureRenderer.Render(_radius, _bouncingBalls);
+        var bouncingBalls = simulationContext.GetAgents<BouncingBall>().ToArray();
+
+        simulationImage.Source = _pictureRenderer.Render(_radius, bouncingBalls);
     }
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)

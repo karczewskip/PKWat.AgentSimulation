@@ -17,6 +17,6 @@ public class Ant : IAgent
 
     public void Act()
     {
-        throw new NotImplementedException();
+        X++;
     }
 }
