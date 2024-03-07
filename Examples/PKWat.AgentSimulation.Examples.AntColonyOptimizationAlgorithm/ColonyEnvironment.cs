@@ -21,6 +21,11 @@
             return coordinates.X >= 0 && coordinates.X < Width && coordinates.Y >= 0 && coordinates.Y < Height;
         }
 
+        public bool IsOutOfBounds(ColonyCoordinates coordinates)
+        {
+            return !IsInBounds(coordinates);
+        }
+
         public bool IsObstacleAt(double x, double y)
         {
             throw new NotImplementedException();
