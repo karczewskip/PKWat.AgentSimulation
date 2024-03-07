@@ -2,6 +2,7 @@
 {
     using System.Drawing;
     using System.Windows.Media.Imaging;
+    using PKWat.AgentSimulation.Core;
     using PKWat.AgentSimulation.Drawing;
 
     public class ColonyDrawer
@@ -16,14 +17,14 @@
             _bmp.SetResolution(96, 96);
         }
 
-        public BitmapSource Draw(Ant[] ants)
+        public BitmapSource Draw(ISimulationContext<ColonyEnvironment> context)
         {
             using var graphic = Graphics.FromImage(_bmp);
             graphic.Clear(Color.White);
 
-            foreach (Ant ant in ants)
+            foreach (Ant ant in context.GetAgents<Ant>())
             {
-                graphic.FillEllipse(System.Drawing.Brushes.Red, (float)ant.X, (float)ant.Y, AntSize, AntSize);
+                graphic.FillEllipse(Brushes.Red, ant.Coordinates.X, ant.Coordinates.Y, AntSize, AntSize);
             }
 
             return _bmp.ConvertToBitmapSource();

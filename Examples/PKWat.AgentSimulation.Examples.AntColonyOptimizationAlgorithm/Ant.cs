@@ -5,37 +5,34 @@ using System;
 
 public class Ant : IAgent<ColonyEnvironment>
 {
-    private double _nextX;
-    private double _nextY;
+    private ColonyCoordinates _nextCoordinates;
 
-    public double X { get; private set; }
-    public double Y { get; private set; }
+    public ColonyCoordinates Coordinates { get; private set; }
     public bool IsCarryingFood { get; private set; } = false;
 
-    public Ant(double startX, double startY)
+    public Ant(ColonyCoordinates coordinates)
     {
-        X = startX;
-        Y = startY;
+        Coordinates = coordinates;
     }
 
     public void Decide(ColonyEnvironment simulationEnvironment)
     {
-        if(simulationEnvironment.IsInBounds(X+1, Y))
+        if(simulationEnvironment.IsInBounds(_nextCoordinates = Coordinates with { X = Coordinates.X + 1} ))
         {
-            _nextX = X + 1;
-            _nextY = Y;
+            return;
         }
-        else if(simulationEnvironment.IsInBounds(X,Y + 1))
+
+        if(simulationEnvironment.IsInBounds(_nextCoordinates = Coordinates with { Y = Coordinates.Y + 1 }))
         {
-            _nextX = X;
-            _nextY = Y + 1;
+            return;
         }
+
+        _nextCoordinates = Coordinates;
     }
 
     public void Act()
     {
-        X = _nextX;
-        Y = _nextY;
+        Coordinates = _nextCoordinates;
     }
 
 }

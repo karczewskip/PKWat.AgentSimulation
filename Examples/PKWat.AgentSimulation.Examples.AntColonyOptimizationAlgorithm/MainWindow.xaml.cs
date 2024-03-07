@@ -40,8 +40,8 @@
             }
 
             _simulation = _simulationBuilder
-                .CreateNewSimulation(new ColonyEnvironment(500, 500))
-                .AddAgents(Enumerable.Range(0, 10).Select(x => new Ant(x * 10, x * 20)).ToArray())
+                .CreateNewSimulation(new ColonyEnvironment(500, 500, new AntHill(new ColonyCoordinates(100, 100))))
+                .AddAgents(Enumerable.Range(0, 10).Select(x => new Ant(new ColonyCoordinates(x * 10, x * 20))).ToArray())
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
                 .Build();
@@ -49,12 +49,8 @@
             await _simulation.StartAsync();
         }
 
-        private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context)
-        {
-            var ants = context.GetAgents<Ant>().ToArray();
-
-            simulationImage.Source = _colonyDrawer.Draw(ants);
-        }
+        private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context) 
+            => simulationImage.Source = _colonyDrawer.Draw(context);
 
         private async void stopSimulationButton_Click(object sender, RoutedEventArgs e)
         {
