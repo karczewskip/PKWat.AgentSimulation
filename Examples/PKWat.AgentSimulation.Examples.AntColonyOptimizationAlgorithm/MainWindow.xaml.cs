@@ -16,9 +16,26 @@
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        private readonly ColonyDrawer _colonyDrawer;
+
+        public MainWindow(ColonyDrawer colonyDrawer)
         {
+            _colonyDrawer = colonyDrawer;
+
             InitializeComponent();
+        }
+
+        private void startSimulationButton_Click(object sender, RoutedEventArgs e)
+        {
+            var ants = Enumerable.Range(0, 10).Select(x => new Ant(x * 10, x * 20)).ToArray();
+            _colonyDrawer.Initialize(500, 500);
+
+            simulationImage.Source = _colonyDrawer.Draw(ants);
+        }
+
+        private void stopSimulationButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

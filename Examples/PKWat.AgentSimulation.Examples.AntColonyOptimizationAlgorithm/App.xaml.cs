@@ -20,6 +20,7 @@
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<MainWindow>();
+                    services.AddTransient<ColonyDrawer>();
                     services.AddAgentSimulation();
                 })
                 .Build();
