@@ -41,15 +41,35 @@
 
             _simulation = _simulationBuilder
                 .CreateNewSimulation(new ColonyEnvironment(500, 500, new AntHill(new ColonyCoordinates(100, 100))))
-                .AddAgents(Enumerable.Range(0, 10).Select(x => new Ant(new ColonyCoordinates(x * 10, x * 20))).ToArray())
+                .AddAgents(Enumerable.Range(0, 100).Select(x => new Ant()).ToArray())
+                .AddEnvironmentUpdates(DecreasePheromones)
+                .AddEnvironmentUpdates(AddPheromones)
                 .AddCallback(RenderAsync)
-                .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
+                .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
                 .Build();
 
             await _simulation.StartAsync();
         }
 
-        private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context) 
+        private async Task DecreasePheromones(ISimulationContext<ColonyEnvironment> context)
+        {
+            context.SimulationEnvironment.DecreasePheromones();
+        }
+
+        private async Task AddPheromones(ISimulationContext<ColonyEnvironment> context)
+        {
+            var ants = context.GetAgents<Ant>();
+
+            foreach (var ant in ants)
+            {
+                if(ant.Coordinates is not null)
+                {
+                    context.SimulationEnvironment.AddPheromone(ant.Coordinates);
+                }
+            }
+        }
+
+        private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context)
             => simulationImage.Source = _colonyDrawer.Draw(context);
 
         private async void stopSimulationButton_Click(object sender, RoutedEventArgs e)

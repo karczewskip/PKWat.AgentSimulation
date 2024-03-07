@@ -3,5 +3,5 @@
 public interface IAgent<T>
 {
     void Decide(T simulationEnvironment);
-    void Act();
+    void Act(T simulationEnvironment);
 }

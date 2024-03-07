@@ -54,7 +54,7 @@ public class BouncingBall : IAgent<BouncingBallBulb>
         throw new NotImplementedException();
     }
 
-    public void Act()
+    public void Act(BouncingBallBulb simulationEnvironment)
     {
         DeltaY += _gravity;
         X = X + DeltaX;

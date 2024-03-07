@@ -4,12 +4,15 @@
 
     public class ColonyEnvironment
     {
-        public double Width { get; }
-        public double Height { get; }
+        private Dictionary<ColonyCoordinates, double> _pheromones = new Dictionary<ColonyCoordinates, double>();
+
+        public int Width { get; }
+        public int Height { get; }
+        public IReadOnlyDictionary<ColonyCoordinates, double> Pheromones => _pheromones;
 
         public AntHill AntHill { get; }
 
-        public ColonyEnvironment(double width, double height, AntHill antHill)
+        public ColonyEnvironment(int width, int height, AntHill antHill)
         {
             Width = width;
             Height = height;
@@ -24,6 +27,36 @@
         public bool IsOutOfBounds(ColonyCoordinates coordinates)
         {
             return !IsInBounds(coordinates);
+        }
+
+        public void AddPheromone(ColonyCoordinates coordinates)
+        {
+            var update = 1;// 1.0 / numberOfMoves;
+
+            if(_pheromones.ContainsKey(coordinates))
+            {
+                _pheromones[coordinates] += update;
+            }
+            else
+            {
+                _pheromones.Add(coordinates, update);
+            }
+        }
+
+        internal void DecreasePheromones()
+        {
+            foreach (var pheromone in _pheromones)
+            {
+                _pheromones[pheromone.Key] -= 0.01;
+            }
+
+            foreach (var pheromone in _pheromones)
+            {
+                if(pheromone.Value < 0.0001)
+                {
+                    _pheromones.Remove(pheromone.Key);
+                }
+            }
         }
 
         public bool IsObstacleAt(double x, double y)
@@ -46,17 +79,7 @@
             throw new NotImplementedException();
         }
 
-        public void AddPheromone(double x, double y)
-        {
-            throw new NotImplementedException();
-        }
-
         public void RemovePheromone(double x, double y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsPheromoneAt(double x, double y)
         {
             throw new NotImplementedException();
         }

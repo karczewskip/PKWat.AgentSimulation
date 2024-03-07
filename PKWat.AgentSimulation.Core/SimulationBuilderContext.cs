@@ -4,6 +4,7 @@ public interface ISimulationBuilderContext<T>
 {
     ISimulationBuilderContext<T> AddAgent(IAgent<T> agent);
     ISimulationBuilderContext<T> AddAgents(IEnumerable<IAgent<T>> agents);
+    ISimulationBuilderContext<T> AddEnvironmentUpdates(Func<ISimulationContext<T>, Task> update);
     ISimulationBuilderContext<T> AddCallback(Func<ISimulationContext<T>, Task> callback);
     ISimulationBuilderContext<T> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
 
@@ -15,6 +16,7 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
     private readonly T _simulationEnvironment;
 
     private List<IAgent<T>> _agents = new();
+    private List<Func<ISimulationContext<T>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<T>, Task>> _callbacks = new();
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
 
@@ -37,6 +39,13 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
         return this;
     }
 
+    public ISimulationBuilderContext<T> AddEnvironmentUpdates(Func<ISimulationContext<T>, Task> update)
+    {
+        _environmentUpdates.Add(update);
+
+        return this;
+    }
+
     public ISimulationBuilderContext<T> AddCallback(Func<ISimulationContext<T>, Task> callback)
     {
         _callbacks.Add(callback);
@@ -53,6 +62,6 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
 
     public ISimulation Build()
     {
-        return new Simulation<T>(new SimulationContext<T>(_simulationEnvironment ,_agents, _waitingTimeBetweenSteps), _callbacks);
+        return new Simulation<T>(new SimulationContext<T>(_simulationEnvironment ,_agents, _waitingTimeBetweenSteps), _environmentUpdates, _callbacks);
     }
 }

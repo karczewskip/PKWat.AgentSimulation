@@ -23,6 +23,13 @@
             using var graphic = Graphics.FromImage(_bmp);
             graphic.Clear(Color.White);
 
+            foreach(var pheromone in context.SimulationEnvironment.Pheromones)
+            {
+                var value = (int)((pheromone.Value <= 1 ? pheromone.Value : 1) * 255);
+                var color = Color.FromArgb(value, 0, 255, 0);
+                graphic.FillRectangle(new SolidBrush(color), pheromone.Key.X, pheromone.Key.Y, 1, 1);
+            }
+
             foreach (Ant ant in context.GetAgents<Ant>())
             {
                 graphic.FillEllipse(Brushes.Red, ant.Coordinates.X, ant.Coordinates.Y, AntSize, AntSize);
