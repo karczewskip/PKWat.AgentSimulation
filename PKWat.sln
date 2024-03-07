@@ -5,9 +5,11 @@ VisualStudioVersion = 17.9.34616.47
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{1B211E5A-54B5-479F-8F95-6DE60C9155F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.ButterflyEffect", "Examples\PKWat.AgentSimulation.Examples.ButterflyEffect\PKWat.AgentSimulation.Examples.ButterflyEffect.csproj", "{370C45EA-1760-4AF6-952E-8BC077378A8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Examples.ButterflyEffect", "Examples\PKWat.AgentSimulation.Examples.ButterflyEffect\PKWat.AgentSimulation.Examples.ButterflyEffect.csproj", "{370C45EA-1760-4AF6-952E-8BC077378A8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Core", "PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj", "{8BF9D0A0-AA86-43AE-AFA3-D0BF4387440C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Core", "PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj", "{8BF9D0A0-AA86-43AE-AFA3-D0BF4387440C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm", "Examples\PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm\PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.csproj", "{F6C13B9F-29D3-4EBB-A26C-836D39F8157A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,12 +25,17 @@ Global
 		{8BF9D0A0-AA86-43AE-AFA3-D0BF4387440C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BF9D0A0-AA86-43AE-AFA3-D0BF4387440C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BF9D0A0-AA86-43AE-AFA3-D0BF4387440C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6C13B9F-29D3-4EBB-A26C-836D39F8157A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6C13B9F-29D3-4EBB-A26C-836D39F8157A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6C13B9F-29D3-4EBB-A26C-836D39F8157A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6C13B9F-29D3-4EBB-A26C-836D39F8157A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{370C45EA-1760-4AF6-952E-8BC077378A8A} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
+		{F6C13B9F-29D3-4EBB-A26C-836D39F8157A} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADF5998-4CDB-4A6B-B457-52B27C507580}
