@@ -38,6 +38,10 @@
             var anthillCoordinates = context.SimulationEnvironment.AntHill.Coordinates;
             graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), anthillCoordinates.X, anthillCoordinates.Y, AntHillSize, AntHillSize);
 
+
+            var foodSourceCoordinates = context.SimulationEnvironment.FoodSource.Coordinates;
+            graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 255, 255, 0)), foodSourceCoordinates.X, foodSourceCoordinates.Y, AntHillSize, AntHillSize);
+
             return _bmp.ConvertToBitmapSource();
         }
     }

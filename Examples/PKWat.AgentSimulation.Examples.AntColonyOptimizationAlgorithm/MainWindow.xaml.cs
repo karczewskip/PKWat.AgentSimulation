@@ -40,7 +40,7 @@
             }
 
             _simulation = _simulationBuilder
-                .CreateNewSimulation(new ColonyEnvironment(500, 500, new AntHill(new ColonyCoordinates(100, 100))))
+                .CreateNewSimulation(new ColonyEnvironment(500, 500, new AntHill(new ColonyCoordinates(100, 100)), new FoodSource(new ColonyCoordinates(300, 300))))
                 .AddAgents(Enumerable.Range(0, 100).Select(x => new Ant()).ToArray())
                 .AddEnvironmentUpdates(DecreasePheromones)
                 .AddEnvironmentUpdates(AddPheromones)

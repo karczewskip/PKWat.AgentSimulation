@@ -6,6 +6,8 @@ using System.Collections;
 
 public class Ant : IAgent<ColonyEnvironment>
 {
+    private const int MaxPossibleStep = 20;
+
     private HashSet<ColonyCoordinates> _visitedCoordinates = new HashSet<ColonyCoordinates>();
     private Stack<ColonyCoordinates> _path = new Stack<ColonyCoordinates>();
 
@@ -27,6 +29,7 @@ public class Ant : IAgent<ColonyEnvironment>
         if(PathLength == 0) 
         {
             IsComingHome = false;
+            IsCarryingFood = false;
         }
 
         if(Coordinates == null)
@@ -39,7 +42,17 @@ public class Ant : IAgent<ColonyEnvironment>
         }
         else
         {
-            _nextCoordinates = ChooseDirection(simulationEnvironment);
+            var foodCoordinates = simulationEnvironment.GetNearestFoodCoordinates(Coordinates, MaxPossibleStep);
+            if(foodCoordinates == null)
+            {
+                _nextCoordinates = ChooseDirection(simulationEnvironment);
+            }
+            else 
+            {
+                IsComingHome = true;
+                IsCarryingFood = true;
+                _nextCoordinates = foodCoordinates;
+            }
         }
     }
 

@@ -11,12 +11,14 @@
         public IReadOnlyDictionary<ColonyCoordinates, double> Pheromones => _pheromones;
 
         public AntHill AntHill { get; }
+        public FoodSource FoodSource { get; }
 
-        public ColonyEnvironment(int width, int height, AntHill antHill)
+        public ColonyEnvironment(int width, int height, AntHill antHill, FoodSource foodSource)
         {
             Width = width;
             Height = height;
             AntHill = antHill;
+            FoodSource = foodSource;
         }
 
         public bool IsInBounds(ColonyCoordinates coordinates)
@@ -57,6 +59,16 @@
                     _pheromones.Remove(pheromone.Key);
                 }
             }
+        }
+
+        public ColonyCoordinates? GetNearestFoodCoordinates(ColonyCoordinates coordinates, int maxDistance)
+        {
+            if(maxDistance > coordinates.DistanceFrom(FoodSource.Coordinates))
+            {
+                return FoodSource.Coordinates;
+            }
+
+            return null;
         }
 
         public bool IsObstacleAt(double x, double y)
