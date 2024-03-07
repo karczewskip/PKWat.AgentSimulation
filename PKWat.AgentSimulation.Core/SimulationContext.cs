@@ -2,22 +2,24 @@
 
 using System.Collections.Generic;
 
-public interface ISimulationContext
+public interface ISimulationContext<U>
 {
-    IEnumerable<T> GetAgents<T>() where T : IAgent;
+    IEnumerable<T> GetAgents<T>() where T : IAgent<U>;
 }
 
-internal class SimulationContext: ISimulationContext
+internal class SimulationContext<U>: ISimulationContext<U>
 {
-    public SimulationContext(List<IAgent> agents, TimeSpan waitingTimeBetweenSteps)
+    public SimulationContext(U simulationEnvironment, List<IAgent<U>> agents, TimeSpan waitingTimeBetweenSteps)
     {
+        SimulationEnvironment = simulationEnvironment;
         Agents = agents;
         WaitingTimeBetweenSteps = waitingTimeBetweenSteps;
     }
 
-    public IReadOnlyList<IAgent> Agents { get; }
+    public U SimulationEnvironment { get; }
+    public IReadOnlyList<IAgent<U>> Agents { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
 
-    public IEnumerable<T> GetAgents<T>() where T : IAgent 
+    public IEnumerable<T> GetAgents<T>() where T : IAgent<U> 
         => Agents.OfType<T>();
 }

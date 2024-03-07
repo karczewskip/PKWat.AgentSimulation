@@ -8,14 +8,14 @@
         Task StopAsync();
     }
 
-    internal class Simulation : ISimulation
+    internal class Simulation<T> : ISimulation
     {
-        private readonly SimulationContext _context;
-        private readonly IReadOnlyList<Func<SimulationContext, Task>> _callbacks;
+        private readonly SimulationContext<T> _context;
+        private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
 
         public bool Running { get; private set; } = false;
 
-        public Simulation(SimulationContext context, IReadOnlyList<Func<SimulationContext,Task>> callbacks)
+        public Simulation(SimulationContext<T> context, IReadOnlyList<Func<SimulationContext<T>,Task>> callbacks)
         {
             _context = context;
             _callbacks = callbacks;
@@ -27,6 +27,11 @@
 
             while (Running)
             {
+                await Parallel.ForEachAsync(
+                    _context.Agents,
+                    new ParallelOptions() { MaxDegreeOfParallelism = 2 },
+                    (x, c) => new ValueTask(Task.Run(() => x.Decide(_context.SimulationEnvironment))));
+
                 await Parallel.ForEachAsync(
                     _context.Agents, 
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },

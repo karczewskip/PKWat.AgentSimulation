@@ -5,7 +5,12 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 
-public class BouncingBall : IAgent
+public class BouncingBallBulb
+{
+
+}
+
+public class BouncingBall : IAgent<BouncingBallBulb>
 {
     private readonly double _maxDistanceFromCenter;
     private readonly double _gravity;
@@ -43,6 +48,11 @@ public class BouncingBall : IAgent
     public double VelocityDirection => Math.Tan(VelocityRadian);
     public double NormalRadian => Math.Atan2(Y, X);
     public double NormalDirection => Math.Tan(NormalRadian);
+
+    public void Decide(BouncingBallBulb simulationEnvironment)
+    {
+        throw new NotImplementedException();
+    }
 
     public void Act()
     {

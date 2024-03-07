@@ -49,7 +49,7 @@ public partial class MainWindow : Window
 
         _simulation
             = _simulationBuilder
-                .CreateNewSimulation()
+                .CreateNewSimulation(new BouncingBallBulb())
                 .AddAgents(bouncingBalls)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
@@ -63,7 +63,7 @@ public partial class MainWindow : Window
         await _simulation.StopAsync();
     }
 
-    private async Task RenderAsync(ISimulationContext simulationContext)
+    private async Task RenderAsync(ISimulationContext<BouncingBallBulb> simulationContext)
     {
         var bouncingBalls = simulationContext.GetAgents<BouncingBall>().ToArray();
 

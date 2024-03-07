@@ -27,7 +27,7 @@
         {
             _simulationBuilder = simulationBuilder;
             _colonyDrawer = colonyDrawer;
-            _colonyDrawer.Initialize(500, 500);
+            _colonyDrawer.Initialize(600, 600);
 
             InitializeComponent();
         }
@@ -40,7 +40,7 @@
             }
 
             _simulation = _simulationBuilder
-                .CreateNewSimulation()
+                .CreateNewSimulation(new ColonyEnvironment(500, 500))
                 .AddAgents(Enumerable.Range(0, 10).Select(x => new Ant(x * 10, x * 20)).ToArray())
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
@@ -49,7 +49,7 @@
             await _simulation.StartAsync();
         }
 
-        private async Task RenderAsync(ISimulationContext context)
+        private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context)
         {
             var ants = context.GetAgents<Ant>().ToArray();
 

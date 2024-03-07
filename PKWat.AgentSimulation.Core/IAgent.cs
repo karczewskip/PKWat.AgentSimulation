@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
-public interface IAgent
+public interface IAgent<T>
 {
+    void Decide(T simulationEnvironment);
     void Act();
 }

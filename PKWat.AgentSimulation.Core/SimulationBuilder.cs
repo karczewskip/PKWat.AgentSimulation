@@ -2,13 +2,13 @@
 
 public interface ISimulationBuilder
 {
-    ISimulationBuilderContext CreateNewSimulation();
+    ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment);
 }
 
 internal class SimulationBuilder : ISimulationBuilder
 {
-    public ISimulationBuilderContext CreateNewSimulation()
+    public ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment)
     {
-        return new SimulationBuilderContext();
+        return new SimulationBuilderContext<T>(simulationEnvironment);
     }
 }
