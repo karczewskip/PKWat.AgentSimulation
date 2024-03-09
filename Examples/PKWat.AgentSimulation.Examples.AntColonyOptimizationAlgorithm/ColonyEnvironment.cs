@@ -36,7 +36,7 @@ public class ColonyEnvironment
     internal void DecreasePheromones()
     {
         var minValue = 0.000001;
-        var p = 0.95;
+        var p = 0.99;
 
         foreach (var coordinates in FoodPheromones.Keys)
         {

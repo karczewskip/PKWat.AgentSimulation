@@ -5,7 +5,7 @@ using System;
 
 public class Ant : IAgent<ColonyEnvironment>
 {
-    private const int PheromonesStrengthInitialValue = 2;
+    private const int PheromonesStrengthInitialValue = 1000000;
     public ColonyDirection Direction { get; private set; }
     public ColonyCoordinates Coordinates { get; private set; }
     public bool IsCarryingFood { get; private set; } = false;
@@ -34,28 +34,37 @@ public class Ant : IAgent<ColonyEnvironment>
         }
         else
         {
+            var random = new Random();
+
             var possibleDirections = ColonyDirection.GeneratePossibleDirections(Direction);
 
-            var consideringDirections = new List<ColonyDirection>() { possibleDirections[0] };
-            var pheromonesStrength = GetPheromonesStrength(simulationEnvironment, Coordinates.MovedBy(possibleDirections[0]));
-            for (int i = 1; i < possibleDirections.Length; i++)
+            if(random.Next(20) < 1)
             {
-                var consideringCoordinates = Coordinates.MovedBy(possibleDirections[i]);
-                var consideringPheromonesStrength = GetPheromonesStrength(simulationEnvironment, consideringCoordinates);
-                if (consideringPheromonesStrength > pheromonesStrength)
+                Direction = possibleDirections[random.Next(possibleDirections.Length)];
+            }
+            else
+            {
+                var consideringDirections = new List<ColonyDirection>() { possibleDirections[0] };
+                var pheromonesStrength = GetPheromonesStrength(simulationEnvironment, Coordinates.MovedBy(possibleDirections[0]));
+                for (int i = 1; i < possibleDirections.Length; i++)
                 {
-                    consideringDirections.Clear();
-                    consideringDirections.Add(possibleDirections[i]);
-                    pheromonesStrength = consideringPheromonesStrength;
+                    var consideringCoordinates = Coordinates.MovedBy(possibleDirections[i]);
+                    var consideringPheromonesStrength = GetPheromonesStrength(simulationEnvironment, consideringCoordinates);
+                    if (consideringPheromonesStrength > pheromonesStrength)
+                    {
+                        consideringDirections.Clear();
+                        consideringDirections.Add(possibleDirections[i]);
+                        pheromonesStrength = consideringPheromonesStrength;
+                    }
+                    else if (consideringPheromonesStrength == pheromonesStrength)
+                    {
+                        consideringDirections.Add(possibleDirections[i]);
+                    }
                 }
-                else if (consideringPheromonesStrength == pheromonesStrength)
-                {
-                    consideringDirections.Add(possibleDirections[i]);
-                }
+
+                Direction = consideringDirections[random.Next(consideringDirections.Count)];
             }
 
-            var random = new Random();
-            Direction = consideringDirections[random.Next(consideringDirections.Count)];
         }
     }
 
@@ -82,6 +91,6 @@ public class Ant : IAgent<ColonyEnvironment>
             Coordinates = consideringCoordinates;
         }
 
-        PheromonesStrength *= 0.95;
+        PheromonesStrength *= 0.9;
     }
 }

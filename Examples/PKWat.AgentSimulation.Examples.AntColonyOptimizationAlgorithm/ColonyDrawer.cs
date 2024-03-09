@@ -9,7 +9,7 @@
     {
         private const int Scale = 10;
         private const int AntSize = 1 * Scale;
-        private const int AntHillSize = 2 * Scale;
+        private const int AnthillScale = 2 * Scale;
 
         private Bitmap _bmp;
 
@@ -44,11 +44,13 @@
             }
 
             var anthillCoordinates = context.SimulationEnvironment.AntHill.Coordinates;
-            graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), Scale * anthillCoordinates.X, Scale * anthillCoordinates.Y, AntHillSize, AntHillSize);
+            var anthillSize = context.SimulationEnvironment.AntHill.Size;
+            graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), Scale * (anthillCoordinates.X - anthillSize), Scale * (anthillCoordinates.Y - anthillSize), anthillSize * AnthillScale, anthillSize * AnthillScale);
 
 
             var foodSourceCoordinates = context.SimulationEnvironment.FoodSource.Coordinates;
-            graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 255, 255, 0)), Scale * foodSourceCoordinates.X, Scale * foodSourceCoordinates.Y, AntHillSize, AntHillSize);
+            var foodSize = context.SimulationEnvironment.FoodSource.Size;
+            graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 255, 255, 0)), Scale * (foodSourceCoordinates.X - foodSize), Scale * (foodSourceCoordinates.Y - foodSize), foodSize * AnthillScale, foodSize * AnthillScale);
 
             return _bmp.ConvertToBitmapSource();
         }
