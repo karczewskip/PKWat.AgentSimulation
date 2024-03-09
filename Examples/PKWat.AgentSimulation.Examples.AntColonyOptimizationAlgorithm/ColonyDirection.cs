@@ -18,8 +18,6 @@ public record ColonyDirection(int X, int Y)
         {
             return [
                 new ColonyDirection(direction.X, direction.Y),
-                new ColonyDirection(direction.X, direction.Y),
-                new ColonyDirection(direction.X, direction.Y),
                 new ColonyDirection(direction.X, 0),
                 new ColonyDirection(0, direction.Y)
             ];
@@ -30,16 +28,12 @@ public record ColonyDirection(int X, int Y)
             return [
                 new ColonyDirection(-1, direction.Y),
                 new ColonyDirection(0, direction.Y),
-                new ColonyDirection(0, direction.Y),
-                new ColonyDirection(0, direction.Y),
                 new ColonyDirection(1, direction.Y)
             ];
         }
 
         return [
             new ColonyDirection(direction.X, -1),
-            new ColonyDirection(direction.X, 0),
-            new ColonyDirection(direction.X, 0),
             new ColonyDirection(direction.X, 0),
             new ColonyDirection(direction.X, 1)
             ];

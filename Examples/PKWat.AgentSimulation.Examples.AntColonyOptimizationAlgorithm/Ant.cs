@@ -9,13 +9,14 @@ public class Ant : IAgent<ColonyEnvironment>
     public ColonyDirection Direction { get; private set; }
     public ColonyCoordinates Coordinates { get; private set; }
     public bool IsCarryingFood { get; private set; } = false;
-    public double PheromonesStrength { get; private set; }
+    public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.8, PathLength);
+    public int PathLength { get; private set; }
 
     public void Initialize(ColonyEnvironment simulationEnvironment)
     {
         Coordinates = simulationEnvironment.AntHill.Coordinates;
         Direction = ColonyDirection.Random();
-        PheromonesStrength = PheromonesStrengthInitialValue;
+        PathLength = 1;
     }
 
     public void Decide(ColonyEnvironment simulationEnvironment)
@@ -23,13 +24,13 @@ public class Ant : IAgent<ColonyEnvironment>
         if (!IsCarryingFood && simulationEnvironment.FoodSource.Coordinates.DistanceFrom(Coordinates) <= simulationEnvironment.FoodSource.Size)
         {
             IsCarryingFood = true;
-            PheromonesStrength = PheromonesStrengthInitialValue;
+            PathLength = 1;
             Direction = Direction.Opposite();
         }
         else if (IsCarryingFood && simulationEnvironment.AntHill.Coordinates.DistanceFrom(Coordinates) <= simulationEnvironment.AntHill.Size)
         {
             IsCarryingFood = false;
-            PheromonesStrength = PheromonesStrengthInitialValue;
+            PathLength = 1;
             Direction = Direction.Opposite();
         }
         else
@@ -38,7 +39,7 @@ public class Ant : IAgent<ColonyEnvironment>
 
             var possibleDirections = ColonyDirection.GeneratePossibleDirections(Direction);
 
-            if(random.Next(20) < 1)
+            if(random.Next(100) < 1)
             {
                 Direction = possibleDirections[random.Next(possibleDirections.Length)];
             }
@@ -91,6 +92,6 @@ public class Ant : IAgent<ColonyEnvironment>
             Coordinates = consideringCoordinates;
         }
 
-        PheromonesStrength *= 0.9;
+        PathLength += 1;
     }
 }
