@@ -2,106 +2,86 @@
 
 using PKWat.AgentSimulation.Core;
 using System;
-using System.Collections;
 
 public class Ant : IAgent<ColonyEnvironment>
 {
-    private const int MaxPossibleStep = 20;
-
-    private HashSet<ColonyCoordinates> _visitedCoordinates = new HashSet<ColonyCoordinates>();
-    private Stack<ColonyCoordinates> _path = new Stack<ColonyCoordinates>();
-
-    private ColonyCoordinates _nextCoordinates;
-
+    private const int PheromonesStrengthInitialValue = 2;
+    public ColonyDirection Direction { get; private set; }
     public ColonyCoordinates Coordinates { get; private set; }
     public bool IsCarryingFood { get; private set; } = false;
-    public bool IsComingHome { get; private set; } = false;
+    public double PheromonesStrength { get; private set; }
 
-    public int PathLength => _path.Count;
+    public void Initialize(ColonyEnvironment simulationEnvironment)
+    {
+        Coordinates = simulationEnvironment.AntHill.Coordinates;
+        Direction = ColonyDirection.Random();
+        PheromonesStrength = PheromonesStrengthInitialValue;
+    }
 
     public void Decide(ColonyEnvironment simulationEnvironment)
     {
-        if(PathLength > 500)
+        if (!IsCarryingFood && simulationEnvironment.FoodSource.Coordinates.DistanceFrom(Coordinates) <= simulationEnvironment.FoodSource.Size)
         {
-            IsComingHome = true;
+            IsCarryingFood = true;
+            PheromonesStrength = PheromonesStrengthInitialValue;
+            Direction = Direction.Opposite();
         }
-
-        if(PathLength == 0) 
+        else if (IsCarryingFood && simulationEnvironment.AntHill.Coordinates.DistanceFrom(Coordinates) <= simulationEnvironment.AntHill.Size)
         {
-            IsComingHome = false;
             IsCarryingFood = false;
-        }
-
-        if(Coordinates == null)
-        {
-            _nextCoordinates = simulationEnvironment.AntHill.Coordinates;
-        }
-        else if(IsComingHome)
-        {
-            _nextCoordinates = _path.Pop();
+            PheromonesStrength = PheromonesStrengthInitialValue;
+            Direction = Direction.Opposite();
         }
         else
         {
-            var foodCoordinates = simulationEnvironment.GetNearestFoodCoordinates(Coordinates, MaxPossibleStep);
-            if(foodCoordinates == null)
+            var possibleDirections = ColonyDirection.GeneratePossibleDirections(Direction);
+
+            var consideringDirections = new List<ColonyDirection>() { possibleDirections[0] };
+            var pheromonesStrength = GetPheromonesStrength(simulationEnvironment, Coordinates.MovedBy(possibleDirections[0]));
+            for (int i = 1; i < possibleDirections.Length; i++)
             {
-                _nextCoordinates = ChooseDirection(simulationEnvironment);
+                var consideringCoordinates = Coordinates.MovedBy(possibleDirections[i]);
+                var consideringPheromonesStrength = GetPheromonesStrength(simulationEnvironment, consideringCoordinates);
+                if (consideringPheromonesStrength > pheromonesStrength)
+                {
+                    consideringDirections.Clear();
+                    consideringDirections.Add(possibleDirections[i]);
+                    pheromonesStrength = consideringPheromonesStrength;
+                }
+                else if (consideringPheromonesStrength == pheromonesStrength)
+                {
+                    consideringDirections.Add(possibleDirections[i]);
+                }
             }
-            else 
-            {
-                IsComingHome = true;
-                IsCarryingFood = true;
-                _nextCoordinates = foodCoordinates;
-            }
+
+            var random = new Random();
+            Direction = consideringDirections[random.Next(consideringDirections.Count)];
         }
     }
 
-    private ColonyCoordinates ChooseDirection(ColonyEnvironment simulationEnvironment)
+    private double GetPheromonesStrength(ColonyEnvironment simulationEnvironment, ColonyCoordinates coordinates)
     {
-        var random = new Random();
-        var step = 1 + random.Next(20);
-
-        var possibleMoves = new HashSet<ColonyCoordinates>()
-        {
-            Coordinates with { X = Coordinates.X - step },
-            Coordinates with { Y = Coordinates.Y - step },
-            Coordinates with { X = Coordinates.X + step },
-            Coordinates with { Y = Coordinates.Y + step }
-        };
-
-        foreach (var move in possibleMoves)
-        {
-            if (simulationEnvironment.IsOutOfBounds(move))
-            {
-                possibleMoves.Remove(move);
-            }
-        }
-
-        var notVisited = new HashSet<ColonyCoordinates>(possibleMoves);
-        foreach (var move in notVisited)
-        {
-            if (_visitedCoordinates.Contains(move))
-            {
-                notVisited.Remove(move);
-            }
-        }
-        if (notVisited.Any())
-        {
-            return notVisited.ElementAt(random.Next(notVisited.Count));
-        }
-
-        return possibleMoves.ElementAt(random.Next(possibleMoves.Count));
+        var pheromones = simulationEnvironment.GetPheromones(coordinates);
+        return IsCarryingFood ? pheromones.Home : pheromones.Food;
     }
 
     public void Act(ColonyEnvironment simulationEnvironment)
     {
-        Coordinates = _nextCoordinates;
-
-        if(!IsComingHome)
+        if (IsCarryingFood)
         {
-            _visitedCoordinates.Add(Coordinates);
-            _path.Push(Coordinates);
+            simulationEnvironment.AddFoodPheromones(Coordinates, PheromonesStrength);
         }
-    }
+        else
+        {
+            simulationEnvironment.AddHomePheromones(Coordinates, PheromonesStrength);
+        }
 
+        var consideringCoordinates = Coordinates.MovedBy(Direction);
+        if(simulationEnvironment.IsInBounds(consideringCoordinates))
+        {
+            Coordinates = consideringCoordinates;
+        }
+
+        PheromonesStrength *= 0.95;
+    }
 }

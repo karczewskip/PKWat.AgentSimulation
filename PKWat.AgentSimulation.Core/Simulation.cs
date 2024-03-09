@@ -27,6 +27,11 @@
         {
             Running = true;
 
+            await Parallel.ForEachAsync(
+                    _context.Agents,
+                    new ParallelOptions() { MaxDegreeOfParallelism = 2 },
+                    (x, c) => new ValueTask(Task.Run(() => x.Initialize(_context.SimulationEnvironment))));
+
             while (Running)
             {
                 foreach (var environmentUpdate in _environmentUpdates)

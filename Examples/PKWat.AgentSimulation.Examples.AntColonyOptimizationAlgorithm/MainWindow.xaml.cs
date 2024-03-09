@@ -18,6 +18,7 @@
     /// </summary>
     public partial class MainWindow : Window
     {
+        private const int Scale = 2;
         private ISimulation _simulation;
 
         private readonly ISimulationBuilder _simulationBuilder;
@@ -27,7 +28,7 @@
         {
             _simulationBuilder = simulationBuilder;
             _colonyDrawer = colonyDrawer;
-            _colonyDrawer.Initialize(600, 600);
+            _colonyDrawer.Initialize(Scale * 60, Scale * 60);
 
             InitializeComponent();
         }
@@ -40,10 +41,9 @@
             }
 
             _simulation = _simulationBuilder
-                .CreateNewSimulation(new ColonyEnvironment(500, 500, new AntHill(new ColonyCoordinates(100, 100)), new FoodSource(new ColonyCoordinates(300, 300))))
-                .AddAgents(Enumerable.Range(0, 100).Select(x => new Ant()).ToArray())
+                .CreateNewSimulation(new ColonyEnvironment(Scale* 50, Scale*50, new AntHill(new ColonyCoordinates(Scale*10, Scale * 10)), new FoodSource(new ColonyCoordinates(Scale* 40, Scale * 40))))
+                .AddAgents(Enumerable.Range(0, 200).Select(x => new Ant()).ToArray())
                 .AddEnvironmentUpdates(DecreasePheromones)
-                .AddEnvironmentUpdates(AddPheromones)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
                 .Build();
@@ -54,19 +54,6 @@
         private async Task DecreasePheromones(ISimulationContext<ColonyEnvironment> context)
         {
             context.SimulationEnvironment.DecreasePheromones();
-        }
-
-        private async Task AddPheromones(ISimulationContext<ColonyEnvironment> context)
-        {
-            var ants = context.GetAgents<Ant>();
-
-            foreach (var ant in ants)
-            {
-                if(ant.Coordinates is not null)
-                {
-                    context.SimulationEnvironment.AddPheromone(ant.Coordinates);
-                }
-            }
         }
 
         private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context)

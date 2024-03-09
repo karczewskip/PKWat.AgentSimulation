@@ -1,104 +1,102 @@
-﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm
+﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
+
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+
+public class ColonyEnvironment
 {
-    using System;
+    public ConcurrentDictionary<ColonyCoordinates, double> FoodPheromones = new();
+    public ConcurrentDictionary<ColonyCoordinates, double> HomePheromones = new();
 
-    public class ColonyEnvironment
+    public int Width { get; }
+    public int Height { get; }
+
+    public AntHill AntHill { get; }
+    public FoodSource FoodSource { get; }
+
+    public ColonyEnvironment(int width, int height, AntHill antHill, FoodSource foodSource)
     {
-        private Dictionary<ColonyCoordinates, double> _pheromones = new Dictionary<ColonyCoordinates, double>();
+        Width = width;
+        Height = height;
+        AntHill = antHill;
+        FoodSource = foodSource;
+    }
 
-        public int Width { get; }
-        public int Height { get; }
-        public IReadOnlyDictionary<ColonyCoordinates, double> Pheromones => _pheromones;
+    public bool IsInBounds(ColonyCoordinates coordinates)
+    {
+        return coordinates.X >= 0 && coordinates.X < Width && coordinates.Y >= 0 && coordinates.Y < Height;
+    }
 
-        public AntHill AntHill { get; }
-        public FoodSource FoodSource { get; }
+    public bool IsOutOfBounds(ColonyCoordinates coordinates)
+    {
+        return !IsInBounds(coordinates);
+    }
 
-        public ColonyEnvironment(int width, int height, AntHill antHill, FoodSource foodSource)
+    internal void DecreasePheromones()
+    {
+        var minValue = 0.000001;
+        var p = 0.95;
+
+        foreach (var coordinates in FoodPheromones.Keys)
         {
-            Width = width;
-            Height = height;
-            AntHill = antHill;
-            FoodSource = foodSource;
-        }
-
-        public bool IsInBounds(ColonyCoordinates coordinates)
-        {
-            return coordinates.X >= 0 && coordinates.X < Width && coordinates.Y >= 0 && coordinates.Y < Height;
-        }
-
-        public bool IsOutOfBounds(ColonyCoordinates coordinates)
-        {
-            return !IsInBounds(coordinates);
-        }
-
-        public void AddPheromone(ColonyCoordinates coordinates)
-        {
-            var update = 1;// 1.0 / numberOfMoves;
-
-            if(_pheromones.ContainsKey(coordinates))
+            if (FoodPheromones[coordinates] < minValue)
             {
-                _pheromones[coordinates] += update;
+                FoodPheromones.Remove(coordinates, out _);
             }
             else
             {
-                _pheromones.Add(coordinates, update);
+                FoodPheromones[coordinates] *= p;
             }
         }
 
-        internal void DecreasePheromones()
+        foreach (var coordinates in HomePheromones.Keys)
         {
-            foreach (var pheromone in _pheromones)
+            if (HomePheromones[coordinates] < minValue)
             {
-                _pheromones[pheromone.Key] -= 0.01;
+                HomePheromones.Remove(coordinates, out _);
             }
-
-            foreach (var pheromone in _pheromones)
+            else
             {
-                if(pheromone.Value < 0.0001)
-                {
-                    _pheromones.Remove(pheromone.Key);
-                }
+                HomePheromones[coordinates] *= p;
             }
-        }
-
-        public ColonyCoordinates? GetNearestFoodCoordinates(ColonyCoordinates coordinates, int maxDistance)
-        {
-            if(maxDistance > coordinates.DistanceFrom(FoodSource.Coordinates))
-            {
-                return FoodSource.Coordinates;
-            }
-
-            return null;
-        }
-
-        public bool IsObstacleAt(double x, double y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsFoodAt(double x, double y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemoveFood(double x, double y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddFood(double x, double y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void RemovePheromone(double x, double y)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void EvaporatePheromones()
-        {
-            throw new NotImplementedException();
         }
     }
+
+    public ColonyCoordinates? GetNearestFoodCoordinates(ColonyCoordinates coordinates, int maxDistance)
+    {
+        if(maxDistance > coordinates.DistanceFrom(FoodSource.Coordinates))
+        {
+            return FoodSource.Coordinates;
+        }
+
+        return null;
+    }
+
+    public Pheromones GetPheromones(ColonyCoordinates coordinates)
+    {
+        var homePheromoneValue = HomePheromones.GetValueOrDefault(coordinates, 0);
+        var foodPheromoneValue = FoodPheromones.GetValueOrDefault(coordinates, 0);
+
+        return new Pheromones(homePheromoneValue, foodPheromoneValue);
+    }
+
+    public void AddFoodPheromones(ColonyCoordinates coordinates, double strength)
+    {
+        FoodPheromones.AddOrUpdate(coordinates, strength, (c, v) => v + strength);
+    }
+
+    public void AddHomePheromones(ColonyCoordinates coordinates, double strength)
+    {
+        HomePheromones.AddOrUpdate(coordinates, strength, (c, v) => v + strength);
+    }
+
+    internal IEnumerable<(ColonyCoordinates Coordinates, Pheromones Pheromones)> GetAllPheromones()
+    {
+        var allConsideringCoordinates = FoodPheromones.Keys.Union(HomePheromones.Keys);
+
+        return allConsideringCoordinates.Select(c => (c, GetPheromones(c)));
+    }
 }
+
+public record Pheromones(double Home, double Food);

@@ -79,4 +79,9 @@ public class BouncingBall : IAgent<BouncingBallBulb>
             //Debug.WriteLine($"Bounced with speed {speed}, energy: {et} = {ek} + {ep}");
         }
     }
+
+    public void Initialize(BouncingBallBulb simulationEnvironment)
+    {
+        throw new NotImplementedException();
+    }
 }

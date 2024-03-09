@@ -2,6 +2,7 @@
 
 public class FoodSource
 {
+    public int Size { get; } = 5;
     public ColonyCoordinates Coordinates { get; }
     public FoodSource(ColonyCoordinates coordinates)
     {
