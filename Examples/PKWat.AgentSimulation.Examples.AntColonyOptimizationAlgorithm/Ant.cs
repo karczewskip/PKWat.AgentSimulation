@@ -12,15 +12,17 @@ public class Ant : IAgent<ColonyEnvironment>
     public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.8, PathLength);
     public int PathLength { get; private set; }
 
-    public void Initialize(ColonyEnvironment simulationEnvironment)
+    public void Initialize(ISimulationContext<ColonyEnvironment> simulationContext)
     {
+        var simulationEnvironment = simulationContext.SimulationEnvironment;
         Coordinates = simulationEnvironment.AntHill.Coordinates;
         Direction = ColonyDirection.Random();
         PathLength = 1;
     }
 
-    public void Decide(ColonyEnvironment simulationEnvironment)
+    public void Decide(ISimulationContext<ColonyEnvironment> simulationContext)
     {
+        var simulationEnvironment = simulationContext.SimulationEnvironment;
         if (!IsCarryingFood && simulationEnvironment.FoodSource.Coordinates.DistanceFrom(Coordinates) <= simulationEnvironment.FoodSource.Size)
         {
             IsCarryingFood = true;
@@ -75,8 +77,9 @@ public class Ant : IAgent<ColonyEnvironment>
         return IsCarryingFood ? pheromones.Home : pheromones.Food;
     }
 
-    public void Act(ColonyEnvironment simulationEnvironment)
+    public void Act(ISimulationContext<ColonyEnvironment> simulationContext)
     {
+        var simulationEnvironment = simulationContext.SimulationEnvironment;
         if (IsCarryingFood)
         {
             simulationEnvironment.AddFoodPheromones(Coordinates, PheromonesStrength);

@@ -2,7 +2,7 @@
 
 public interface IAgent<T>
 {
-    void Initialize(T simulationEnvironment);
-    void Decide(T simulationEnvironment);
-    void Act(T simulationEnvironment);
+    void Initialize(ISimulationContext<T> simulationContext);
+    void Decide(ISimulationContext<T> simulationContext);
+    void Act(ISimulationContext<T> simulationContext);
 }

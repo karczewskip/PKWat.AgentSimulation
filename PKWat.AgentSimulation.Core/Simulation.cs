@@ -30,7 +30,7 @@
             await Parallel.ForEachAsync(
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Initialize(_context.SimulationEnvironment))));
+                    (x, c) => new ValueTask(Task.Run(() => x.Initialize(_context))));
 
             while (Running)
             {
@@ -42,12 +42,12 @@
                 await Parallel.ForEachAsync(
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Decide(_context.SimulationEnvironment))));
+                    (x, c) => new ValueTask(Task.Run(() => x.Decide(_context))));
 
                 await Parallel.ForEachAsync(
                     _context.Agents, 
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run( () => x.Act(_context.SimulationEnvironment))));
+                    (x, c) => new ValueTask(Task.Run( () => x.Act(_context))));
 
                 foreach (var callback in _callbacks)
                 {

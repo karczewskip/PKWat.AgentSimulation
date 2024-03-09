@@ -49,12 +49,12 @@ public class BouncingBall : IAgent<BouncingBallBulb>
     public double NormalRadian => Math.Atan2(Y, X);
     public double NormalDirection => Math.Tan(NormalRadian);
 
-    public void Decide(BouncingBallBulb simulationEnvironment)
+    public void Decide(ISimulationContext<BouncingBallBulb> simulationContext)
     {
         throw new NotImplementedException();
     }
 
-    public void Act(BouncingBallBulb simulationEnvironment)
+    public void Act(ISimulationContext<BouncingBallBulb> simulationContext)
     {
         DeltaY += _gravity;
         X = X + DeltaX;
@@ -80,7 +80,7 @@ public class BouncingBall : IAgent<BouncingBallBulb>
         }
     }
 
-    public void Initialize(BouncingBallBulb simulationEnvironment)
+    public void Initialize(ISimulationContext<BouncingBallBulb> simulationContext)
     {
         throw new NotImplementedException();
     }
