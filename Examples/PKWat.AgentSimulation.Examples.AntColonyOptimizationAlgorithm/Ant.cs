@@ -6,17 +6,25 @@ using System;
 public class Ant : IAgent<ColonyEnvironment>
 {
     private const int PheromonesStrengthInitialValue = 1000000;
+
+    private readonly IRandomNumbersGenerator _randomNumbersGenerator;
+
     public ColonyDirection Direction { get; private set; }
     public ColonyCoordinates Coordinates { get; private set; }
     public bool IsCarryingFood { get; private set; } = false;
     public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.8, PathLength);
     public int PathLength { get; private set; }
 
+    public Ant(IRandomNumbersGenerator randomNumbersGenerator)
+    {
+        _randomNumbersGenerator = randomNumbersGenerator;
+    }
+
     public void Initialize(ISimulationContext<ColonyEnvironment> simulationContext)
     {
         var simulationEnvironment = simulationContext.SimulationEnvironment;
         Coordinates = simulationEnvironment.AntHill.Coordinates;
-        Direction = ColonyDirection.Random();
+        Direction = ColonyDirection.Random(_randomNumbersGenerator);
         PathLength = 1;
     }
 
@@ -37,13 +45,11 @@ public class Ant : IAgent<ColonyEnvironment>
         }
         else
         {
-            var random = new Random();
-
             var possibleDirections = ColonyDirection.GeneratePossibleDirections(Direction);
 
-            if(random.Next(100) < 1)
+            if(_randomNumbersGenerator.Next(1000) < 1)
             {
-                Direction = possibleDirections[random.Next(possibleDirections.Length)];
+                Direction = possibleDirections[_randomNumbersGenerator.Next(possibleDirections.Length)];
             }
             else
             {
@@ -65,7 +71,7 @@ public class Ant : IAgent<ColonyEnvironment>
                     }
                 }
 
-                Direction = consideringDirections[random.Next(consideringDirections.Count)];
+                Direction = consideringDirections[_randomNumbersGenerator.Next(consideringDirections.Count)];
             }
 
         }

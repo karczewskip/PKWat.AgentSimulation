@@ -8,6 +8,7 @@ public static class AgentSimulationServiceCollectionExtensions
     public static void AddAgentSimulation(this IServiceCollection services, Assembly assembly)
     {
         services.AddSingleton<ISimulationBuilder, SimulationBuilder>();
+        services.AddTransient<IRandomNumbersGenerator, RandomNumbersGenerator>();
 
         foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface))
         {

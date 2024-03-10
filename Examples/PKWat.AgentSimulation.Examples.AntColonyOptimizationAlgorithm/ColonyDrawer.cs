@@ -31,12 +31,19 @@
             //    graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
             //}
 
-            //foreach (var (coordinates, pheromone) in context.SimulationEnvironment.HomePheromones)
-            //{
-            //    var value = CalculateValue(pheromone);
-            //    var color = Color.FromArgb(value, 255, 0, 255);
-            //    graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
-            //}
+            foreach (var (coordinates, pheromone) in context.SimulationEnvironment.HomePheromones)
+            {
+                var value = CalculateValue(pheromone);
+                var color = Color.FromArgb(value, 255, 0, 255);
+                graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
+            }
+
+            foreach (var (coordinates, pheromone) in context.SimulationEnvironment.FoodPheromones)
+            {
+                var value = CalculateValue(pheromone);
+                var color = Color.FromArgb(value, 255, 255, 0);
+                graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
+            }
 
             foreach (Ant ant in context.GetAgents<Ant>())
             {

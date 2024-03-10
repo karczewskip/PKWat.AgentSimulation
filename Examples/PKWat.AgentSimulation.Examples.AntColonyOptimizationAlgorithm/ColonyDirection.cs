@@ -1,14 +1,14 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
+using PKWat.AgentSimulation.Core;
 using System;
 
 public record ColonyDirection(int X, int Y)
 {
-    public static ColonyDirection Random()
+    public static ColonyDirection Random(IRandomNumbersGenerator random)
     {
-        var random = new Random();
-        var x = random.Next(-1, 2);
-        var y = random.Next(-1, 2);
+        var x = random.Next(3)-1;
+        var y = random.Next(3)-1;
         return new ColonyDirection(x, y);
     }
 
