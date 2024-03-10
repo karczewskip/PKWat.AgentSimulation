@@ -24,3 +24,8 @@ internal class SimulationContext<U>: ISimulationContext<U>
     public IEnumerable<T> GetAgents<T>() where T : IAgent<U> 
         => Agents.OfType<T>();
 }
+
+public interface IRandomNumbersGenerator
+{
+    
+}

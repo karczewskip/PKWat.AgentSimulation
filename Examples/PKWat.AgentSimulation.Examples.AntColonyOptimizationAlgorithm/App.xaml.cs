@@ -5,6 +5,7 @@
     using PKWat.AgentSimulation.Core;
     using System.Configuration;
     using System.Data;
+    using System.Reflection;
     using System.Windows;
 
     /// <summary>
@@ -21,7 +22,7 @@
                 {
                     services.AddSingleton<MainWindow>();
                     services.AddTransient<ColonyDrawer>();
-                    services.AddAgentSimulation();
+                    services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
                 })
                 .Build();
         }

@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PKWat.AgentSimulation.Core;
+using System.Reflection;
 using System.Windows;
 
 public partial class App : Application
@@ -17,7 +18,7 @@ public partial class App : Application
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<ColorsGenerator>();
                 services.AddSingleton<PictureRenderer>();
-                services.AddAgentSimulation();
+                services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
             })
             .Build();
     }

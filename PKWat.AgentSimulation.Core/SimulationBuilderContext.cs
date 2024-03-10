@@ -1,9 +1,12 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
+using Microsoft.Extensions.DependencyInjection;
+
 public interface ISimulationBuilderContext<T>
 {
     ISimulationBuilderContext<T> AddAgent(IAgent<T> agent);
     ISimulationBuilderContext<T> AddAgents(IEnumerable<IAgent<T>> agents);
+    ISimulationBuilderContext<T> AddAgents<U>(int number) where U : IAgent<T>;
     ISimulationBuilderContext<T> AddEnvironmentUpdates(Func<ISimulationContext<T>, Task> update);
     ISimulationBuilderContext<T> AddCallback(Func<ISimulationContext<T>, Task> callback);
     ISimulationBuilderContext<T> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
@@ -14,15 +17,17 @@ public interface ISimulationBuilderContext<T>
 internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
 {
     private readonly T _simulationEnvironment;
+    private readonly IServiceProvider _serviceProvider;
 
     private List<IAgent<T>> _agents = new();
     private List<Func<ISimulationContext<T>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<T>, Task>> _callbacks = new();
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
 
-    public SimulationBuilderContext(T simulationEnvironment)
+    public SimulationBuilderContext(T simulationEnvironment, IServiceProvider serviceProvider)
     {
         _simulationEnvironment = simulationEnvironment;
+        _serviceProvider = serviceProvider;
     }
 
     public ISimulationBuilderContext<T> AddAgent(IAgent<T> agent)
@@ -35,6 +40,13 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
     public ISimulationBuilderContext<T> AddAgents(IEnumerable<IAgent<T>> agents)
     {
         _agents.AddRange(agents);
+
+        return this;
+    }
+
+    public ISimulationBuilderContext<T> AddAgents<U>(int number) where U : IAgent<T>
+    {
+        _agents.AddRange(Enumerable.Range(0, number).Select(x => (IAgent<T>)_serviceProvider.GetService<U>()));
 
         return this;
     }
