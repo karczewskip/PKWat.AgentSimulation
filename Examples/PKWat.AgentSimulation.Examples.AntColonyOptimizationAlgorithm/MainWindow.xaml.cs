@@ -42,7 +42,7 @@
 
             _simulation = _simulationBuilder
                 .CreateNewSimulation(new ColonyEnvironment(Scale * 50, Scale * 50, new AntHill(new ColonyCoordinates(Scale * 10, Scale * 10)), new FoodSource(new ColonyCoordinates(Scale * 40, Scale * 40))))
-                .AddAgents<Ant>(300)
+                .AddAgents<Ant>(1000)
                 .AddEnvironmentUpdates(DecreasePheromones)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
