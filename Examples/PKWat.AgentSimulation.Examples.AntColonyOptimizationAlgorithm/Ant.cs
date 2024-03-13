@@ -12,7 +12,7 @@ public class Ant : IAgent<ColonyEnvironment>
     public ColonyDirection Direction { get; private set; }
     public ColonyCoordinates Coordinates { get; private set; }
     public bool IsCarryingFood { get; private set; } = false;
-    public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.8, PathLength);
+    public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.7, PathLength);
     public int PathLength { get; private set; }
 
     public Ant(IRandomNumbersGenerator randomNumbersGenerator)
