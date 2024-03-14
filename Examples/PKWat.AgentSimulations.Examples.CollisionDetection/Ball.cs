@@ -22,7 +22,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
         {
             var environment = simulationContext.SimulationEnvironment;
             var x = _randomNumbersGenerator.NextDouble() * environment.Width;
-            Coordinates = new BallCoordinates(x, environment.Height);
+            Coordinates = new BallCoordinates(x, environment.Height/2);
             Velocity = new BallVelocity(0, 0);
         }
 
@@ -56,7 +56,11 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             }
             else
             {
-                // Bounce
+                var timeAfterBounce = timeInSeconds - timeToBounceVertical;
+                var velocityYAfterBounce = -(Velocity.Y + environment.Gravity.Y * timeAfterBounce);
+                newY = velocityYAfterBounce * timeAfterBounce
+                        + environment.Gravity.Y * timeAfterBounce * timeAfterBounce / 2;
+                newVelocityY = velocityYAfterBounce + environment.Gravity.Y * timeAfterBounce;
 
             }
 

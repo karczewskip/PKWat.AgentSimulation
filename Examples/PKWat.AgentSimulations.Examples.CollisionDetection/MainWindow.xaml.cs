@@ -38,8 +38,8 @@ public partial class MainWindow : Window
             .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -10)))
             .AddAgents<Ball>(1)
             .AddCallback(RenderAsync)
-            .SetSimulationStep(TimeSpan.FromSeconds(1))
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(5))
+            .SetSimulationStep(TimeSpan.FromSeconds(0.1))
+            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(0.1))
             .Build();
 
         await _simulation.StartAsync();
