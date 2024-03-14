@@ -35,11 +35,11 @@ public partial class MainWindow : Window
         }
 
         _simulation = _simulationBuilder
-            .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -10)))
-            .AddAgents<Ball>(1)
+            .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -5)))
+            .AddAgents<Ball>(10)
             .AddCallback(RenderAsync)
-            .SetSimulationStep(TimeSpan.FromSeconds(0.1))
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(0.1))
+            .SetSimulationStep(TimeSpan.FromSeconds(0.5))
+            .SetWaitingTimeBetweenSteps(TimeSpan.Zero)
             .Build();
 
         await _simulation.StartAsync();

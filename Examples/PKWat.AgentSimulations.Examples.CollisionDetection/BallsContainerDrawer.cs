@@ -13,6 +13,9 @@ public class BallsContainerDrawer
     private Bitmap _bmp;
     private double _xScale;
     private double _yScale;
+    private double _maxHeight = 0;
+    private double _height = 0;
+    private double _lastVelocity = 0;
 
     public void Initialize(int bitmapWidth, int bitmapHeight, double width, double height)
     {
@@ -41,6 +44,15 @@ public class BallsContainerDrawer
                 (float)(BallRadius ));
 
             velocity = ball.Velocity.Y;
+            if(_maxHeight < ball.Coordinates.Y)
+            {
+                _maxHeight = ball.Coordinates.Y;
+            }
+            if(_lastVelocity > 0 && ball.Velocity.Y <= 0)
+            {
+                _height = ball.Coordinates.Y;
+            }
+            _lastVelocity = ball.Velocity.Y;
 
         }
 
@@ -49,6 +61,8 @@ public class BallsContainerDrawer
 
         graphic.DrawString($"{velocity}", new Font("Arial", 16), Brushes.Black, new PointF(_bmp.Width / 2, _bmp.Height / 2));
         graphic.DrawString($"{context.SimulationTime}", new Font("Arial", 16), Brushes.Black, new PointF(_bmp.Width / 2, _bmp.Height / 2 + 20));
+        graphic.DrawString($"{_maxHeight}", new Font("Arial", 16), Brushes.Black, new PointF(_bmp.Width / 2, _bmp.Height / 2 + 40));
+        graphic.DrawString($"{_height}", new Font("Arial", 16), Brushes.Black, new PointF(_bmp.Width / 2, _bmp.Height / 2 + 60));
 
         return _bmp.ConvertToBitmapSource();
     }
