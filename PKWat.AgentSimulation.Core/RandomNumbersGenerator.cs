@@ -3,6 +3,7 @@
 public interface IRandomNumbersGenerator
 {
     int Next(int maxValue);
+    double NextDouble();
 }
 
 internal class RandomNumbersGenerator : IRandomNumbersGenerator
@@ -20,6 +21,11 @@ internal class RandomNumbersGenerator : IRandomNumbersGenerator
     public int Next(int maxValue)
     {
         return _random.Next(maxValue);
+    }
+
+    public double NextDouble()
+    {
+        return _random.NextDouble();
     }
 }
 
