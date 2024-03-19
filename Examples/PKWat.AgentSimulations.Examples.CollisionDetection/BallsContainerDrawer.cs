@@ -8,7 +8,7 @@ using PKWat.AgentSimulation.Drawing;
 
 public class BallsContainerDrawer
 {
-    private const double BallKernelRadius = 10;
+    private const double BallKernelRadius = 2;
 
     private Bitmap _bmp;
     private double _xScale;
@@ -34,14 +34,18 @@ public class BallsContainerDrawer
 
         graphic.Clear(Color.White);
         var velocity = 0.0;
+        for(double i = 0.1;  i <= 1; i+= 0.2)
+        {
+            DrawBalls(context, graphic, i);
+        }
         foreach (var ball in context.GetAgents<Ball>())
         {
-            graphic.FillEllipse(
-                new SolidBrush(ball.Color),
-                (float)(ball.Coordinates.X * _xScale),
-                (float)(ball.Coordinates.Y * _yScale),
-                (float)(ball.Radius),
-                (float)(ball.Radius));
+            //graphic.FillEllipse(
+            //    new SolidBrush(ball.Color),
+            //    (float)(ball.Coordinates.X * _xScale - ball.Radius / 2),
+            //    (float)(ball.Coordinates.Y * _yScale - ball.Radius / 2),
+            //    (float)(ball.Radius),
+            //    (float)(ball.Radius));
 
             //graphic.FillEllipse(
             //    Brushes.Black,
@@ -51,11 +55,11 @@ public class BallsContainerDrawer
             //    (float)(BallKernelRadius));
 
             velocity = ball.Velocity.Y;
-            if(_maxHeight < ball.Coordinates.Y)
+            if (_maxHeight < ball.Coordinates.Y)
             {
                 _maxHeight = ball.Coordinates.Y;
             }
-            if(_lastVelocity > 0 && ball.Velocity.Y <= 0)
+            if (_lastVelocity > 0 && ball.Velocity.Y <= 0)
             {
                 _height = ball.Coordinates.Y;
             }
@@ -74,5 +78,19 @@ public class BallsContainerDrawer
         return _bmp.ConvertToBitmapSource();
     }
 
+    private void DrawBalls(ISimulationContext<BallsContainer> context, Graphics graphic, double scale)
+    {
+        foreach (var ball in context.GetAgents<Ball>())
+        {
+            var radius = ball.Radius * 2;
+            graphic.FillEllipse(
+                new SolidBrush(Color.FromArgb((int)((1-scale)*255), ball.Color)),
+                (float)(ball.Coordinates.X * _xScale - radius * scale),
+                (float)(ball.Coordinates.Y * _yScale - radius * scale),
+                (float)(radius * 2 * scale),
+                (float)(radius * 2 * scale));
+
+        }
+    }
 
 }

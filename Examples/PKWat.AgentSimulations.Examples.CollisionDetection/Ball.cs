@@ -19,7 +19,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
 
         public BallCoordinates Coordinates { get; private set; }
         public BallVelocity Velocity { get; private set; }
-        public double Radius { get; } = 20.0;
+        public double Radius { get; } = 4.0;
         public Color Color { get; private set; } 
 
         public void Initialize(ISimulationContext<BallsContainer> simulationContext)
@@ -28,7 +28,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             var x = _randomNumbersGenerator.NextDouble() * environment.Width;
             var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height/2;
             Coordinates = new BallCoordinates(x, y);
-            Velocity = new BallVelocity(50, 0);
+            Velocity = new BallVelocity(_randomNumbersGenerator.NextDouble()*50 - 25, _randomNumbersGenerator.NextDouble()*50 - 25);
             Color = _colorInitializer.GetNext();
         }
 
@@ -55,7 +55,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
                     return (accumulatedDelta.deltaX + nextDelta.deltaX, accumulatedDelta.deltaY + nextDelta.deltaY);
                 } );
 
-                velocity = Velocity.ChangeDirection(delta.deltaX, delta.deltaY);
+                velocity = Velocity.ChangeDirection(delta.deltaX, delta.deltaY).Scale(0.5);
             }
 
 
@@ -196,6 +196,11 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             var scaleFactor = powerFactor / normalizationFactor;
 
             return new BallVelocity(deltaX * scaleFactor, deltaY * scaleFactor);
+        }
+
+        internal BallVelocity Scale(double scale)
+        {
+            return new BallVelocity(X*scale, Y*scale);
         }
     }
 

@@ -22,6 +22,7 @@ public class ColorInitializer
 
     public Color GetNext()
     {
+        return Color.Aqua;
         return _colors[(takenColors++)%_colors.Length];
     }
 }
