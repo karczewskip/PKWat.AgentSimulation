@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Drawing;
 using System.Diagnostics.Metrics;
 using System.Windows;
 using System.Windows.Media;

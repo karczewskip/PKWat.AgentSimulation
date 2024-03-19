@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Drawing;
 using System.Reflection;
 using System.Windows;
 

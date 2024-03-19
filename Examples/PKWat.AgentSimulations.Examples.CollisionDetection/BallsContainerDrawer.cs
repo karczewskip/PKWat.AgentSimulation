@@ -8,7 +8,7 @@ using PKWat.AgentSimulation.Drawing;
 
 public class BallsContainerDrawer
 {
-    private const double BallRadius = 10;
+    private const double BallKernelRadius = 10;
 
     private Bitmap _bmp;
     private double _xScale;
@@ -37,11 +37,18 @@ public class BallsContainerDrawer
         foreach (var ball in context.GetAgents<Ball>())
         {
             graphic.FillEllipse(
-                Brushes.Black,
+                new SolidBrush(ball.Color),
                 (float)(ball.Coordinates.X * _xScale),
                 (float)(ball.Coordinates.Y * _yScale),
-                (float)(BallRadius ),
-                (float)(BallRadius ));
+                (float)(ball.Radius),
+                (float)(ball.Radius));
+
+            //graphic.FillEllipse(
+            //    Brushes.Black,
+            //    (float)(ball.Coordinates.X * _xScale),
+            //    (float)(ball.Coordinates.Y * _yScale),
+            //    (float)(BallKernelRadius),
+            //    (float)(BallKernelRadius));
 
             velocity = ball.Velocity.Y;
             if(_maxHeight < ball.Coordinates.Y)

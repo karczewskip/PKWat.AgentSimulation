@@ -8,20 +8,21 @@ using System.Windows;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private const double ContainerWidth = 10000;
-    private const double ContainerHeight = 10000;
+    private const double ContainerWidth = 1000;
+    private const double ContainerHeight = 1000;
 
     private readonly ISimulationBuilder _simulationBuilder;
     private readonly BallsContainerDrawer _ballsContainerDrawer;
+    private readonly ColorInitializer _colorInitializer;
 
     private ISimulation _simulation;
 
 
-    public MainWindow(ISimulationBuilder simulationBuilder, BallsContainerDrawer ballsContainerDrawer)
+    public MainWindow(ISimulationBuilder simulationBuilder, BallsContainerDrawer ballsContainerDrawer, ColorInitializer colorInitializer)
     {
         _simulationBuilder = simulationBuilder;
         _ballsContainerDrawer = ballsContainerDrawer;
-
+        _colorInitializer = colorInitializer;
         _ballsContainerDrawer.Initialize(1000, 1000, ContainerWidth, ContainerHeight);
 
         InitializeComponent();
@@ -34,12 +35,16 @@ public partial class MainWindow : Window
             await _simulation.StopAsync();
         }
 
+        int numberOfBalls = 200;
+
+        _colorInitializer.Initialize(numberOfBalls);
+
         _simulation = _simulationBuilder
             .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -5)))
-            .AddAgents<Ball>(10)
+            .AddAgents<Ball>(numberOfBalls)
             .AddCallback(RenderAsync)
             .SetSimulationStep(TimeSpan.FromSeconds(0.5))
-            .SetWaitingTimeBetweenSteps(TimeSpan.Zero)
+            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.01))
             .Build();
 
         await _simulation.StartAsync();
