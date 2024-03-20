@@ -35,7 +35,7 @@ public partial class MainWindow : Window
             await _simulation.StopAsync();
         }
 
-        int numberOfBalls = 1000;
+        int numberOfBalls = 1;
 
         _colorInitializer.Initialize(numberOfBalls);
 

@@ -28,7 +28,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             var x = _randomNumbersGenerator.NextDouble() * environment.Width;
             var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height/2;
             Coordinates = new BallCoordinates(x, y);
-            Velocity = new BallVelocity(0, 0); //new BallVelocity(5*(_randomNumbersGenerator.NextDouble() - 0.5), 0);
+            Velocity = new BallVelocity(50*(_randomNumbersGenerator.NextDouble() - 0.5), 0);
             Color = _colorInitializer.GetNext();
             Radius = environment.BallRadius;
         }
@@ -44,136 +44,14 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             var environment = simulationContext.SimulationEnvironment;
             var timeInSeconds = simulationContext.SimulationStep.TotalSeconds;
 
-            var ballAcceleration = environment.Gravity;
-
-            var velocity = Velocity;
-            var overlappingBalls = simulationContext.SimulationEnvironment.GetNearestBalls(Coordinates).Select(anotherBall => (Overlap: anotherBall.OverlapDistance(this), AnotherBall: anotherBall)).Where(x => x.Overlap > 0 && x.AnotherBall != this).ToArray();
-            if(overlappingBalls.Any())
+            _nextVelocity = Velocity.ApplyAcceleration(environment.Gravity, simulationContext.SimulationStep);
+            _nextCoordinates = Coordinates with
             {
-                var delta = overlappingBalls.Aggregate((deltaX: 0.0,deltaY: 0.0), (accumulatedDelta, next) =>
-                {
-                    var nextDelta = next.AnotherBall.Coordinates.GetDirectionTo(Coordinates);
-                    return (accumulatedDelta.deltaX + nextDelta.deltaX, accumulatedDelta.deltaY + nextDelta.deltaY);
-                } );
-
-                velocity = Velocity.ChangeDirection(delta.deltaX, delta.deltaY).Scale(0.0);
-            }
-
-            var sourceForceBase = environment.Gravity.Value * Math.Pow(environment.BallRadius, 2) * Math.Pow(19.0 / 10, 2);
-            foreach (var anotherBall in overlappingBalls)
-            {
-                var direction = anotherBall.AnotherBall.Coordinates.GetDirectionTo(Coordinates);
-                var distance = anotherBall.AnotherBall.Radius + Radius - anotherBall.Overlap;
-                var addingAcceleration = new BallAcceleration(direction.deltaX, direction.deltaY).Scale(sourceForceBase / Math.Pow(distance, 2));
-                ballAcceleration += addingAcceleration;
-            }
-
-            //if(ballAcceleration.Value > 10)
-            //{
-            //    throw new Exception();
-            //}
-
-            var timeToBounceLeft = CalculateTimeToBounce(velocity.X, ballAcceleration.X, Coordinates.X, 0);
-            var timeToBounceRight = CalculateTimeToBounce(velocity.X, ballAcceleration.X, Coordinates.X, environment.Width);
-            var timeToBounceBottom = CalculateTimeToBounce(velocity.Y, ballAcceleration.Y, Coordinates.Y, 0);
-            var timeToBounceTop = CalculateTimeToBounce(velocity.Y, ballAcceleration.Y, Coordinates.Y, environment.Height);
-
-            var timeToBounceVertical = SelectTimeToBounce(timeToBounceBottom, timeToBounceTop);
-            var timeToBounceHorizontal = SelectTimeToBounce(timeToBounceLeft, timeToBounceRight);
-
-            var newY = Coordinates.Y;
-            var newVelocityY = velocity.Y;
-            if(timeToBounceVertical?.time > timeInSeconds)
-            {
-                newY = Coordinates.Y 
-                        + velocity.Y * timeInSeconds
-                        + ballAcceleration.Y * timeInSeconds * timeInSeconds / 2;
-                newVelocityY = velocity.Y + ballAcceleration.Y * timeInSeconds;
-            }
-            else if(timeToBounceVertical != null)
-            {
-                var timeAfterBounce = timeInSeconds - timeToBounceVertical.time;
-                var velocityYAfterBounce = -(velocity.Y + ballAcceleration.Y * timeAfterBounce) * environment.VelocityLossAfterBounce;
-                newY = velocityYAfterBounce * timeAfterBounce
-                        + ballAcceleration.Y * timeAfterBounce * timeAfterBounce / 2;
-                newVelocityY = velocityYAfterBounce + ballAcceleration.Y * timeAfterBounce;
-            }
-            if(newY < 0)
-            {
-                newY = 0;
-            }
-            else if(newY > environment.Height)
-            {
-                newY = environment.Height;
-            }
-
-            var newX = Coordinates.X;
-            var newVelocityX = velocity.X;
-            if (timeToBounceHorizontal?.time > timeInSeconds)
-            {
-                newX = Coordinates.X
-                        + velocity.X * timeInSeconds
-                        + ballAcceleration.X * timeInSeconds * timeInSeconds / 2;
-                newVelocityX = velocity.X + ballAcceleration.X * timeInSeconds;
-            }
-            else if (timeToBounceHorizontal != null)
-            {
-                var timeAfterBounce = timeInSeconds - timeToBounceHorizontal.time;
-                var velocityXAfterBounce = -(velocity.X + ballAcceleration.X * timeAfterBounce) * environment.VelocityLossAfterBounce;
-                newX = timeToBounceHorizontal.place + velocityXAfterBounce * timeAfterBounce
-                        + ballAcceleration.X * timeAfterBounce * timeAfterBounce / 2;
-                newVelocityX = velocityXAfterBounce + ballAcceleration.X * timeAfterBounce;
-            }
-            if (newX < 0)
-            {
-                newX = 0;
-            }
-            else if (newX > environment.Width)
-            {
-                newX = environment.Width;
-            }
-
-            
-            _nextCoordinates = new BallCoordinates(newX, newY);
-            _nextVelocity = new BallVelocity(newVelocityX, newVelocityY);
+                X = Coordinates.X + _nextVelocity.X * timeInSeconds,
+                Y = Coordinates.Y + _nextVelocity.Y * timeInSeconds
+            };
         }
 
-        private double OverlapDistance(Ball anotherBall)
-        {
-            var overlapDistance = Radius + anotherBall.Radius - Coordinates.DistanceFrom(anotherBall.Coordinates);
-            return overlapDistance > 0 ? overlapDistance : 0;
-        }
-
-        private BallBounce CalculateTimeToBounce(double velocity, double acceleration, double position, double bouncePlace)
-        {
-            var distance = bouncePlace - position;
-
-            if(Math.Abs(acceleration) < 0.00001)
-            {
-                var time = distance / velocity;
-                return new BallBounce(time > 0 ? time : double.MaxValue, bouncePlace);
-            }
-
-            var delta = velocity * velocity + 2 * acceleration * distance;
-            if(delta < 0)
-            {
-                return new BallBounce(double.MaxValue, bouncePlace);
-            }
-
-            var deltaSqrt = Math.Sqrt(delta);
-            var t1 = (-velocity - deltaSqrt) / acceleration;
-            var t2 = (-velocity + deltaSqrt) / acceleration;
-
-            return SelectTimeToBounce(
-                new BallBounce(t1, bouncePlace), 
-                new BallBounce(t2, bouncePlace));
-
-        }
-
-        private BallBounce SelectTimeToBounce(params BallBounce[] times)
-        {
-            return times.Where(e => e?.time > 0).OrderBy(x => x.time).FirstOrDefault();
-        }
     }
 
     public record BallBounce(double time, double place);
@@ -198,9 +76,10 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
     public record BallVelocity(double X, double Y)
     {
         public double Value => Math.Sqrt(X * X + Y * Y);
-        public BallVelocity ApplyAcceleration(BallAcceleration acceleration)
+        public BallVelocity ApplyAcceleration(BallAcceleration acceleration, TimeSpan deltaTime)
         {
-            return this with { X = X + acceleration.X, Y = Y + acceleration.Y };
+            var timeInSecond = deltaTime.TotalSeconds;
+            return this with { X = X + acceleration.X * timeInSecond, Y = Y + acceleration.Y * timeInSecond };
         }
 
         internal BallVelocity ChangeDirection(double deltaX, double deltaY)
