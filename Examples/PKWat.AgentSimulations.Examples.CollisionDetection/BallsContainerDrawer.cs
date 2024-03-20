@@ -34,7 +34,7 @@ public class BallsContainerDrawer
 
         graphic.Clear(Color.White);
         var velocity = 0.0;
-        for(double i = 0.1;  i <= 1; i+= 0.2)
+        for(double i = 0.1;  i <= 1; i+= 0.5)
         {
             DrawBalls(context, graphic, i);
         }
@@ -82,7 +82,7 @@ public class BallsContainerDrawer
     {
         foreach (var ball in context.GetAgents<Ball>())
         {
-            var radius = ball.Radius * 2;
+            var radius = ball.Radius * 10;
             graphic.FillEllipse(
                 new SolidBrush(Color.FromArgb((int)((1-scale)*255), ball.Color)),
                 (float)(ball.Coordinates.X * _xScale - radius * scale),

@@ -40,14 +40,20 @@ public partial class MainWindow : Window
         _colorInitializer.Initialize(numberOfBalls);
 
         _simulation = _simulationBuilder
-            .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -5)))
+            .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -10), 2))
             .AddAgents<Ball>(numberOfBalls)
             .AddCallback(RenderAsync)
-            .SetSimulationStep(TimeSpan.FromSeconds(0.5))
+            .AddCallback(UpdateBallsCacheAsync)
+            .SetSimulationStep(TimeSpan.FromSeconds(0.1))
             .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.01))
             .Build();
 
         await _simulation.StartAsync();
+    }
+
+    private async Task UpdateBallsCacheAsync(ISimulationContext<BallsContainer> context)
+    {
+        context.SimulationEnvironment.UpdateNearestBalls(context.GetAgents<Ball>());
     }
 
     private async void stopSimulationButton_Click(object sender, RoutedEventArgs e)

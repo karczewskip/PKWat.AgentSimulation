@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace PKWat.AgentSimulations.Examples.CollisionDetection
 {
-    class Ball : IAgent<BallsContainer>
+    public class Ball : IAgent<BallsContainer>
     {
         private readonly IRandomNumbersGenerator _randomNumbersGenerator;
         private readonly ColorInitializer _colorInitializer;
@@ -19,7 +19,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
 
         public BallCoordinates Coordinates { get; private set; }
         public BallVelocity Velocity { get; private set; }
-        public double Radius { get; } = 4.0;
+        public double Radius { get; private set; }
         public Color Color { get; private set; } 
 
         public void Initialize(ISimulationContext<BallsContainer> simulationContext)
@@ -28,8 +28,9 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             var x = _randomNumbersGenerator.NextDouble() * environment.Width;
             var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height/2;
             Coordinates = new BallCoordinates(x, y);
-            Velocity = new BallVelocity(_randomNumbersGenerator.NextDouble()*50 - 25, _randomNumbersGenerator.NextDouble()*50 - 25);
+            Velocity = new BallVelocity(0, 0); //new BallVelocity(5*(_randomNumbersGenerator.NextDouble() - 0.5), 0);
             Color = _colorInitializer.GetNext();
+            Radius = environment.BallRadius;
         }
 
         public void Act(ISimulationContext<BallsContainer> simulationContext)
@@ -46,7 +47,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             var ballAcceleration = environment.Gravity;
 
             var velocity = Velocity;
-            var overlappingBalls = simulationContext.GetAgents<Ball>().Select(anotherBall => (Overlap: anotherBall.OverlapDistance(this), AnotherBall: anotherBall)).Where(x => x.Overlap > 0 && x.AnotherBall != this).ToArray();
+            var overlappingBalls = simulationContext.SimulationEnvironment.GetNearestBalls(Coordinates).Select(anotherBall => (Overlap: anotherBall.OverlapDistance(this), AnotherBall: anotherBall)).Where(x => x.Overlap > 0 && x.AnotherBall != this).ToArray();
             if(overlappingBalls.Any())
             {
                 var delta = overlappingBalls.Aggregate((deltaX: 0.0,deltaY: 0.0), (accumulatedDelta, next) =>
@@ -55,22 +56,21 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
                     return (accumulatedDelta.deltaX + nextDelta.deltaX, accumulatedDelta.deltaY + nextDelta.deltaY);
                 } );
 
-                velocity = Velocity.ChangeDirection(delta.deltaX, delta.deltaY).Scale(0.5);
+                velocity = Velocity.ChangeDirection(delta.deltaX, delta.deltaY).Scale(0.0);
             }
 
+            var sourceForceBase = environment.Gravity.Value * Math.Pow(environment.BallRadius, 2) * Math.Pow(19.0 / 10, 2);
+            foreach (var anotherBall in overlappingBalls)
+            {
+                var direction = anotherBall.AnotherBall.Coordinates.GetDirectionTo(Coordinates);
+                var distance = anotherBall.AnotherBall.Radius + Radius - anotherBall.Overlap;
+                var addingAcceleration = new BallAcceleration(direction.deltaX, direction.deltaY).Scale(sourceForceBase / Math.Pow(distance, 2));
+                ballAcceleration += addingAcceleration;
+            }
 
-
-            //foreach (var anotherBall in simulationContext.GetAgents<Ball>().Where(x => x != this))
+            //if(ballAcceleration.Value > 10)
             //{
-            //    var overlapDistance = anotherBall.OverlapDistance(this);
-            //    if (overlapDistance > 0)
-            //    {
-            //        var distance = anotherBall.Coordinates.DistanceFrom(Coordinates);
-            //        var ballBouncingAccelerationValue = 500 / (distance*distance);
-            //        var accelerationDirection = anotherBall.Coordinates.GetDirectionTo(Coordinates);
-            //        var ballBouncingAcceleration = new BallAcceleration(accelerationDirection.deltaX * ballBouncingAccelerationValue, accelerationDirection.deltaY * ballBouncingAccelerationValue);
-            //        ballAcceleration += ballBouncingAcceleration;
-            //    }
+            //    throw new Exception();
             //}
 
             var timeToBounceLeft = CalculateTimeToBounce(velocity.X, ballAcceleration.X, Coordinates.X, 0);
@@ -93,11 +93,18 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             else if(timeToBounceVertical != null)
             {
                 var timeAfterBounce = timeInSeconds - timeToBounceVertical.time;
-                var velocityYAfterBounce = -(velocity.Y + ballAcceleration.Y * timeAfterBounce);
+                var velocityYAfterBounce = -(velocity.Y + ballAcceleration.Y * timeAfterBounce) * environment.VelocityLossAfterBounce;
                 newY = velocityYAfterBounce * timeAfterBounce
                         + ballAcceleration.Y * timeAfterBounce * timeAfterBounce / 2;
                 newVelocityY = velocityYAfterBounce + ballAcceleration.Y * timeAfterBounce;
-
+            }
+            if(newY < 0)
+            {
+                newY = 0;
+            }
+            else if(newY > environment.Height)
+            {
+                newY = environment.Height;
             }
 
             var newX = Coordinates.X;
@@ -112,11 +119,18 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             else if (timeToBounceHorizontal != null)
             {
                 var timeAfterBounce = timeInSeconds - timeToBounceHorizontal.time;
-                var velocityXAfterBounce = -(velocity.X + ballAcceleration.X * timeAfterBounce);
+                var velocityXAfterBounce = -(velocity.X + ballAcceleration.X * timeAfterBounce) * environment.VelocityLossAfterBounce;
                 newX = timeToBounceHorizontal.place + velocityXAfterBounce * timeAfterBounce
                         + ballAcceleration.X * timeAfterBounce * timeAfterBounce / 2;
                 newVelocityX = velocityXAfterBounce + ballAcceleration.X * timeAfterBounce;
-
+            }
+            if (newX < 0)
+            {
+                newX = 0;
+            }
+            else if (newX > environment.Width)
+            {
+                newX = environment.Width;
             }
 
             
@@ -206,6 +220,13 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
 
     public record BallAcceleration(double X, double Y)
     {
+        public double Value => Math.Sqrt(X * X + Y * Y);
+
+        internal BallAcceleration Scale(double scale)
+        {
+            return new BallAcceleration(X * scale, Y * scale);
+        }
+
         public static BallAcceleration operator +(BallAcceleration a, BallAcceleration b)
         {
             return new BallAcceleration(a.X + b.X, a.Y + b.Y);
