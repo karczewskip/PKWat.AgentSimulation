@@ -44,6 +44,7 @@
                 .CreateNewSimulation(new ColonyEnvironment(Scale * 50, Scale * 50, new AntHill(new ColonyCoordinates(Scale * 10, Scale * 10)), new FoodSource(new ColonyCoordinates(Scale * 40, Scale * 40))))
                 .AddAgents<Ant>(1000)
                 .AddEnvironmentUpdates(DecreasePheromones)
+                .AddEnvironmentUpdates(AddPheromones)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
                 .Build();
@@ -54,6 +55,23 @@
         private async Task DecreasePheromones(ISimulationContext<ColonyEnvironment> context)
         {
             context.SimulationEnvironment.DecreasePheromones();
+        }
+
+        private async Task AddPheromones(ISimulationContext<ColonyEnvironment> context)
+        {
+            var environment = context.SimulationEnvironment;
+            var ants = context.GetAgents<Ant>();
+            foreach (var ant in ants)
+            {
+                if (ant.State.IsCarryingFood)
+                {
+                    environment.AddFoodPheromones(ant.State.Coordinates, ant.State.PheromonesStrength);
+                }
+                else
+                {
+                    environment.AddHomePheromones(ant.State.Coordinates, ant.State.PheromonesStrength);
+                }
+            }
         }
 
         private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context)
