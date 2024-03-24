@@ -54,16 +54,16 @@ public class BallsContainerDrawer
             //    (float)(BallKernelRadius),
             //    (float)(BallKernelRadius));
 
-            velocity = ball.Velocity.Y;
-            if (_maxHeight < ball.Coordinates.Y)
+            velocity = ball.State.Velocity.Y;
+            if (_maxHeight < ball.State.Coordinates.Y)
             {
-                _maxHeight = ball.Coordinates.Y;
+                _maxHeight = ball.State.Coordinates.Y;
             }
-            if (_lastVelocity > 0 && ball.Velocity.Y <= 0)
+            if (_lastVelocity > 0 && ball.State.Velocity.Y <= 0)
             {
-                _height = ball.Coordinates.Y;
+                _height = ball.State.Coordinates.Y;
             }
-            _lastVelocity = ball.Velocity.Y;
+            _lastVelocity = ball.State.Velocity.Y;
 
         }
 
@@ -82,11 +82,11 @@ public class BallsContainerDrawer
     {
         foreach (var ball in context.GetAgents<Ball>())
         {
-            var radius = ball.Radius * 10;
+            var radius = context.SimulationEnvironment.BallRadius * 10;
             graphic.FillEllipse(
-                new SolidBrush(Color.FromArgb((int)((1-scale)*255), ball.Color)),
-                (float)(ball.Coordinates.X * _xScale - radius * scale),
-                (float)(ball.Coordinates.Y * _yScale - radius * scale),
+                new SolidBrush(Color.FromArgb((int)((1-scale)*255), ball.State.Color)),
+                (float)(ball.State.Coordinates.X * _xScale - radius * scale),
+                (float)(ball.State.Coordinates.Y * _yScale - radius * scale),
                 (float)(radius * 2 * scale),
                 (float)(radius * 2 * scale));
 

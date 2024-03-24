@@ -27,7 +27,7 @@
         {
             _ballsInBackets.Clear();
 
-            var groupedBalls = balls.GroupBy(ball => Backet.GetFromCoordinatesAndRadius(ball.Coordinates, BallRadius));
+            var groupedBalls = balls.GroupBy(ball => Backet.GetFromCoordinatesAndRadius(ball.State.Coordinates, BallRadius));
 
             foreach(var ballsGroup in groupedBalls)
             {

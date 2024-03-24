@@ -47,7 +47,7 @@
 
             foreach (Ant ant in context.GetAgents<Ant>())
             {
-                graphic.FillEllipse(ant.IsCarryingFood ? Brushes.Green : Brushes.Black, Scale * ant.Coordinates.X, Scale * ant.Coordinates.Y, AntSize, AntSize);
+                graphic.FillEllipse(ant.State.IsCarryingFood ? Brushes.Green : Brushes.Black, Scale * ant.State.Coordinates.X, Scale * ant.State.Coordinates.Y, AntSize, AntSize);
             }
 
             var anthillCoordinates = context.SimulationEnvironment.AntHill.Coordinates;

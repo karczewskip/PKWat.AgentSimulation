@@ -25,7 +25,7 @@
 
             foreach (var b in bouncingBalls)
             {
-                drawingContext.DrawEllipse(b.Brush, null, new Point(b.X, b.Y), b.Radius, b.Radius);
+                drawingContext.DrawEllipse(b.State.Brush, null, new Point(b.State.X, b.State.Y), b.State.Radius, b.State.Radius);
             }
 
             drawingContext.Close();

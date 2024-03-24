@@ -3,7 +3,9 @@ using System.Drawing;
 
 namespace PKWat.AgentSimulations.Examples.CollisionDetection
 {
-    public class Ball : IAgent<BallsContainer>
+    public record BallState(BallCoordinates Coordinates, BallVelocity Velocity, Color Color);
+
+    public class Ball : SimulationAgent<BallsContainer, BallState>
     {
         private readonly IRandomNumbersGenerator _randomNumbersGenerator;
         private readonly ColorInitializer _colorInitializer;
@@ -14,44 +16,39 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             _colorInitializer = colorInitializer;
         }
 
-        private BallCoordinates _nextCoordinates;
-        private BallVelocity _nextVelocity;
-
-        public BallCoordinates Coordinates { get; private set; }
-        public BallVelocity Velocity { get; private set; }
-        public double Radius { get; private set; }
-        public Color Color { get; private set; } 
-
-        public void Initialize(ISimulationContext<BallsContainer> simulationContext)
+        protected override BallState GetInitialState(ISimulationContext<BallsContainer> simulationContext)
         {
             var environment = simulationContext.SimulationEnvironment;
             var x = _randomNumbersGenerator.NextDouble() * environment.Width;
-            var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height/2;
-            Coordinates = new BallCoordinates(x, y);
-            Velocity = new BallVelocity(50*(_randomNumbersGenerator.NextDouble() - 0.5), 0);
-            Color = _colorInitializer.GetNext();
-            Radius = environment.BallRadius;
+            var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height / 2;
+
+            return new BallState(
+                new BallCoordinates(x, y),
+                new BallVelocity(50 * (_randomNumbersGenerator.NextDouble() - 0.5), 0),
+                _colorInitializer.GetNext());
         }
 
-        public void Act(ISimulationContext<BallsContainer> simulationContext)
-        {
-            Coordinates = _nextCoordinates;
-            Velocity = _nextVelocity;
-        }
-
-        public void Decide(ISimulationContext<BallsContainer> simulationContext)
+        protected override BallState GetNextState(ISimulationContext<BallsContainer> simulationContext)
         {
             var environment = simulationContext.SimulationEnvironment;
             var timeInSeconds = simulationContext.SimulationStep.TotalSeconds;
 
-            _nextVelocity = Velocity.ApplyAcceleration(environment.Gravity, simulationContext.SimulationStep);
-            _nextCoordinates = Coordinates with
+            var newVelocity = State.Velocity.ApplyAcceleration(environment.Gravity, simulationContext.SimulationStep);
+
+            return State with
             {
-                X = Coordinates.X + _nextVelocity.X * timeInSeconds,
-                Y = Coordinates.Y + _nextVelocity.Y * timeInSeconds
+                Velocity = newVelocity,
+                Coordinates = State.Coordinates with
+                {
+                    X = State.Coordinates.X + newVelocity.X * timeInSeconds,
+                    Y = State.Coordinates.Y + newVelocity.Y * timeInSeconds
+                }
             };
         }
 
+        public void Decide(ISimulationContext<BallsContainer> simulationContext)
+        {
+        }
     }
 
     public record BallBounce(double time, double place);

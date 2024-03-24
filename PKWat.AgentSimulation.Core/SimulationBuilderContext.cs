@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 public interface ISimulationBuilderContext<T>
 {
-    ISimulationBuilderContext<T> AddAgent(IAgent<T> agent);
-    ISimulationBuilderContext<T> AddAgents(IEnumerable<IAgent<T>> agents);
-    ISimulationBuilderContext<T> AddAgents<U>(int number) where U : IAgent<T>;
+    ISimulationBuilderContext<T> AddAgent(ISimulationAgent<T> agent);
+    ISimulationBuilderContext<T> AddAgents(IEnumerable<ISimulationAgent<T>> agents);
+    ISimulationBuilderContext<T> AddAgents<U>(int number) where U : ISimulationAgent<T>;
     ISimulationBuilderContext<T> AddEnvironmentUpdates(Func<ISimulationContext<T>, Task> update);
     ISimulationBuilderContext<T> AddCallback(Func<ISimulationContext<T>, Task> callback);
     ISimulationBuilderContext<T> SetSimulationStep(TimeSpan simulationStep);
@@ -20,7 +20,7 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
     private readonly T _simulationEnvironment;
     private readonly IServiceProvider _serviceProvider;
 
-    private List<IAgent<T>> _agents = new();
+    private List<ISimulationAgent<T>> _agents = new();
     private List<Func<ISimulationContext<T>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<T>, Task>> _callbacks = new();
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
@@ -32,23 +32,23 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
         _serviceProvider = serviceProvider;
     }
 
-    public ISimulationBuilderContext<T> AddAgent(IAgent<T> agent)
+    public ISimulationBuilderContext<T> AddAgent(ISimulationAgent<T> agent)
     {
         _agents.Add(agent);
 
         return this;
     }
 
-    public ISimulationBuilderContext<T> AddAgents(IEnumerable<IAgent<T>> agents)
+    public ISimulationBuilderContext<T> AddAgents(IEnumerable<ISimulationAgent<T>> agents)
     {
         _agents.AddRange(agents);
 
         return this;
     }
 
-    public ISimulationBuilderContext<T> AddAgents<U>(int number) where U : IAgent<T>
+    public ISimulationBuilderContext<T> AddAgents<U>(int number) where U : ISimulationAgent<T>
     {
-        _agents.AddRange(Enumerable.Range(0, number).Select(x => (IAgent<T>)_serviceProvider.GetService<U>()));
+        _agents.AddRange(Enumerable.Range(0, number).Select(x => (ISimulationAgent<T>)_serviceProvider.GetService<U>()));
 
         return this;
     }

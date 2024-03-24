@@ -47,7 +47,7 @@
                 await Parallel.ForEachAsync(
                     _context.Agents, 
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run( () => x.Act(_context))));
+                    (x, c) => new ValueTask(Task.Run( () => x.Act())));
 
                 foreach (var callback in _callbacks)
                 {

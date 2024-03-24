@@ -34,24 +34,11 @@ public partial class MainWindow : Window
         var random = new Random();
 
         var colors = _colorsGenerator.Generate(ballsCount);
-        var bouncingBalls = Enumerable.Range(0, ballsCount).Select(x =>
-        {
-            var color = colors[x];
-            var startX = ((ballsCount / 2 - x) * 0.00001) / ballsCount;
-            var radius = (1 + random.NextDouble())*10;
-            var startY = -(_radius/2);
-            var startDeltaX = 0;
-            var startDeltaY = 0;
-            var maxDistanceFromTheCenter = _radius;
-            var gravity = 0.25;
-            var brush = new SolidColorBrush(Color.FromArgb(color.A, color.R, color.G, color.B));
-            return new BouncingBall(startX, startY, radius, startDeltaX, startDeltaY, maxDistanceFromTheCenter, gravity, brush);
-        }).ToArray();
 
         _simulation
             = _simulationBuilder
                 .CreateNewSimulation(new BouncingBallBulb())
-                .AddAgents(bouncingBalls)
+                .AddAgents<BouncingBall>(ballsCount)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
                 .Build();

@@ -9,7 +9,7 @@
             return Math.Sqrt(Math.Pow(X - coordinates.X, 2) + Math.Pow(Y - coordinates.Y, 2));
         }
 
-        public ColonyCoordinates MovedBy(ColonyDirection direction)
+        public ColonyCoordinates MoveBy(ColonyDirection direction)
         {
             return new ColonyCoordinates(X + direction.X, Y + direction.Y);
         }

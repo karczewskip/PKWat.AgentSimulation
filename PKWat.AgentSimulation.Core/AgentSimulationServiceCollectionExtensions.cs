@@ -13,7 +13,7 @@ public static class AgentSimulationServiceCollectionExtensions
         foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface))
         {
             var interfaces = type.GetInterfaces();
-            if(interfaces.Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IAgent<>)))
+            if(interfaces.Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISimulationAgent<>)))
             {
                 services.AddTransient(type);
             }

@@ -8,12 +8,12 @@ public interface ISimulationContext<U>
     TimeSpan SimulationStep { get; }
     TimeSpan SimulationTime { get; }
 
-    IEnumerable<T> GetAgents<T>() where T : IAgent<U>;
+    IEnumerable<T> GetAgents<T>() where T : ISimulationAgent<U>;
 }
 
 internal class SimulationContext<U>: ISimulationContext<U>
 {
-    public SimulationContext(U simulationEnvironment, List<IAgent<U>> agents, TimeSpan simulationStep, TimeSpan waitingTimeBetweenSteps)
+    public SimulationContext(U simulationEnvironment, List<ISimulationAgent<U>> agents, TimeSpan simulationStep, TimeSpan waitingTimeBetweenSteps)
     {
         SimulationEnvironment = simulationEnvironment;
         Agents = agents;
@@ -26,10 +26,10 @@ internal class SimulationContext<U>: ISimulationContext<U>
     public TimeSpan SimulationStep { get; }
     public TimeSpan SimulationTime { get; private set; }
 
-    public IReadOnlyList<IAgent<U>> Agents { get; }
+    public IReadOnlyList<ISimulationAgent<U>> Agents { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
 
-    public IEnumerable<T> GetAgents<T>() where T : IAgent<U> 
+    public IEnumerable<T> GetAgents<T>() where T : ISimulationAgent<U> 
         => Agents.OfType<T>();
 
     internal void UpdateSimulationTime()
