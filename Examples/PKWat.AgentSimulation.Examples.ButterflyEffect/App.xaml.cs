@@ -17,6 +17,7 @@ public partial class App : Application
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddSingleton<MainWindow>();
+                services.AddSingleton<BouncingBallStateInitializer>();
                 services.AddSingleton<ColorsGenerator>();
                 services.AddSingleton<PictureRenderer>();
                 services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));

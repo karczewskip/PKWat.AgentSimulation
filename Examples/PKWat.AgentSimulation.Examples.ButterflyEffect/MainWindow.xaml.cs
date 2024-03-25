@@ -2,43 +2,43 @@
 
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Drawing;
-using System.Diagnostics.Metrics;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 public partial class MainWindow : Window
 {
-    private const int _radius = 400;
-
-    private TranslateTransform _centerTransform;
-
     private ISimulation _simulation;
 
     private readonly ISimulationBuilder _simulationBuilder;
     private readonly ColorsGenerator _colorsGenerator;
     private readonly PictureRenderer _pictureRenderer;
+    private readonly BouncingBallStateInitializer _bouncingBallStateInitializer;
 
-    public MainWindow(ISimulationBuilder simulationBuilder, ColorsGenerator colorsGenerator, PictureRenderer pictureRenderer)
+    public MainWindow(ISimulationBuilder simulationBuilder, ColorsGenerator colorsGenerator, PictureRenderer pictureRenderer, BouncingBallStateInitializer bouncingBallStateInitializer)
     {
         _simulationBuilder = simulationBuilder;
         _colorsGenerator = colorsGenerator;
         _pictureRenderer = pictureRenderer;
+        _bouncingBallStateInitializer = bouncingBallStateInitializer;
 
         InitializeComponent();
     }
 
     private async void startSimulationButton_Click(object sender, RoutedEventArgs e)
     {
-        int ballsCount = 500;
+        double bulbRadius = 400.0;
+        int ballsCount = 10;
         var random = new Random();
 
         var colors = _colorsGenerator.Generate(ballsCount);
 
+        _bouncingBallStateInitializer.Initialize(colors, ballsCount);
+        var bitmapSize = (int)(bulbRadius * 2);
+        _pictureRenderer.Initialize(bitmapSize, bitmapSize);
+
         _simulation
             = _simulationBuilder
-                .CreateNewSimulation(new BouncingBallBulb())
-                .AddAgents<BouncingBall>(ballsCount)
+                .CreateNewSimulation(new BouncingBallBulb(bulbRadius, 10.0))
+                .AddAgents<BouncingBall>(200)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
                 .Build();
@@ -53,9 +53,7 @@ public partial class MainWindow : Window
 
     private async Task RenderAsync(ISimulationContext<BouncingBallBulb> simulationContext)
     {
-        var bouncingBalls = simulationContext.GetAgents<BouncingBall>().ToArray();
-
-        simulationImage.Source = _pictureRenderer.Render(_radius, bouncingBalls);
+        simulationImage.Source = _pictureRenderer.Draw(simulationContext);
     }
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
