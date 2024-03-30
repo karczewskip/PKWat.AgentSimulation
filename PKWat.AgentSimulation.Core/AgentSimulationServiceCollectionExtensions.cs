@@ -19,7 +19,5 @@ public static class AgentSimulationServiceCollectionExtensions
                 services.AddTransient(type);
             }
         }
-
-
     }
 }
