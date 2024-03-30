@@ -35,7 +35,7 @@ public partial class MainWindow : Window
             await _simulation.StopAsync();
         }
 
-        int numberOfBalls = 1;
+        int numberOfBalls = 10;
 
         _colorInitializer.Initialize(numberOfBalls);
 
@@ -46,6 +46,7 @@ public partial class MainWindow : Window
             .AddCallback(UpdateBallsCacheAsync)
             .SetSimulationStep(TimeSpan.FromSeconds(0.1))
             .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.01))
+            .SetRandomSeed(100)
             .Build();
 
         await _simulation.StartAsync();

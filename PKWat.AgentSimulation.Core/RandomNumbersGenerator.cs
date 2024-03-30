@@ -8,14 +8,11 @@ public interface IRandomNumbersGenerator
 
 internal class RandomNumbersGenerator : IRandomNumbersGenerator
 {
-    private static int Counter = 0;
-    private static int Seed = 2475;
-
     private Random _random;
 
-    public RandomNumbersGenerator()
+    public RandomNumbersGenerator(Random random)
     {
-        _random = new Random(Seed + Counter++);
+        _random = random;
     }
 
     public int Next(int maxValue)
@@ -27,5 +24,26 @@ internal class RandomNumbersGenerator : IRandomNumbersGenerator
     {
         return _random.NextDouble();
     }
+}
+
+internal class RandomNumbersGeneratorFactory
+{
+    private Random _random;
+
+    public void Initialize(int? seed = null)
+    {
+        _random = seed.HasValue ? new Random(seed.Value) : new Random();
+    }
+
+    public IRandomNumbersGenerator Create()
+    {
+        if(_random == null)
+        {
+            throw new InvalidOperationException("RandomNumbersGeneratorFactory has not been initialized");
+        }
+
+        return new RandomNumbersGenerator(new Random(_random.Next(int.MaxValue)));
+    }
+
 }
 
