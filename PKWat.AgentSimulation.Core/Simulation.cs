@@ -13,14 +13,20 @@
         private readonly SimulationContext<T> _context;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
+        private readonly IReadOnlyList<ISimulationEvent<T>> _events;
 
         public bool Running { get; private set; } = false;
 
-        public Simulation(SimulationContext<T> context, IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates, IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks)
+        public Simulation(
+            SimulationContext<T> context, 
+            IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
+            IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
+            IReadOnlyList<ISimulationEvent<T>> events)
         {
             _context = context;
             _environmentUpdates = environmentUpdates;
             _callbacks = callbacks;
+            _events = events;
         }
 
         public async Task StartAsync()
@@ -37,6 +43,14 @@
                 foreach (var environmentUpdate in _environmentUpdates)
                 {
                     await environmentUpdate(_context);
+                }
+
+                foreach (var simulationEvent in _events)
+                {
+                    if(await simulationEvent.ShouldBeExecuted(_context))
+                    {
+                        await simulationEvent.Execute(_context);
+                    }
                 }
 
                 await Parallel.ForEachAsync(

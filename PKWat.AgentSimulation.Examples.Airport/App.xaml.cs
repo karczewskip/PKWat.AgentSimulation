@@ -5,6 +5,7 @@
     using System.Reflection;
     using System.Windows;
     using PKWat.AgentSimulation.Core;
+    using PKWat.AgentSimulation.Examples.Airport.Simulation;
 
     /// <summary>
     /// Interaction logic for App.xaml
@@ -19,6 +20,7 @@
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<MainWindow>();
+                    services.AddScoped<AirportDrawer>();
                     services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
                 })
                 .Build();

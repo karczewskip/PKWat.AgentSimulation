@@ -1,26 +1,26 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
-public interface ISimulationAgent<T>
+public interface ISimulationAgent<ENVIRONMENT>
 {
-    void Initialize(ISimulationContext<T> simulationContext);
-    void Decide(ISimulationContext<T> simulationContext);
+    void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
+    void Decide(ISimulationContext<ENVIRONMENT> simulationContext);
     void Act();
 
 }
 
-public abstract class SimulationAgent<T, U> : ISimulationAgent<T>
+public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENVIRONMENT>
 {
-    private U _nextState;
+    private STATE _nextState;
 
-    public U State { get; private set; }
+    public STATE State { get; private set; }
 
 
-    public void Initialize(ISimulationContext<T> simulationContext)
+    public void Initialize(ISimulationContext<ENVIRONMENT> simulationContext)
     {
         State = GetInitialState(simulationContext);
     }
 
-    public void Decide(ISimulationContext<T> simulationContext)
+    public void Decide(ISimulationContext<ENVIRONMENT> simulationContext)
     {
         _nextState = GetNextState(simulationContext);
     }
@@ -30,6 +30,6 @@ public abstract class SimulationAgent<T, U> : ISimulationAgent<T>
         State = _nextState;
     }
 
-    protected abstract U GetInitialState(ISimulationContext<T> simulationContext);
-    protected abstract U GetNextState(ISimulationContext<T> simulationContext);
+    protected abstract STATE GetInitialState(ISimulationContext<ENVIRONMENT> simulationContext);
+    protected abstract STATE GetNextState(ISimulationContext<ENVIRONMENT> simulationContext);
 }

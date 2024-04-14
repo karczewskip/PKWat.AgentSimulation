@@ -18,8 +18,4 @@
     <ProjectReference Include="..\PKWat.AgentSimulation.Drawing\PKWat.AgentSimulation.Drawing.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Simulation\Agents\" />
-  </ItemGroup>
-
 </Project>

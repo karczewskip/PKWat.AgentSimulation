@@ -3,6 +3,8 @@
     using PKWat.AgentSimulation.Core;
     using System.Windows;
     using PKWat.AgentSimulation.Examples.Airport.Simulation;
+    using PKWat.AgentSimulation.Examples.Airport.Simulation.Events;
+    using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -20,6 +22,7 @@
 
             InitializeComponent();
             _airportDrawer = airportDrawer;
+            _airportDrawer.Initialize(800, 800);
         }
 
         private async void startSimulationButton_Click(object sender, RoutedEventArgs e)
@@ -30,8 +33,10 @@
             }
             _simulation = _simulationBuilder
             .CreateNewSimulation(new AirportEnvironment())
+            .AddEvent<NewAirplaneArrived>()
             .AddCallback(RenderAsync)
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
+            .SetSimulationStep(TimeSpan.FromMinutes(1))
+            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
             .SetRandomSeed(100)
             .Build();
 

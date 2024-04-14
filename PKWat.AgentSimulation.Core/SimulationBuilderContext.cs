@@ -2,14 +2,15 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-public interface ISimulationBuilderContext<T>
+public interface ISimulationBuilderContext<ENVIRONMENT>
 {
-    ISimulationBuilderContext<T> AddAgents<U>(int number) where U : ISimulationAgent<T>;
-    ISimulationBuilderContext<T> AddEnvironmentUpdates(Func<ISimulationContext<T>, Task> update);
-    ISimulationBuilderContext<T> AddCallback(Func<ISimulationContext<T>, Task> callback);
-    ISimulationBuilderContext<T> SetSimulationStep(TimeSpan simulationStep);
-    ISimulationBuilderContext<T> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
-    ISimulationBuilderContext<T> SetRandomSeed(int seed);
+    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
+    ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
+    ISimulationBuilderContext<ENVIRONMENT> SetSimulationStep(TimeSpan simulationStep);
+    ISimulationBuilderContext<ENVIRONMENT> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
+    ISimulationBuilderContext<ENVIRONMENT> SetRandomSeed(int seed);
+    ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
 
     ISimulation Build();
 }
@@ -21,8 +22,10 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
 
     private List<ISimulationAgent<T>> _agents = new();
     private List<Func<ISimulationAgent<T>>> _agentsToGenerate = new();
+    private List<Func<ISimulationEvent<T>>> _eventsToGenerate = new();
     private List<Func<ISimulationContext<T>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<T>, Task>> _callbacks = new();
+    private List<ISimulationEvent<T>> _events = new();
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
@@ -78,11 +81,19 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
         return this;
     }
 
+    public ISimulationBuilderContext<T> AddEvent<U>() where U : ISimulationEvent<T>
+    {
+        _eventsToGenerate.Add(() => _serviceProvider.GetRequiredService<U>());
+
+        return this;
+    }
+
     public ISimulation Build()
     {
         _serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
         _agents.AddRange(_agentsToGenerate.Select(x => x()));
+        _events.AddRange(_eventsToGenerate.Select(x => x()));
 
-        return new Simulation<T>(new SimulationContext<T>(_simulationEnvironment ,_agents, _simulationStep, _waitingTimeBetweenSteps), _environmentUpdates, _callbacks);
+        return new Simulation<T>(new SimulationContext<T>(_serviceProvider, _simulationEnvironment ,_agents, _simulationStep, _waitingTimeBetweenSteps), _environmentUpdates, _callbacks, _events);
     }
 }
