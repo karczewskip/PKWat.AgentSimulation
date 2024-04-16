@@ -1,11 +1,16 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
-public interface ISimulationAgent<ENVIRONMENT>
+public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent
 {
     void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
     void Decide(ISimulationContext<ENVIRONMENT> simulationContext);
     void Act();
 
+}
+
+public interface IRecognizableAgent : IEquatable<IRecognizableAgent>
+{
+    Guid Id { get; }
 }
 
 public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENVIRONMENT>
@@ -14,6 +19,7 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
 
     public STATE State { get; private set; }
 
+    public Guid Id { get; } = Guid.NewGuid();
 
     public void Initialize(ISimulationContext<ENVIRONMENT> simulationContext)
     {
@@ -32,4 +38,9 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
 
     protected abstract STATE GetInitialState(ISimulationContext<ENVIRONMENT> simulationContext);
     protected abstract STATE GetNextState(ISimulationContext<ENVIRONMENT> simulationContext);
+
+    public bool Equals(IRecognizableAgent? other)
+    {
+        return other is IRecognizableAgent agent && agent.Id == Id;
+    }
 }

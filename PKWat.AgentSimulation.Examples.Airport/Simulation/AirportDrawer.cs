@@ -8,6 +8,8 @@ using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 public class AirportDrawer
 {
+    private const int AirplaneSize = 10;
+
     private Bitmap _bmp;
 
     public void Initialize(int width, int height)
@@ -24,7 +26,7 @@ public class AirportDrawer
         int i = 0;
         foreach (var airplane in context.GetAgents<Airplane>())
         {
-            graphic.FillEllipse(Brushes.Black, _bmp.Width/2 + i*5, _bmp.Height/2, 5, 5);
+            graphic.FillEllipse(Brushes.Black, _bmp.Width/2 + i* AirplaneSize, _bmp.Height/2, AirplaneSize, AirplaneSize);
             i++;
         }
 

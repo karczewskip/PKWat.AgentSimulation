@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 public interface ISimulationContext<ENVIRONMENT>
@@ -9,13 +10,20 @@ public interface ISimulationContext<ENVIRONMENT>
     TimeSpan SimulationStep { get; }
     TimeSpan SimulationTime { get; }
 
-    IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
-
     void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+
+    void SendMessage<RECEIVER>(RECEIVER receiver, IAgentMessage message) where RECEIVER : IRecognizableAgent;
+    IEnumerable<IAgentMessage> GetMessages<RECEIVER>(RECEIVER receiver) where RECEIVER : IRecognizableAgent;
+
 }
 
-internal class SimulationContext<ENVIRONMENT>: ISimulationContext<ENVIRONMENT>
+internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
 {
+    private readonly ConcurrentBag<(IRecognizableAgent, IAgentMessage)> _newMessages = new();
+    private readonly Dictionary<IRecognizableAgent, List<IAgentMessage>> _messagesToDeliver = new();
+
     private readonly IServiceProvider _serviceProvider;
 
     public SimulationContext(
@@ -44,14 +52,46 @@ internal class SimulationContext<ENVIRONMENT>: ISimulationContext<ENVIRONMENT>
     public IEnumerable<T> GetAgents<T>() where T : ISimulationAgent<ENVIRONMENT> 
         => Agents.OfType<T>();
 
-    internal void UpdateSimulationTime()
+    public AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
+        => Agents.OfType<AGENT>().Single();
+
+    internal void Update()
     {
         SimulationTime += SimulationStep;
+
+        _messagesToDeliver.Clear();
+        foreach (var (receiver, message) in _newMessages)
+        {
+            if (!_messagesToDeliver.ContainsKey(receiver))
+            {
+                _messagesToDeliver[receiver] = new List<IAgentMessage>();
+            }
+
+            _messagesToDeliver[receiver].Add(message);
+        }
+
+        _newMessages.Clear();
     }
 
     public void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
         Agents.Add(agent);
+    }
+
+    public void SendMessage<RECEIVER>(RECEIVER receiver, IAgentMessage message)
+        where RECEIVER : IRecognizableAgent
+    {
+        _newMessages.Add((receiver, message));
+    }
+
+    public IEnumerable<IAgentMessage> GetMessages<RECEIVER>(RECEIVER receiver) where RECEIVER : IRecognizableAgent
+    {
+        if (_messagesToDeliver.TryGetValue(receiver, out var messages))
+        {
+            return messages;
+        }
+
+        return [];
     }
 }

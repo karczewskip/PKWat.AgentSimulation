@@ -68,7 +68,7 @@
                     await callback(_context);
                 }
 
-                _context.UpdateSimulationTime();
+                _context.Update();
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
             }
         }
