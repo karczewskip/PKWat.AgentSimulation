@@ -3,7 +3,7 @@
 public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent
 {
     void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
-    void Decide(ISimulationContext<ENVIRONMENT> simulationContext);
+    void Prepare(ISimulationContext<ENVIRONMENT> simulationContext);
     void Act();
 
 }
@@ -26,7 +26,7 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
         State = GetInitialState(simulationContext);
     }
 
-    public void Decide(ISimulationContext<ENVIRONMENT> simulationContext)
+    public void Prepare(ISimulationContext<ENVIRONMENT> simulationContext)
     {
         _nextState = GetNextState(simulationContext);
     }

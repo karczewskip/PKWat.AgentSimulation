@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 public interface ISimulationBuilderContext<ENVIRONMENT>
 {
+    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
     ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
@@ -34,6 +35,11 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
     {
         _simulationEnvironment = simulationEnvironment;
         _serviceProvider = serviceProvider;
+    }
+
+    public ISimulationBuilderContext<T> AddAgent<U>() where U : ISimulationAgent<T>
+    {
+        return AddAgents<U>(1);
     }
 
     public ISimulationBuilderContext<T> AddAgents<U>(int number) where U : ISimulationAgent<T>

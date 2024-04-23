@@ -16,7 +16,7 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
 
         if (!State.AskedForLand)
         {
-            simulationContext.SendMessage(coordinator, new AskForLand(this));
+            simulationContext.SendMessage(new AddressedAgentMessage(coordinator, new AskForLand(this)));
 
             return State with { AskedForLand = true };
         }

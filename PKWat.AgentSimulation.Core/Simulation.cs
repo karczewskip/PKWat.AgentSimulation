@@ -56,7 +56,7 @@
                 await Parallel.ForEachAsync(
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Decide(_context))));
+                    (x, c) => new ValueTask(Task.Run(() => x.Prepare(_context))));
 
                 await Parallel.ForEachAsync(
                     _context.Agents, 

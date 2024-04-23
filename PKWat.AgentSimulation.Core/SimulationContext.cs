@@ -14,14 +14,13 @@ public interface ISimulationContext<ENVIRONMENT>
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
 
-    void SendMessage<RECEIVER>(RECEIVER receiver, IAgentMessage message) where RECEIVER : IRecognizableAgent;
-    IEnumerable<IAgentMessage> GetMessages<RECEIVER>(RECEIVER receiver) where RECEIVER : IRecognizableAgent;
-
+    void SendMessage(IAddressedAgentMessage addressedAgentMessage);
+    IEnumerable<IAgentMessage> GetMessages(IRecognizableAgent receiver);
 }
 
 internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
 {
-    private readonly ConcurrentBag<(IRecognizableAgent, IAgentMessage)> _newMessages = new();
+    private readonly ConcurrentBag<IAddressedAgentMessage> _newMessages = new();
     private readonly Dictionary<IRecognizableAgent, List<IAgentMessage>> _messagesToDeliver = new();
 
     private readonly IServiceProvider _serviceProvider;
@@ -60,8 +59,11 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
         SimulationTime += SimulationStep;
 
         _messagesToDeliver.Clear();
-        foreach (var (receiver, message) in _newMessages)
+        foreach (var addressedAgentMessage in _newMessages)
         {
+            var receiver = addressedAgentMessage.Receiver;
+            var message = addressedAgentMessage.Message;
+
             if (!_messagesToDeliver.ContainsKey(receiver))
             {
                 _messagesToDeliver[receiver] = new List<IAgentMessage>();
@@ -76,16 +78,16 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
     public void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
+        agent.Initialize(this);
         Agents.Add(agent);
     }
 
-    public void SendMessage<RECEIVER>(RECEIVER receiver, IAgentMessage message)
-        where RECEIVER : IRecognizableAgent
+    public void SendMessage(IAddressedAgentMessage addressedAgentMessage)
     {
-        _newMessages.Add((receiver, message));
+        _newMessages.Add(addressedAgentMessage);
     }
 
-    public IEnumerable<IAgentMessage> GetMessages<RECEIVER>(RECEIVER receiver) where RECEIVER : IRecognizableAgent
+    public IEnumerable<IAgentMessage> GetMessages(IRecognizableAgent receiver)
     {
         if (_messagesToDeliver.TryGetValue(receiver, out var messages))
         {
