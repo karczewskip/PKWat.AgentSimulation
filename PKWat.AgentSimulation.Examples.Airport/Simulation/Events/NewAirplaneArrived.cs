@@ -1,31 +1,34 @@
-﻿using PKWat.AgentSimulation.Core;
+﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Events;
+
+using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Events
+public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
 {
-    public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
+    private IRandomNumbersGenerator _randomNumbersGenerator;
+
+    public NewAirplaneArrived(IRandomNumbersGenerator randomNumbersGenerator)
     {
-        private TimeSpan _nextExecutingTime;
+        _randomNumbersGenerator = randomNumbersGenerator;
 
-        public NewAirplaneArrived()
-        {
-            _nextExecutingTime = TimeSpan.FromMinutes(10);
-        }
-
-        public async Task Execute(ISimulationContext<AirportEnvironment> context)
-        {
-            context.AddAgent<Airplane>();
-            _nextExecutingTime += TimeSpan.FromMinutes(10);
-        }
-
-        public Task<bool> ShouldBeExecuted(ISimulationContext<AirportEnvironment> context)
-        {
-            return Task.FromResult(context.SimulationTime >= _nextExecutingTime);
-        }
+        _nextExecutingTime = GenerateTimeForNextExecution();
     }
+
+    private TimeSpan _nextExecutingTime;
+
+    public async Task Execute(ISimulationContext<AirportEnvironment> context)
+    {
+        context.AddAgent<Airplane>();
+        _nextExecutingTime += GenerateTimeForNextExecution();
+    }
+
+    public Task<bool> ShouldBeExecuted(ISimulationContext<AirportEnvironment> context)
+    {
+        return Task.FromResult(context.SimulationTime >= _nextExecutingTime);
+    }
+
+    private TimeSpan GenerateTimeForNextExecution()
+        => TimeSpan.FromMinutes(_randomNumbersGenerator.GetNextExponential(1.0 / 10.0));
 }
