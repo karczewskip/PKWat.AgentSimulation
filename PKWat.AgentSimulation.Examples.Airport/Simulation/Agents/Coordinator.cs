@@ -6,11 +6,6 @@ using System.Linq;
 
 public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {
-    protected override CoordinatorState GetInitialState(ISimulationContext<AirportEnvironment> simulationContext)
-    {
-        return new CoordinatorState([]);
-    }
-
     protected override CoordinatorState GetNextState(ISimulationContext<AirportEnvironment> simulationContext)
     {
         var messages = simulationContext.GetMessages(this);

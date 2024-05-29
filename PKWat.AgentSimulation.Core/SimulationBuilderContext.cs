@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 public interface ISimulationBuilderContext<ENVIRONMENT>
 {
-    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT, AGENTSTATE>(Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
+    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT, AGENTSTATE>(int number, Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
     ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
     ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
     ISimulationBuilderContext<ENVIRONMENT> SetSimulationStep(TimeSpan simulationStep);
@@ -16,10 +16,9 @@ public interface ISimulationBuilderContext<ENVIRONMENT>
     ISimulation Build();
 }
 
-internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
+internal class SimulationBuilderContext<T>(T simulationEnvironment, IServiceProvider serviceProvider) : ISimulationBuilderContext<T>
 {
-    private readonly T _simulationEnvironment;
-    private readonly IServiceProvider _serviceProvider;
+    private IRandomNumbersGenerator _randomNumbersGenerator => serviceProvider.GetRequiredService<IRandomNumbersGenerator>();
 
     private List<ISimulationAgent<T>> _agents = new();
     private List<Func<ISimulationAgent<T>>> _agentsToGenerate = new();
@@ -31,23 +30,22 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
 
-    public SimulationBuilderContext(T simulationEnvironment, IServiceProvider serviceProvider)
+    public ISimulationBuilderContext<T> AddAgent<U, AGENTSTATE>(Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where U : IStateContainingAgent<T, AGENTSTATE>
     {
-        _simulationEnvironment = simulationEnvironment;
-        _serviceProvider = serviceProvider;
+        return AddAgents<U, AGENTSTATE>(1, generateInitialState);
     }
 
-    public ISimulationBuilderContext<T> AddAgent<U>() where U : ISimulationAgent<T>
-    {
-        return AddAgents<U>(1);
-    }
-
-    public ISimulationBuilderContext<T> AddAgents<U>(int number) where U : ISimulationAgent<T>
+    public ISimulationBuilderContext<T> AddAgents<U, AGENTSTATE>(int number, Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where U : IStateContainingAgent<T, AGENTSTATE>
     {
         _agentsToGenerate.AddRange(Enumerable
             .Range(0, number)
             .Select(x => new Func<ISimulationAgent<T>>(
-                () => _serviceProvider.GetRequiredService<U>())));
+                () =>
+                {
+                    var newAgent = serviceProvider.GetRequiredService<U>();
+                    newAgent.Initialize(generateInitialState(_randomNumbersGenerator));
+                    return newAgent;
+                })));
 
         return this;
     }
@@ -89,17 +87,17 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
 
     public ISimulationBuilderContext<T> AddEvent<U>() where U : ISimulationEvent<T>
     {
-        _eventsToGenerate.Add(() => _serviceProvider.GetRequiredService<U>());
+        _eventsToGenerate.Add(() => serviceProvider.GetRequiredService<U>());
 
         return this;
     }
 
     public ISimulation Build()
     {
-        _serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
+        serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
         _agents.AddRange(_agentsToGenerate.Select(x => x()));
         _events.AddRange(_eventsToGenerate.Select(x => x()));
 
-        return new Simulation<T>(new SimulationContext<T>(_serviceProvider, _simulationEnvironment ,_agents, _simulationStep, _waitingTimeBetweenSteps), _environmentUpdates, _callbacks, _events);
+        return new Simulation<T>(new SimulationContext<T>(serviceProvider, simulationEnvironment ,_agents, _simulationStep, _waitingTimeBetweenSteps), _environmentUpdates, _callbacks, _events);
     }
 }

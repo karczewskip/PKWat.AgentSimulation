@@ -41,7 +41,16 @@ public partial class MainWindow : Window
 
         _simulation = _simulationBuilder
             .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -10), 2))
-            .AddAgents<Ball>(numberOfBalls)
+            .AddAgents<Ball, BallState>(numberOfBalls, randomNumbersGenerator =>
+            {
+                var x = randomNumbersGenerator.NextDouble() * ContainerWidth;
+                var y = ContainerHeight * 0.1 + randomNumbersGenerator.NextDouble() * ContainerHeight / 2;
+
+                return new BallState(
+                    new BallCoordinates(x, y),
+                    new BallVelocity(50 * (randomNumbersGenerator.NextDouble() - 0.5), 0),
+                    _colorInitializer.GetNext());
+            })
             .AddCallback(RenderAsync)
             .AddCallback(UpdateBallsCacheAsync)
             .SetSimulationStep(TimeSpan.FromSeconds(0.1))

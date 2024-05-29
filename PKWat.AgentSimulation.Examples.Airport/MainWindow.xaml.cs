@@ -33,7 +33,7 @@
             }
             _simulation = _simulationBuilder
             .CreateNewSimulation(new AirportEnvironment())
-            .AddAgent<Coordinator>()
+            .AddAgent<Coordinator, CoordinatorState>(x => new CoordinatorState([]))
             .AddEvent<NewAirplaneArrived>()
             .AddCallback(RenderAsync)
             .SetSimulationStep(TimeSpan.FromMinutes(1))

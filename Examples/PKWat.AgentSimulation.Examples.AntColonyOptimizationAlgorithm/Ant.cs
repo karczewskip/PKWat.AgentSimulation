@@ -9,23 +9,8 @@ public record AntState(ColonyDirection Direction, ColonyCoordinates Coordinates,
     public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.7, PathLength);
 }
 
-public class Ant : SimulationAgent<ColonyEnvironment, AntState>
+public class Ant(IRandomNumbersGenerator randomNumbersGenerator) : SimulationAgent<ColonyEnvironment, AntState>
 {
-
-    private readonly IRandomNumbersGenerator _randomNumbersGenerator;
-
-    public Ant(IRandomNumbersGenerator randomNumbersGenerator)
-    {
-        _randomNumbersGenerator = randomNumbersGenerator;
-    }
-
-    protected override AntState GetInitialState(ISimulationContext<ColonyEnvironment> simulationContext) 
-        => new AntState(
-            ColonyDirection.Random(_randomNumbersGenerator),
-            simulationContext.SimulationEnvironment.AntHill.Coordinates,
-            false,
-            1);
-
     protected override AntState GetNextState(ISimulationContext<ColonyEnvironment> simulationContext)
     {
         var simulationEnvironment = simulationContext.SimulationEnvironment;
@@ -51,9 +36,9 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
         {
             var possibleDirections = ColonyDirection.GeneratePossibleDirections(State.Direction);
 
-            if (_randomNumbersGenerator.Next(1000) < 1)
+            if (randomNumbersGenerator.Next(1000) < 1)
             {
-                var newDirection = possibleDirections[_randomNumbersGenerator.Next(possibleDirections.Length)];
+                var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
                 return State with
                 {
                     Direction = newDirection,
@@ -81,7 +66,7 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
                     }
                 }
 
-                var newDirection = consideringDirections[_randomNumbersGenerator.Next(consideringDirections.Count)];
+                var newDirection = consideringDirections[randomNumbersGenerator.Next(consideringDirections.Count)];
                 return State with
                 {
                     Direction = newDirection,

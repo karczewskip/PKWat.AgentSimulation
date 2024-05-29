@@ -10,7 +10,7 @@ public interface ISimulationContext<ENVIRONMENT>
     TimeSpan SimulationStep { get; }
     TimeSpan SimulationTime { get; }
 
-    void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    void AddAgent<AGENT, AGENTSTATE>(AGENTSTATE initialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
 
@@ -75,10 +75,10 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
         _newMessages.Clear();
     }
 
-    public void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
+    public void AddAgent<AGENT, AGENTSTATE>(AGENTSTATE initialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
-        agent.Initialize(this);
+        agent.Initialize(initialState);
         Agents.Add(agent);
     }
 

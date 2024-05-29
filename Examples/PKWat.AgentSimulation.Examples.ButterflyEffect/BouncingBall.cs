@@ -58,20 +58,8 @@ public class BouncingBallStateInitializer
 
 public class BouncingBall : SimulationAgent<BouncingBallBulb, BouncingBallState>
 {
-    private readonly BouncingBallStateInitializer _bouncingBallStateInitializer;
-
-    public BouncingBall(BouncingBallStateInitializer bouncingBallStateInitializer)
-    {
-        _bouncingBallStateInitializer = bouncingBallStateInitializer;
-    }
-
     public void Act(ISimulationContext<BouncingBallBulb> simulationContext)
     {
-    }
-
-    protected override BouncingBallState GetInitialState(ISimulationContext<BouncingBallBulb> simulationContext)
-    {
-        return _bouncingBallStateInitializer.InitializeNewState(simulationContext.SimulationEnvironment);
     }
 
     protected override BouncingBallState GetNextState(ISimulationContext<BouncingBallBulb> simulationContext)

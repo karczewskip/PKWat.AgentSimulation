@@ -31,9 +31,17 @@
                 await _simulation.StopAsync();
             }
 
+            var colonyCoordinates = new ColonyCoordinates(Scale * 10, Scale * 10);
+
             _simulation = _simulationBuilder
-                .CreateNewSimulation(new ColonyEnvironment(Scale * 50, Scale * 50, new AntHill(new ColonyCoordinates(Scale * 10, Scale * 10)), new FoodSource(new ColonyCoordinates(Scale * 40, Scale * 40))))
-                .AddAgents<Ant>(1000)
+                .CreateNewSimulation(new ColonyEnvironment(Scale * 50, Scale * 50, new AntHill(colonyCoordinates), new FoodSource(new ColonyCoordinates(Scale * 40, Scale * 40))))
+                .AddAgents<Ant, AntState>(
+                    1000, 
+                    randomNumbersGenerator => new AntState(
+                        ColonyDirection.Random(randomNumbersGenerator),
+                        colonyCoordinates,
+                        false,
+                        1))
                 .AddEnvironmentUpdates(DecreasePheromones)
                 .AddEnvironmentUpdates(AddPheromones)
                 .AddCallback(RenderAsync)

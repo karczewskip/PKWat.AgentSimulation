@@ -20,7 +20,7 @@ public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
 
     public async Task Execute(ISimulationContext<AirportEnvironment> context)
     {
-        context.AddAgent<Airplane>();
+        context.AddAgent<Airplane, AirplaneState>(new AirplaneState());
         _nextExecutingTime += GenerateTimeForNextExecution();
     }
 

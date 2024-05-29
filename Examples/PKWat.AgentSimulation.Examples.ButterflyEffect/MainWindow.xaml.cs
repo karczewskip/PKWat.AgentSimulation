@@ -35,10 +35,15 @@ public partial class MainWindow : Window
         var bitmapSize = (int)(bulbRadius * 2);
         _pictureRenderer.Initialize(bitmapSize, bitmapSize);
 
+        var environment = new BouncingBallBulb(bulbRadius, 10.0);
+
         _simulation
             = _simulationBuilder
-                .CreateNewSimulation(new BouncingBallBulb(bulbRadius, 10.0))
-                .AddAgents<BouncingBall>(200)
+                .CreateNewSimulation(environment)
+                .AddAgents<BouncingBall, BouncingBallState>(200, randomNumbersGenerator =>
+                {
+                    return _bouncingBallStateInitializer.InitializeNewState(environment);
+                })
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
                 .Build();

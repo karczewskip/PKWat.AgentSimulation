@@ -7,27 +7,6 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
 
     public class Ball : SimulationAgent<BallsContainer, BallState>
     {
-        private readonly IRandomNumbersGenerator _randomNumbersGenerator;
-        private readonly ColorInitializer _colorInitializer;
-
-        public Ball(IRandomNumbersGenerator randomNumbersGenerator, ColorInitializer colorInitializer)
-        {
-            _randomNumbersGenerator = randomNumbersGenerator;
-            _colorInitializer = colorInitializer;
-        }
-
-        protected override BallState GetInitialState(ISimulationContext<BallsContainer> simulationContext)
-        {
-            var environment = simulationContext.SimulationEnvironment;
-            var x = _randomNumbersGenerator.NextDouble() * environment.Width;
-            var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height / 2;
-
-            return new BallState(
-                new BallCoordinates(x, y),
-                new BallVelocity(50 * (_randomNumbersGenerator.NextDouble() - 0.5), 0),
-                _colorInitializer.GetNext());
-        }
-
         protected override BallState GetNextState(ISimulationContext<BallsContainer> simulationContext)
         {
             var environment = simulationContext.SimulationEnvironment;
