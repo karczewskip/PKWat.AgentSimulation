@@ -5,7 +5,7 @@ using PKWat.AgentSimulation.Examples.Airport.Simulation.Messages;
 
 public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
 {
-    protected override AirplaneState GetNextState(ISimulationContext<AirportEnvironment> simulationContext)
+    protected override AirplaneState GetNextState(IDictionary<Type, IPercept> percepts)
     {
         //var coordinator = simulationContext.GetRequiredAgent<Coordinator>();
 

@@ -7,7 +7,7 @@ public interface IStateContainingAgent<ENVIRONMENT, STATE> : ISimulationAgent<EN
 
 public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent
 {
-    void Prepare(ISimulationContext<ENVIRONMENT> simulationContext);
+    void Prepare(IDictionary<Type, IPercept> percepts);
     void Act();
 
 }
@@ -30,9 +30,9 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : IStateContainingAgen
         State = initialState;
     }
 
-    public void Prepare(ISimulationContext<ENVIRONMENT> simulationContext)
+    public void Prepare(IDictionary<Type, IPercept> percepts)
     {
-        _nextState = GetNextState(simulationContext);
+        _nextState = GetNextState(percepts);
     }
 
     public void Act()
@@ -40,7 +40,7 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : IStateContainingAgen
         State = _nextState;
     }
 
-    protected abstract STATE GetNextState(ISimulationContext<ENVIRONMENT> simulationContext);
+    protected abstract STATE GetNextState(IDictionary<Type, IPercept> percepts);
 
     public bool Equals(IRecognizableAgent? other)
     {

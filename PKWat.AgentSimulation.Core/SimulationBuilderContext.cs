@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 public interface ISimulationBuilderContext<ENVIRONMENT>
 {
-    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT, AGENTSTATE>(Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
-    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT, AGENTSTATE>(int number, Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
+    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT, AGENTSTATE>(Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState, ISensor<ENVIRONMENT>[] sensors) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
+    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT, AGENTSTATE>(int number, Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState, ISensor<ENVIRONMENT>[] sensors) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
     ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
     ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
     ISimulationBuilderContext<ENVIRONMENT> SetSimulationStep(TimeSpan simulationStep);
@@ -20,8 +20,8 @@ internal class SimulationBuilderContext<T>(T simulationEnvironment, IServiceProv
 {
     private IRandomNumbersGenerator _randomNumbersGenerator => serviceProvider.GetRequiredService<IRandomNumbersGenerator>();
 
-    private List<ISimulationAgent<T>> _agents = new();
-    private List<Func<ISimulationAgent<T>>> _agentsToGenerate = new();
+    private List<AgentWithSensors<T>> _agents = new();
+    private List<Func<AgentWithSensors<T>>> _agentsToGenerate = new();
     private List<Func<ISimulationEvent<T>>> _eventsToGenerate = new();
     private List<Func<ISimulationContext<T>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<T>, Task>> _callbacks = new();
@@ -30,21 +30,21 @@ internal class SimulationBuilderContext<T>(T simulationEnvironment, IServiceProv
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
 
-    public ISimulationBuilderContext<T> AddAgent<U, AGENTSTATE>(Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where U : IStateContainingAgent<T, AGENTSTATE>
+    public ISimulationBuilderContext<T> AddAgent<U, AGENTSTATE>(Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState, ISensor<T>[] sensors) where U : IStateContainingAgent<T, AGENTSTATE>
     {
-        return AddAgents<U, AGENTSTATE>(1, generateInitialState);
+        return AddAgents<U, AGENTSTATE>(1, generateInitialState, sensors);
     }
 
-    public ISimulationBuilderContext<T> AddAgents<U, AGENTSTATE>(int number, Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState) where U : IStateContainingAgent<T, AGENTSTATE>
+    public ISimulationBuilderContext<T> AddAgents<U, AGENTSTATE>(int number, Func<IRandomNumbersGenerator, AGENTSTATE> generateInitialState, ISensor<T>[] sensors) where U : IStateContainingAgent<T, AGENTSTATE>
     {
         _agentsToGenerate.AddRange(Enumerable
             .Range(0, number)
-            .Select(x => new Func<ISimulationAgent<T>>(
+            .Select(x => new Func<AgentWithSensors<T>>(
                 () =>
                 {
                     var newAgent = serviceProvider.GetRequiredService<U>();
                     newAgent.Initialize(generateInitialState(_randomNumbersGenerator));
-                    return newAgent;
+                    return new AgentWithSensors<T>(newAgent, sensors);
                 })));
 
         return this;

@@ -49,14 +49,14 @@
                 }
 
                 await Parallel.ForEachAsync(
-                    _context.Agents,
+                    _context.AgentsWithSensors,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Prepare(_context))));
+                    (agentWithSensors, c) => new ValueTask(Task.Run(() => agentWithSensors.PrepareAgent(_context.SimulationEnvironment))));
 
                 await Parallel.ForEachAsync(
-                    _context.Agents, 
+                    _context.AgentsWithSensors, 
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run( () => x.Act())));
+                    (agentWithSensor, c) => new ValueTask(Task.Run( () => agentWithSensor.Agent.Act())));
 
                 foreach (var callback in _callbacks)
                 {

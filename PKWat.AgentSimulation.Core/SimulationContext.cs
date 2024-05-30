@@ -10,7 +10,7 @@ public interface ISimulationContext<ENVIRONMENT>
     TimeSpan SimulationStep { get; }
     TimeSpan SimulationTime { get; }
 
-    void AddAgent<AGENT, AGENTSTATE>(AGENTSTATE initialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
+    void AddAgent<AGENT, AGENTSTATE>(AGENTSTATE initialState, ISensor<ENVIRONMENT>[] sensors) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>;
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
 
@@ -28,14 +28,14 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
     public SimulationContext(
         IServiceProvider serviceProvider,
         ENVIRONMENT simulationEnvironment,
-        List<ISimulationAgent<ENVIRONMENT>> agents,
+        List<AgentWithSensors<ENVIRONMENT>> agentsWithSensors,
         TimeSpan simulationStep,
         TimeSpan waitingTimeBetweenSteps)
     {
         _serviceProvider = serviceProvider;
 
         SimulationEnvironment = simulationEnvironment;
-        Agents = agents;
+        AgentsWithSensors = agentsWithSensors;
         SimulationStep = simulationStep;
         SimulationTime = TimeSpan.Zero;
         WaitingTimeBetweenSteps = waitingTimeBetweenSteps;
@@ -45,14 +45,14 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
     public TimeSpan SimulationStep { get; }
     public TimeSpan SimulationTime { get; private set; }
 
-    public List<ISimulationAgent<ENVIRONMENT>> Agents { get; }
+    public List<AgentWithSensors<ENVIRONMENT>> AgentsWithSensors { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
 
     public IEnumerable<T> GetAgents<T>() where T : ISimulationAgent<ENVIRONMENT> 
-        => Agents.OfType<T>();
+        => AgentsWithSensors.Select(x => x.Agent).OfType<T>();
 
     public AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
-        => Agents.OfType<AGENT>().Single();
+        => AgentsWithSensors.Select(x => x.Agent).OfType<AGENT>().Single();
 
     internal void Update()
     {
@@ -75,11 +75,11 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
         _newMessages.Clear();
     }
 
-    public void AddAgent<AGENT, AGENTSTATE>(AGENTSTATE initialState) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>
+    public void AddAgent<AGENT, AGENTSTATE>(AGENTSTATE initialState, ISensor<ENVIRONMENT>[] sensors) where AGENT : IStateContainingAgent<ENVIRONMENT, AGENTSTATE>
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
         agent.Initialize(initialState);
-        Agents.Add(agent);
+        AgentsWithSensors.Add(new AgentWithSensors<ENVIRONMENT>(agent, sensors));
     }
 
     public void SendMessage(IAddressedAgentMessage addressedAgentMessage)

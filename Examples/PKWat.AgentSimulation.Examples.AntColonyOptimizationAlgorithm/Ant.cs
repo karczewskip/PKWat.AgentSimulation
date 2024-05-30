@@ -11,7 +11,7 @@ public record AntState(ColonyDirection Direction, ColonyCoordinates Coordinates,
 
 public class Ant(IRandomNumbersGenerator randomNumbersGenerator) : SimulationAgent<ColonyEnvironment, AntState>
 {
-    protected override AntState GetNextState(ISimulationContext<ColonyEnvironment> simulationContext)
+    protected override AntState GetNextState(IPercept[] percepts)
     {
         var simulationEnvironment = simulationContext.SimulationEnvironment;
         if (!State.IsCarryingFood && simulationEnvironment.FoodSource.Coordinates.DistanceFrom(State.Coordinates) <= simulationEnvironment.FoodSource.Size)
