@@ -4,11 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
+public record SimulationTime(TimeSpan Time, TimeSpan Step)
+{
+    public SimulationTime AddStep() => this with { Time = Time + Step };
+}
+
 public interface ISimulationContext<ENVIRONMENT>
 {
     ENVIRONMENT SimulationEnvironment { get; }
-    TimeSpan SimulationStep { get; }
-    TimeSpan SimulationTime { get; }
+    SimulationTime SimulationTime { get; }
 
     void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
@@ -36,14 +40,12 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
 
         SimulationEnvironment = simulationEnvironment;
         Agents = agents;
-        SimulationStep = simulationStep;
-        SimulationTime = TimeSpan.Zero;
+        SimulationTime = new SimulationTime(TimeSpan.Zero, simulationStep);
         WaitingTimeBetweenSteps = waitingTimeBetweenSteps;
     }
 
     public ENVIRONMENT SimulationEnvironment { get; }
-    public TimeSpan SimulationStep { get; }
-    public TimeSpan SimulationTime { get; private set; }
+    public SimulationTime SimulationTime { get; private set; }
 
     public List<ISimulationAgent<ENVIRONMENT>> Agents { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
@@ -56,7 +58,7 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
 
     internal void Update()
     {
-        SimulationTime += SimulationStep;
+        SimulationTime = SimulationTime.AddStep();
 
         _messagesToDeliver.Clear();
         foreach (var addressedAgentMessage in _newMessages)

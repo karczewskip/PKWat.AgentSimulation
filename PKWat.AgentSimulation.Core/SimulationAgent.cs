@@ -5,7 +5,6 @@ public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent
     void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
     void Prepare(ISimulationContext<ENVIRONMENT> simulationContext);
     void Act();
-
 }
 
 public interface IRecognizableAgent : IEquatable<IRecognizableAgent>
@@ -23,12 +22,12 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
 
     public void Initialize(ISimulationContext<ENVIRONMENT> simulationContext)
     {
-        State = GetInitialState(simulationContext);
+        State = GetInitialState(simulationContext.SimulationEnvironment);
     }
 
     public void Prepare(ISimulationContext<ENVIRONMENT> simulationContext)
     {
-        _nextState = GetNextState(simulationContext);
+        _nextState = GetNextState(simulationContext.SimulationEnvironment, simulationContext.SimulationTime);
     }
 
     public void Act()
@@ -36,8 +35,8 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
         State = _nextState;
     }
 
-    protected abstract STATE GetInitialState(ISimulationContext<ENVIRONMENT> simulationContext);
-    protected abstract STATE GetNextState(ISimulationContext<ENVIRONMENT> simulationContext);
+    protected abstract STATE GetInitialState(ENVIRONMENT environment);
+    protected abstract STATE GetNextState(ENVIRONMENT environment, SimulationTime simulationTime);
 
     public bool Equals(IRecognizableAgent? other)
     {

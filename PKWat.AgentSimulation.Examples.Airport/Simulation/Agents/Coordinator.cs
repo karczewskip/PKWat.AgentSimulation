@@ -1,26 +1,25 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core;
-using PKWat.AgentSimulation.Examples.Airport.Simulation.Messages;
-using System.Linq;
 
 public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {
-    protected override CoordinatorState GetInitialState(ISimulationContext<AirportEnvironment> simulationContext)
+    protected override CoordinatorState GetInitialState(AirportEnvironment environment)
     {
         return new CoordinatorState([]);
     }
 
-    protected override CoordinatorState GetNextState(ISimulationContext<AirportEnvironment> simulationContext)
+    protected override CoordinatorState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
     {
-        var messages = simulationContext.GetMessages(this);
+        //var messages = simulationContext.GetMessages(this);
 
-        var newAirplanesForLand = messages
-            .OfType<AskForLand>()
-            .Select(message => message.Sender)
-            .ToArray();
+        //var newAirplanesForLand = messages
+        //    .OfType<AskForLand>()
+        //    .Select(message => message.Sender)
+        //    .ToArray();
 
-        return State with { AirplanesToLand = [..State.AirplanesToLand, ..newAirplanesForLand] };
+        //return State with { AirplanesToLand = [..State.AirplanesToLand, ..newAirplanesForLand] };
+        return State;
     }
 }
 

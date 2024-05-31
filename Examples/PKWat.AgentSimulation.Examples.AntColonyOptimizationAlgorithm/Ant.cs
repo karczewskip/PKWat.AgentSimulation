@@ -19,17 +19,16 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
         _randomNumbersGenerator = randomNumbersGenerator;
     }
 
-    protected override AntState GetInitialState(ISimulationContext<ColonyEnvironment> simulationContext) 
+    protected override AntState GetInitialState(ColonyEnvironment environment) 
         => new AntState(
             ColonyDirection.Random(_randomNumbersGenerator),
-            simulationContext.SimulationEnvironment.AntHill.Coordinates,
+            environment.AntHill.Coordinates,
             false,
             1);
 
-    protected override AntState GetNextState(ISimulationContext<ColonyEnvironment> simulationContext)
+    protected override AntState GetNextState(ColonyEnvironment environment, SimulationTime simulationTime)
     {
-        var simulationEnvironment = simulationContext.SimulationEnvironment;
-        if (!State.IsCarryingFood && simulationEnvironment.FoodSource.Coordinates.DistanceFrom(State.Coordinates) <= simulationEnvironment.FoodSource.Size)
+        if (!State.IsCarryingFood && environment.FoodSource.Coordinates.DistanceFrom(State.Coordinates) <= environment.FoodSource.Size)
         {
             return State with
             {
@@ -38,7 +37,7 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
                 Direction = State.Direction.Opposite()
             };
         }
-        else if (State.IsCarryingFood && simulationEnvironment.AntHill.Coordinates.DistanceFrom(State.Coordinates) <= simulationEnvironment.AntHill.Size)
+        else if (State.IsCarryingFood && environment.AntHill.Coordinates.DistanceFrom(State.Coordinates) <= environment.AntHill.Size)
         {
             return State with
             {
@@ -58,17 +57,17 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
                 {
                     Direction = newDirection,
                     PathLength = State.PathLength + 1,
-                    Coordinates = MoveCoordinates(simulationEnvironment, State.Coordinates, newDirection)
+                    Coordinates = MoveCoordinates(environment, State.Coordinates, newDirection)
                 };
             }
             else
             {
                 var consideringDirections = new List<ColonyDirection>() { possibleDirections[0] };
-                var pheromonesStrength = GetPheromonesStrength(simulationEnvironment, State.Coordinates.MoveBy(possibleDirections[0]));
+                var pheromonesStrength = GetPheromonesStrength(environment, State.Coordinates.MoveBy(possibleDirections[0]));
                 for (int i = 1; i < possibleDirections.Length; i++)
                 {
                     var consideringCoordinates = State.Coordinates.MoveBy(possibleDirections[i]);
-                    var consideringPheromonesStrength = GetPheromonesStrength(simulationEnvironment, consideringCoordinates);
+                    var consideringPheromonesStrength = GetPheromonesStrength(environment, consideringCoordinates);
                     if (consideringPheromonesStrength > pheromonesStrength)
                     {
                         consideringDirections.Clear();
@@ -86,7 +85,7 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
                 {
                     Direction = newDirection,
                     PathLength = State.PathLength + 1,
-                    Coordinates = MoveCoordinates(simulationEnvironment, State.Coordinates, newDirection)
+                    Coordinates = MoveCoordinates(environment, State.Coordinates, newDirection)
                 };
             }
         }

@@ -26,7 +26,7 @@ public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
 
     public Task<bool> ShouldBeExecuted(ISimulationContext<AirportEnvironment> context)
     {
-        return Task.FromResult(context.SimulationTime >= _nextExecutingTime);
+        return Task.FromResult(context.SimulationTime.Time >= _nextExecutingTime);
     }
 
     private TimeSpan GenerateTimeForNextExecution()
