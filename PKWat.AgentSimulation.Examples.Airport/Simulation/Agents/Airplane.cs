@@ -1,7 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core;
-using PKWat.AgentSimulation.Examples.Airport.Simulation.Messages;
 
 public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
 {
@@ -17,10 +16,10 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
             return State with { AskedForLand = true, AskingForLand = true };
         }
 
-        //if(State.AskingForLand && environment.AllowedForLand == Id)
-        //{
-        //    return State with { AskingForLand = false, Landing = true };
-        //}
+        if (State.AskingForLand && environment.AllowedForLand == Id)
+        {
+            return State with { AskingForLand = false, LandingStart = simulationTime.Time, LandingFinish = simulationTime.Time + (simulationTime.Step * 10) };
+        }
 
         return State;
     }
@@ -28,4 +27,11 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
 
 public record AirplaneState(
     bool AskedForLand = false,
-    bool AskingForLand = false);
+    bool AskingForLand = false,
+    TimeSpan? LandingStart = null,
+    TimeSpan? LandingFinish = null)
+{
+    public bool IsBeforeLanding(TimeSpan now) => LandingStart == null || LandingStart > now;
+    public bool IsLanding(TimeSpan now) => LandingStart <= now && now <= LandingFinish;
+    public double LandingProgress(TimeSpan now) => LandingStart == null || LandingFinish == null || now < LandingStart ? 0 : (now - LandingStart).Value.TotalMilliseconds / (LandingFinish - LandingStart).Value.TotalMilliseconds;
+}

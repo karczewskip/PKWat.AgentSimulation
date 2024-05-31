@@ -32,16 +32,50 @@
                 await _simulation.StopAsync();
             }
             _simulation = _simulationBuilder
-            .CreateNewSimulation(new AirportEnvironment())
-            .AddAgent<Coordinator>()
-            .AddEvent<NewAirplaneArrived>()
-            .AddCallback(RenderAsync)
-            .SetSimulationStep(TimeSpan.FromMinutes(1))
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
-            .SetRandomSeed(100)
-            .Build();
+                .CreateNewSimulation(new AirportEnvironment())
+                .AddAgent<Coordinator>()
+                .AddEvent<NewAirplaneArrived>()
+                .AddEnvironmentUpdates(UpdateAskingForLand)
+                .AddEnvironmentUpdates(UpdateLandingAirplane)
+                .AddEnvironmentUpdates(UpdateAllowedForLand)
+                .AddCallback(RenderAsync)
+                .SetSimulationStep(TimeSpan.FromMinutes(1))
+                .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
+                .SetRandomSeed(100)
+                .Build();
 
             await _simulation.StartAsync();
+        }
+
+        private async Task UpdateAskingForLand(ISimulationContext<AirportEnvironment> context)
+        {
+            context
+                .SimulationEnvironment
+                .SetAirplanesAskingForLand(context
+                    .GetAgents<Airplane>()
+                    .Where(x => x.State.AskingForLand)
+                    .Select(x => x.Id)
+                    .ToArray());
+        }
+
+        private async Task UpdateLandingAirplane(ISimulationContext<AirportEnvironment> context)
+        {
+            context
+                .SimulationEnvironment
+                .SetLandingAirplane(context
+                    .GetAgents<Airplane>()
+                    .FirstOrDefault(x => x.State.IsLanding(context.SimulationTime.Time))
+                    ?.Id ?? AgentId.Empty);
+        }
+
+        private async Task UpdateAllowedForLand(ISimulationContext<AirportEnvironment> context)
+        {
+            context
+                .SimulationEnvironment
+                .SetAllowedForLand(context
+                    .GetRequiredAgent<Coordinator>()
+                    .State
+                    .AllowedAirplaneForLanding);
         }
 
         private async Task RenderAsync(ISimulationContext<AirportEnvironment> context)

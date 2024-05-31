@@ -6,21 +6,18 @@ public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {
     protected override CoordinatorState GetInitialState(AirportEnvironment environment)
     {
-        return new CoordinatorState([]);
+        return new CoordinatorState(AgentId.Empty);
     }
 
     protected override CoordinatorState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
     {
-        //var messages = simulationContext.GetMessages(this);
+        if(environment.IsLandingAirplane == false && environment.AirplanesAskingForLand.Length > 0)
+        {
+            return State with { AllowedAirplaneForLanding = environment.AirplanesAskingForLand[0] };
+        }
 
-        //var newAirplanesForLand = messages
-        //    .OfType<AskForLand>()
-        //    .Select(message => message.Sender)
-        //    .ToArray();
-
-        //return State with { AirplanesToLand = [..State.AirplanesToLand, ..newAirplanesForLand] };
         return State;
     }
 }
 
-public record CoordinatorState(Airplane[] AirplanesToLand);
+public record CoordinatorState(AgentId AllowedAirplaneForLanding);

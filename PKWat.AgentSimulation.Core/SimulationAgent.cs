@@ -7,9 +7,23 @@ public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent
     void Act();
 }
 
+public record AgentId
+{
+    public static AgentId Empty { get; } = new AgentId(Guid.Empty);
+
+    public Guid Id { get; }
+
+    private AgentId(Guid id)
+    {
+        Id = id;
+    }
+
+    public static AgentId GenerateNew() => new AgentId(Guid.NewGuid());
+}
+
 public interface IRecognizableAgent : IEquatable<IRecognizableAgent>
 {
-    Guid Id { get; }
+    AgentId Id { get; }
 }
 
 public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENVIRONMENT>
@@ -18,7 +32,7 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
 
     public STATE State { get; private set; }
 
-    public Guid Id { get; } = Guid.NewGuid();
+    public AgentId Id { get; } = AgentId.GenerateNew();
 
     public void Initialize(ISimulationContext<ENVIRONMENT> simulationContext)
     {
