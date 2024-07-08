@@ -14,7 +14,7 @@ public interface ISimulationContext<ENVIRONMENT>
     ENVIRONMENT SimulationEnvironment { get; }
     SimulationTime SimulationTime { get; }
 
-    void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
 
@@ -77,11 +77,13 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
         _newMessages.Clear();
     }
 
-    public void AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
+    public AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
         agent.Initialize(this);
         Agents.Add(agent);
+
+        return agent;
     }
 
     public void SendMessage(IAddressedAgentMessage addressedAgentMessage)

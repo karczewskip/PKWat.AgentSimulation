@@ -38,6 +38,8 @@
                 .AddEnvironmentUpdates(UpdateAskingForLand)
                 .AddEnvironmentUpdates(UpdateLandingAirplane)
                 .AddEnvironmentUpdates(UpdateAllowedForLand)
+                .AddEnvironmentUpdates(UpdateLandedAirplanes)
+                .AddEnvironmentUpdates(UpdateNumberOfPassangersInEachAirplane)
                 .AddCallback(RenderAsync)
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
@@ -76,6 +78,27 @@
                     .GetRequiredAgent<Coordinator>()
                     .State
                     .AllowedAirplanesForLanding);
+        }
+
+        private async Task UpdateLandedAirplanes(ISimulationContext<AirportEnvironment> context)
+        {
+            context
+                .SimulationEnvironment
+                .SetLandedAirplanes(context
+                    .GetAgents<Airplane>()
+                    .Where(x => x.State.HasLanded(context.SimulationTime.Time))
+                    .ToDictionary(x => x.Id, x => x.State.LandingLine.Value));
+        }
+
+        private async Task UpdateNumberOfPassangersInEachAirplane(ISimulationContext<AirportEnvironment> context)
+        {
+            context
+                .SimulationEnvironment
+                .SetNumberOfPassengersInEachAirplane(context
+                    .GetAgents<Passenger>()
+                    .Where(x => x.State.AirplaneId != null)
+                    .GroupBy(x => x.State.AirplaneId)
+                    .ToDictionary(x => x.Key, x => x.Count()));
         }
 
         private async Task RenderAsync(ISimulationContext<AirportEnvironment> context)

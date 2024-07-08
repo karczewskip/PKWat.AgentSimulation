@@ -9,15 +9,12 @@ public class AirportEnvironment
     public AgentId[] AirplanesAskingForLand { get; private set; } = [];
     public IReadOnlyDictionary<AgentId, int> LandingAirplanes { get; private set; } = new Dictionary<AgentId, int>();
     public IReadOnlyDictionary<AgentId, int> AllowedForLand { get; private set; } = new Dictionary<AgentId, int>();
+    public IReadOnlyDictionary<AgentId, int> LandedAirplanes { get; private set; } = new Dictionary<AgentId, int>();
+    public IReadOnlyDictionary<AgentId, int> NumberOfPassengersInEachAirplane { get; private set; } = new Dictionary<AgentId, int>();
 
     public void SetAirplanesAskingForLand(AgentId[] airplanesAskingForLand)
     {
         AirplanesAskingForLand = airplanesAskingForLand;
-    }
-
-    public void SetLandingAirplane(IReadOnlyDictionary<AgentId, int> landingAirplanes)
-    {
-        LandingAirplanes = landingAirplanes;
     }
 
     public void SetAllowedForLand(IReadOnlyDictionary<AgentId, int> allowedForLand)
@@ -25,12 +22,27 @@ public class AirportEnvironment
         AllowedForLand = allowedForLand;
     }
 
-    public bool NoPassengerInAirplane(AgentId airplaneId)
+    public void SetLandingAirplane(IReadOnlyDictionary<AgentId, int> landingAirplanes)
     {
-        return true;
+        LandingAirplanes = landingAirplanes;
     }
 
-    internal int? GetAssignedLine(AgentId id)
+    public void SetLandedAirplanes(IReadOnlyDictionary<AgentId, int> landedAirplanes)
+    {
+        LandedAirplanes = landedAirplanes;
+    }
+
+    public void SetNumberOfPassengersInEachAirplane(IReadOnlyDictionary<AgentId, int> numberOfPassengersInEachAirplane)
+    {
+        NumberOfPassengersInEachAirplane = numberOfPassengersInEachAirplane;
+    }
+
+    public bool NoPassengerInAirplane(AgentId airplaneId)
+    {
+        return NumberOfPassengersInEachAirplane.ContainsKey(airplaneId) == false || NumberOfPassengersInEachAirplane[airplaneId] == 0;
+    }
+
+    public int? GetAssignedLine(AgentId id)
     {
         if(AllowedForLand.TryGetValue(id, out var line))
         {
@@ -39,4 +51,11 @@ public class AirportEnvironment
 
         return null;
     }
+
+    public bool AirplaneLanded(AgentId airplaneId)
+    {
+        return LandingAirplanes.ContainsKey(airplaneId);
+    }
+
+
 }

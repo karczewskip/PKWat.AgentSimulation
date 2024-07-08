@@ -52,6 +52,11 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
     protected abstract STATE GetInitialState(ENVIRONMENT environment);
     protected abstract STATE GetNextState(ENVIRONMENT environment, SimulationTime simulationTime);
 
+    protected void SetState(STATE nextState)
+    {
+        State = nextState;
+    }
+
     public bool Equals(IRecognizableAgent? other)
     {
         return other is IRecognizableAgent agent && agent.Id == Id;

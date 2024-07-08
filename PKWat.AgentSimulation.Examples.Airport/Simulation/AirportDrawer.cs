@@ -9,6 +9,7 @@ using System;
 
 public class AirportDrawer
 {
+    private const int ShiftDetails = 10;
     private const int AirplaneSize = 10;
 
     private Bitmap _bmp;
@@ -22,7 +23,6 @@ public class AirportDrawer
     public BitmapSource Draw(ISimulationContext<AirportEnvironment> context)
     {
         var waitingCordinates = new DrawingCoordinates(_bmp.Width / 2, 100);
-        var landingPlace = new DrawingCoordinates(100, _bmp.Height - 100);
         var departureCoordinates = new DrawingCoordinates(_bmp.Width - 100, _bmp.Height / 2);
 
         using var graphic = Graphics.FromImage(_bmp);
@@ -32,16 +32,18 @@ public class AirportDrawer
 
         foreach(var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsLanding(now)))
         {
-            var coordinates = GetCoordinatesForLandingAirplane(airplane, waitingCordinates, landingPlace, now);
+            var coordinates = GetCoordinatesForLandingAirplane(airplane, waitingCordinates, now);
 
             graphic.FillEllipse(Brushes.Blue, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
+            graphic.DrawString(context.SimulationEnvironment.NumberOfPassengersInEachAirplane.GetValueOrDefault(airplane.Id).ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
-        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsDeparting(now)))
+        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsDeparting(now) || x.State.WaitsForDeparture(now)))
         {
-            var coordinates = GetCoordinatesForDepartingAirplane(airplane, landingPlace, departureCoordinates, now);
+            var coordinates = GetCoordinatesForDepartingAirplane(airplane, departureCoordinates, now);
 
             graphic.FillEllipse(Brushes.Green, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
+            graphic.DrawString(context.SimulationEnvironment.NumberOfPassengersInEachAirplane.GetValueOrDefault(airplane.Id).ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
         int i = 0;
@@ -50,6 +52,7 @@ public class AirportDrawer
             var coordinates = GetCoordinatesForWaitingAirplane(i, waitingCordinates);
 
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
+            graphic.DrawString(context.SimulationEnvironment.NumberOfPassengersInEachAirplane.GetValueOrDefault(airplane.Id).ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
             i++;
         }
 
@@ -61,16 +64,24 @@ public class AirportDrawer
         return new DrawingCoordinates(waitingCordinates.X + index * AirplaneSize, waitingCordinates.Y);
     }
 
-    private DrawingCoordinates GetCoordinatesForLandingAirplane(Airplane airplane, DrawingCoordinates waitingCordinates, DrawingCoordinates landingPlace, TimeSpan now)
+    private DrawingCoordinates GetCoordinatesForLandingAirplane(Airplane airplane, DrawingCoordinates waitingCordinates, TimeSpan now)
     {
+        var landingPlace = GetLandingPlace(airplane);
         var lerp = waitingCordinates.Lerp(landingPlace, airplane.State.LandingProgress(now));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
-    private DrawingCoordinates GetCoordinatesForDepartingAirplane(Airplane airplane, DrawingCoordinates landingPlace, DrawingCoordinates departureCoordinates, TimeSpan now)
+    private DrawingCoordinates GetCoordinatesForDepartingAirplane(Airplane airplane, DrawingCoordinates departureCoordinates, TimeSpan now)
     {
+        var landingPlace = GetLandingPlace(airplane);
         var lerp = landingPlace.Lerp(departureCoordinates, airplane.State.DepartureProgress(now), convertY: x => 1 - Math.Cos(Math.PI * x/2));
         return new DrawingCoordinates(lerp.X, lerp.Y);
+    }
+
+    private DrawingCoordinates GetLandingPlace(Airplane airplane)
+    {
+        var landingLine = airplane.State.LandingLine.Value;
+        return new DrawingCoordinates(100, _bmp.Height - landingLine * 50);
     }
 
     private record DrawingCoordinates(int X, int Y)
