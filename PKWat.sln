@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Drawi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulations.Examples.CollisionDetection", "Examples\PKWat.AgentSimulations.Examples.CollisionDetection\PKWat.AgentSimulations.Examples.CollisionDetection.csproj", "{3F36208A-F7CC-4DA2-8C82-1A837B86DA01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.Airport", "PKWat.AgentSimulation.Examples.Airport\PKWat.AgentSimulation.Examples.Airport.csproj", "{6E78C902-369F-427C-BA18-3713BEB87C4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Examples.Airport", "PKWat.AgentSimulation.Examples.Airport\PKWat.AgentSimulation.Examples.Airport.csproj", "{6E78C902-369F-427C-BA18-3713BEB87C4D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Math", "PKWat.AgentSimulation.Math\PKWat.AgentSimulation.Math.csproj", "{005815F0-3719-4DFA-AE9B-9201BF39CA28}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{6E78C902-369F-427C-BA18-3713BEB87C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E78C902-369F-427C-BA18-3713BEB87C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E78C902-369F-427C-BA18-3713BEB87C4D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{005815F0-3719-4DFA-AE9B-9201BF39CA28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{005815F0-3719-4DFA-AE9B-9201BF39CA28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{005815F0-3719-4DFA-AE9B-9201BF39CA28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{005815F0-3719-4DFA-AE9B-9201BF39CA28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

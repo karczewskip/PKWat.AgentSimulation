@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Math.Extensions;
 
 public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
 {
@@ -33,5 +34,5 @@ public record AirplaneState(
 {
     public bool IsBeforeLanding(TimeSpan now) => LandingStart == null || LandingStart > now;
     public bool IsLanding(TimeSpan now) => LandingStart <= now && now <= LandingFinish;
-    public double LandingProgress(TimeSpan now) => LandingStart == null || LandingFinish == null || now < LandingStart ? 0 : (now - LandingStart).Value.TotalMilliseconds / (LandingFinish - LandingStart).Value.TotalMilliseconds;
+    public double LandingProgress(TimeSpan now) => LandingStart.HasValue && LandingFinish.HasValue ? now.GetProgressBetween(LandingStart.Value, LandingFinish.Value) : 0;
 }
