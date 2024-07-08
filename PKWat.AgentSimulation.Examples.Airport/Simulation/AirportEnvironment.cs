@@ -25,4 +25,9 @@ public class AirportEnvironment
         AllowedForLand = allowedForLand;
     }
 
+    public bool NoPassengerInAirplane(AgentId airplaneId)
+    {
+        return true;
+    }
+
 }
