@@ -26,8 +26,7 @@ public partial class MainWindow : Window
     private async void startSimulationButton_Click(object sender, RoutedEventArgs e)
     {
         double bulbRadius = 400.0;
-        int ballsCount = 10;
-        var random = new Random();
+        int ballsCount = 200;
 
         var colors = _colorsGenerator.Generate(ballsCount);
 
@@ -38,7 +37,7 @@ public partial class MainWindow : Window
         _simulation
             = _simulationBuilder
                 .CreateNewSimulation(new BouncingBallBulb(bulbRadius, 10.0))
-                .AddAgents<BouncingBall>(200)
+                .AddAgents<BouncingBall>(ballsCount)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
                 .Build();
