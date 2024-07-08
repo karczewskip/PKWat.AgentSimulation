@@ -6,18 +6,25 @@ public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {
     protected override CoordinatorState GetInitialState(AirportEnvironment environment)
     {
-        return new CoordinatorState(AgentId.Empty);
+        return new CoordinatorState(new Dictionary<AgentId, int>());
     }
 
     protected override CoordinatorState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
     {
-        if(environment.IsLandingAirplane == false && environment.AirplanesAskingForLand.Length > 0)
+        var airplanesAskingForLand = new Queue<AgentId>(environment.AirplanesAskingForLand);
+        var busyLandingLines = environment.LandingAirplanes.Select(x => x.Value);
+        var availableLandingLines = new Queue<int>(environment.AllLandingLines.Except(busyLandingLines));
+
+        var newAllowedAirplanesForLanding = new Dictionary<AgentId, int>();
+        while (airplanesAskingForLand.Any() && availableLandingLines.Any())
         {
-            return State with { AllowedAirplaneForLanding = environment.AirplanesAskingForLand[0] };
+            var nextAirplane = airplanesAskingForLand.Dequeue();
+            var nextLine = availableLandingLines.Dequeue();
+            newAllowedAirplanesForLanding.Add(nextAirplane, nextLine);
         }
 
-        return State;
+        return State with { AllowedAirplanesForLanding = newAllowedAirplanesForLanding };
     }
 }
 
-public record CoordinatorState(AgentId AllowedAirplaneForLanding);
+public record CoordinatorState(IReadOnlyDictionary<AgentId, int> AllowedAirplanesForLanding);

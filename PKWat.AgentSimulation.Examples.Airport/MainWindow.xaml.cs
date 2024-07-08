@@ -64,8 +64,8 @@
                 .SimulationEnvironment
                 .SetLandingAirplane(context
                     .GetAgents<Airplane>()
-                    .FirstOrDefault(x => x.State.IsLanding(context.SimulationTime.Time))
-                    ?.Id ?? AgentId.Empty);
+                    .Where(x => x.State.IsLanding(context.SimulationTime.Time))
+                    .ToDictionary(x => x.Id, x => x.State.LandingLine.Value));
         }
 
         private async Task UpdateAllowedForLand(ISimulationContext<AirportEnvironment> context)
@@ -75,7 +75,7 @@
                 .SetAllowedForLand(context
                     .GetRequiredAgent<Coordinator>()
                     .State
-                    .AllowedAirplaneForLanding);
+                    .AllowedAirplanesForLanding);
         }
 
         private async Task RenderAsync(ISimulationContext<AirportEnvironment> context)

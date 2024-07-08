@@ -17,9 +17,15 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
             return State with { AskedForLand = true, AskingForLand = true };
         }
 
-        if (State.AskingForLand && environment.AllowedForLand == Id)
+        if (State.AskingForLand)
         {
-            return State with { AskingForLand = false, LandingStart = simulationTime.Time, LandingFinish = simulationTime.Time + (simulationTime.Step * 10) };
+            var givenLine = environment.GetAssignedLine(Id);
+            if(givenLine == null)
+            {
+                return State;
+            }
+
+            return State with { AskingForLand = false, LandingLine = givenLine, LandingStart = simulationTime.Time, LandingFinish = simulationTime.Time + (simulationTime.Step * 10) };
         }
 
         if(State.WaitsForDeparture(simulationTime.Time) && environment.NoPassengerInAirplane(Id))
@@ -34,6 +40,7 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
 public record AirplaneState(
     bool AskedForLand = false,
     bool AskingForLand = false,
+    int? LandingLine = null,
     TimeSpan? LandingStart = null,
     TimeSpan? LandingFinish = null,
     TimeSpan? DepartureStart = null,
