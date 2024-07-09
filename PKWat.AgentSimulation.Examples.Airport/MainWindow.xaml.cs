@@ -86,7 +86,7 @@
                 .SimulationEnvironment
                 .SetLandedAirplanes(context
                     .GetAgents<Airplane>()
-                    .Where(x => x.State.HasLanded(context.SimulationTime.Time))
+                    .Where(x => x.State.HasLanded(context.SimulationTime.Time) && !x.State.HasDeparted(context.SimulationTime.Time))
                     .ToDictionary(x => x.Id, x => x.State.LandingLine.Value));
         }
 
