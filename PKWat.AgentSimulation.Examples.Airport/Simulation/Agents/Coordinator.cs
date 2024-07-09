@@ -12,7 +12,7 @@ public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
     protected override CoordinatorState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
     {
         var airplanesAskingForLand = new Queue<AgentId>(environment.AirplanesAskingForLand);
-        var busyLandingLines = environment.LandingAirplanes.Select(x => x.Value);
+        var busyLandingLines = environment.LandingAirplanes.Values.Union(environment.LandedAirplanes.Values);
         var availableLandingLines = new Queue<int>(environment.AllLandingLines.Except(busyLandingLines));
 
         var newAllowedAirplanesForLanding = new Dictionary<AgentId, int>();
