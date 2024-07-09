@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Math.Extensions;
 using System;
 
 public class Passenger : SimulationAgent<AirportEnvironment, PassengerState>
@@ -29,7 +30,7 @@ public class Passenger : SimulationAgent<AirportEnvironment, PassengerState>
 
         if(State.ReadyForCheckout && State.CheckoutStarted == null && environment.PassengerAllowedToCheckout(Id, State.AirplaneId))
         {
-            return State with { CheckoutStarted = simulationTime.Time, CheckoutEnd = simulationTime.Time + simulationTime.Step };
+            return State with { CheckoutStarted = simulationTime.Time, CheckoutEnd = simulationTime.Time + simulationTime.Step*3 };
         }
 
         return State;
@@ -38,5 +39,7 @@ public class Passenger : SimulationAgent<AirportEnvironment, PassengerState>
 
 public record PassengerState(AgentId? AirplaneId = null, bool ReadyForCheckout = false, TimeSpan? CheckoutStarted = null, TimeSpan? CheckoutEnd = null)
 {
+    public bool IsCheckouting => CheckoutStarted.HasValue;
+    public double CheckoutProgress(TimeSpan now) => now.GetProgressBetween(CheckoutStarted.Value, CheckoutEnd.Value);
     public bool Checkouted(TimeSpan now) => CheckoutEnd.HasValue && CheckoutEnd.Value <= now;
 }

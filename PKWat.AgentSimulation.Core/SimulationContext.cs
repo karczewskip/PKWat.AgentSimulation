@@ -17,6 +17,7 @@ public interface ISimulationContext<ENVIRONMENT>
     AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>;
 
     void SendMessage(IAddressedAgentMessage addressedAgentMessage);
     IEnumerable<IAgentMessage> GetMessages(IRecognizableAgent receiver);
@@ -39,7 +40,7 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
         _serviceProvider = serviceProvider;
 
         SimulationEnvironment = simulationEnvironment;
-        Agents = agents;
+        Agents = agents.ToDictionary(x => x.Id);
         SimulationTime = new SimulationTime(TimeSpan.Zero, simulationStep);
         WaitingTimeBetweenSteps = waitingTimeBetweenSteps;
     }
@@ -47,14 +48,17 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
     public ENVIRONMENT SimulationEnvironment { get; }
     public SimulationTime SimulationTime { get; private set; }
 
-    public List<ISimulationAgent<ENVIRONMENT>> Agents { get; }
+    public Dictionary<AgentId, ISimulationAgent<ENVIRONMENT>> Agents { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
 
     public IEnumerable<T> GetAgents<T>() where T : ISimulationAgent<ENVIRONMENT> 
-        => Agents.OfType<T>();
+        => Agents.Values.OfType<T>();
 
     public AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
-        => Agents.OfType<AGENT>().Single();
+        => Agents.Values.OfType<AGENT>().Single();
+
+    public AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>
+        => (AGENT)Agents[agentId];
 
     internal void Update()
     {
@@ -81,7 +85,7 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
         agent.Initialize(this);
-        Agents.Add(agent);
+        Agents.Add(agent.Id, agent);
 
         return agent;
     }

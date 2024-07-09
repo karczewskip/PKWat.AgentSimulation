@@ -38,6 +38,14 @@ public class AirportDrawer
             graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
+        foreach(var passenger in context.GetAgents<Passenger>().Where(x => x.State.IsCheckouting))
+        {
+            var airplane = context.GetRequiredAgent<Airplane>(passenger.State.AirplaneId);
+            var coordinates = GetCoordinatesForPassengerAirplane(passenger, airplane, now);
+
+            graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, 5, 5);
+        }
+
         foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsDeparting(now) || x.State.WaitsForDeparture(now)))
         {
             var coordinates = GetCoordinatesForDepartingAirplane(airplane, departureCoordinates, now);
@@ -71,6 +79,14 @@ public class AirportDrawer
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
+    private DrawingCoordinates GetCoordinatesForPassengerAirplane(Passenger passenger, Airplane airplane, TimeSpan now)
+    {
+        var landingPlace = GetLandingPlace(airplane);
+        var checkoutPlace = new DrawingCoordinates(0, landingPlace.Y);
+        var lerp = landingPlace.Lerp(checkoutPlace, passenger.State.CheckoutProgress(now));
+        return new DrawingCoordinates(lerp.X, lerp.Y);
+    }
+
     private DrawingCoordinates GetCoordinatesForDepartingAirplane(Airplane airplane, DrawingCoordinates departureCoordinates, TimeSpan now)
     {
         var landingPlace = GetLandingPlace(airplane);
@@ -81,18 +97,18 @@ public class AirportDrawer
     private DrawingCoordinates GetLandingPlace(Airplane airplane)
     {
         var landingLine = airplane.State.LandingLine.Value;
-        return new DrawingCoordinates(100, _bmp.Height - landingLine * 50);
+        return new DrawingCoordinates(100, _bmp.Height - landingLine * 30);
     }
 
     private record DrawingCoordinates(int X, int Y)
     {
-        internal DrawingCoordinates Lerp(DrawingCoordinates landingPlace, double progress, Func<double, double> convertX = null, Func<double, double> convertY = null)
+        internal DrawingCoordinates Lerp(DrawingCoordinates destination, double progress, Func<double, double> convertX = null, Func<double, double> convertY = null)
         {
             var progressX = convertX?.Invoke(progress) ?? progress;
             var progressY = convertY?.Invoke(progress) ?? progress;
 
-            var newX = X + (landingPlace.X - X) * progressX;
-            var newY = Y + (landingPlace.Y - Y) * progressY;
+            var newX = X + (destination.X - X) * progressX;
+            var newY = Y + (destination.Y - Y) * progressY;
 
             return new DrawingCoordinates(
                 (int)newX,

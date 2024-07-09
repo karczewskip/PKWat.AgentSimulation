@@ -22,7 +22,7 @@ public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
     {
         var airplane = context.AddAgent<Airplane>();
         
-        var passengers = _randomNumbersGenerator.Next(10);
+        var passengers = _randomNumbersGenerator.Next(30);
         for(int i = 0; i < passengers; i++)
         {
             var passanger = context.AddAgent<Passenger>();
