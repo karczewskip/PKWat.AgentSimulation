@@ -94,11 +94,11 @@
         {
             context
                 .SimulationEnvironment
-                .SetNumberOfPassengersInEachAirplane(context
+                .SetPassengersInEachAirplane(context
                     .GetAgents<Passenger>()
-                    .Where(x => x.State.AirplaneId != null)
+                    .Where(x => !x.State.Checkouted(context.SimulationTime.Time))
                     .GroupBy(x => x.State.AirplaneId)
-                    .ToDictionary(x => x.Key, x => x.Count()));
+                    .ToDictionary(x => x.Key, x => x.Select(y => y.Id).ToArray()));
         }
 
         private async Task RenderAsync(ISimulationContext<AirportEnvironment> context)

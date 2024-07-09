@@ -10,7 +10,7 @@ public class AirportEnvironment
     public IReadOnlyDictionary<AgentId, int> LandingAirplanes { get; private set; } = new Dictionary<AgentId, int>();
     public IReadOnlyDictionary<AgentId, int> AllowedForLand { get; private set; } = new Dictionary<AgentId, int>();
     public IReadOnlyDictionary<AgentId, int> LandedAirplanes { get; private set; } = new Dictionary<AgentId, int>();
-    public IReadOnlyDictionary<AgentId, int> NumberOfPassengersInEachAirplane { get; private set; } = new Dictionary<AgentId, int>();
+    public IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane { get; private set; } = new Dictionary<AgentId, AgentId[]>();
 
     public void SetAirplanesAskingForLand(AgentId[] airplanesAskingForLand)
     {
@@ -32,14 +32,14 @@ public class AirportEnvironment
         LandedAirplanes = landedAirplanes;
     }
 
-    public void SetNumberOfPassengersInEachAirplane(IReadOnlyDictionary<AgentId, int> numberOfPassengersInEachAirplane)
+    public void SetPassengersInEachAirplane(IReadOnlyDictionary<AgentId, AgentId[]> passengersInEachAirplane)
     {
-        NumberOfPassengersInEachAirplane = numberOfPassengersInEachAirplane;
+        PassengersInEachAirplane = passengersInEachAirplane;
     }
 
     public bool NoPassengerInAirplane(AgentId airplaneId)
     {
-        return NumberOfPassengersInEachAirplane.ContainsKey(airplaneId) == false || NumberOfPassengersInEachAirplane[airplaneId] == 0;
+        return PassengersInEachAirplane.ContainsKey(airplaneId) == false || PassengersInEachAirplane[airplaneId].Length == 0;
     }
 
     public int? GetAssignedLine(AgentId id)
@@ -54,8 +54,11 @@ public class AirportEnvironment
 
     public bool AirplaneLanded(AgentId airplaneId)
     {
-        return LandingAirplanes.ContainsKey(airplaneId);
+        return LandedAirplanes.ContainsKey(airplaneId);
     }
 
-
+    internal bool PassengerAllowedToCheckout(AgentId passengerId, AgentId airplaneId)
+    {
+        return PassengersInEachAirplane[airplaneId].First() == passengerId;
+    }
 }

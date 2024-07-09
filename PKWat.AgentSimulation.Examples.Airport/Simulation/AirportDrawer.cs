@@ -35,7 +35,7 @@ public class AirportDrawer
             var coordinates = GetCoordinatesForLandingAirplane(airplane, waitingCordinates, now);
 
             graphic.FillEllipse(Brushes.Blue, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(context.SimulationEnvironment.NumberOfPassengersInEachAirplane.GetValueOrDefault(airplane.Id).ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
         foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsDeparting(now) || x.State.WaitsForDeparture(now)))
@@ -43,7 +43,7 @@ public class AirportDrawer
             var coordinates = GetCoordinatesForDepartingAirplane(airplane, departureCoordinates, now);
 
             graphic.FillEllipse(Brushes.Green, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(context.SimulationEnvironment.NumberOfPassengersInEachAirplane.GetValueOrDefault(airplane.Id).ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
         int i = 0;
@@ -52,7 +52,7 @@ public class AirportDrawer
             var coordinates = GetCoordinatesForWaitingAirplane(i, waitingCordinates);
 
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(context.SimulationEnvironment.NumberOfPassengersInEachAirplane.GetValueOrDefault(airplane.Id).ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
             i++;
         }
 

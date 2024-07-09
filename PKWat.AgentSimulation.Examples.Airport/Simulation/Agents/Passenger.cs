@@ -17,18 +17,26 @@ public class Passenger : SimulationAgent<AirportEnvironment, PassengerState>
 
     protected override PassengerState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
     {
-        if (State.AirplaneId == null || State.CheckoutStart.HasValue)
+        if (State.AirplaneId == null)
         {
             return State;
         }
 
-        if (environment.AirplaneLanded(State.AirplaneId))
+        if (environment.AirplaneLanded(State.AirplaneId) && !State.ReadyForCheckout)
         {
-            return State with { CheckoutStart = simulationTime.Time, CheckoutEnd = simulationTime.Time + (simulationTime.Step * 10) };
+            return State with { ReadyForCheckout = true };
+        }
+
+        if(State.ReadyForCheckout && State.CheckoutStarted == null && environment.PassengerAllowedToCheckout(Id, State.AirplaneId))
+        {
+            return State with { CheckoutStarted = simulationTime.Time, CheckoutEnd = simulationTime.Time + simulationTime.Step };
         }
 
         return State;
     }
 }
 
-public record PassengerState(AgentId? AirplaneId = null, TimeSpan? CheckoutStart = null, TimeSpan? CheckoutEnd = null);
+public record PassengerState(AgentId? AirplaneId = null, bool ReadyForCheckout = false, TimeSpan? CheckoutStarted = null, TimeSpan? CheckoutEnd = null)
+{
+    public bool Checkouted(TimeSpan now) => CheckoutEnd.HasValue && CheckoutEnd.Value <= now;
+}
