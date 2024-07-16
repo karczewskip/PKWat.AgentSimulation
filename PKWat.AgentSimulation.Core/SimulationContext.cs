@@ -3,9 +3,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 
-public record SimulationTime(TimeSpan Time, TimeSpan Step)
+public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0)
 {
-    public SimulationTime AddStep() => this with { Time = Time + Step };
+    public SimulationTime AddStep() => this with { Time = Time + Step, StepNo = StepNo + 1 };
 }
 
 public interface ISimulationContext<ENVIRONMENT>
