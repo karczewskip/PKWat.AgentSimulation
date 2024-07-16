@@ -13,14 +13,20 @@
         private readonly SimulationContext<T> _context;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
+        private readonly IReadOnlyList<ISimulationEvent<T>> _events;
 
         public bool Running { get; private set; } = false;
 
-        public Simulation(SimulationContext<T> context, IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates, IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks)
+        public Simulation(
+            SimulationContext<T> context, 
+            IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
+            IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
+            IReadOnlyList<ISimulationEvent<T>> events)
         {
             _context = context;
             _environmentUpdates = environmentUpdates;
             _callbacks = callbacks;
+            _events = events;
         }
 
         public async Task StartAsync()
@@ -30,7 +36,7 @@
             await Parallel.ForEachAsync(
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Initialize(_context))));
+                    (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context))));
 
             while (Running)
             {
@@ -39,22 +45,30 @@
                     await environmentUpdate(_context);
                 }
 
+                foreach (var simulationEvent in _events)
+                {
+                    if(await simulationEvent.ShouldBeExecuted(_context))
+                    {
+                        await simulationEvent.Execute(_context);
+                    }
+                }
+
                 await Parallel.ForEachAsync(
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Decide(_context))));
+                    (x, c) => new ValueTask(Task.Run(() => x.Value.Prepare(_context))));
 
                 await Parallel.ForEachAsync(
                     _context.Agents, 
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run( () => x.Act())));
+                    (x, c) => new ValueTask(Task.Run( () => x.Value.Act())));
 
                 foreach (var callback in _callbacks)
                 {
                     await callback(_context);
                 }
 
-                _context.UpdateSimulationTime();
+                _context.Update();
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
             }
         }

@@ -4,6 +4,8 @@ public interface IRandomNumbersGenerator
 {
     int Next(int maxValue);
     double NextDouble();
+
+    double GetNextExponential(double lambda);
 }
 
 internal class RandomNumbersGenerator : IRandomNumbersGenerator
@@ -23,6 +25,99 @@ internal class RandomNumbersGenerator : IRandomNumbersGenerator
     public double NextDouble()
     {
         return _random.NextDouble();
+    }
+
+    public double GetNextExponential(double lambda)
+    {
+        return -Math.Log(1 - _random.NextDouble()) / lambda;
+    }
+
+    public double GetNextNormal(double mean, double standardDeviation)
+    {
+        var u1 = _random.NextDouble();
+        var u2 = _random.NextDouble();
+        var z0 = Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2);
+        return mean + standardDeviation * z0;
+    }
+
+    public double GetNextLogNormal(double mean, double standardDeviation)
+    {
+        var u1 = _random.NextDouble();
+        var u2 = _random.NextDouble();
+        var z0 = Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2);
+        return Math.Exp(mean + standardDeviation * z0);
+    }
+
+    public double GetNextTriangular(double a, double b, double c)
+    {
+        var u = _random.NextDouble();
+        if (u < (c - a) / (b - a))
+        {
+            return a + Math.Sqrt(u * (b - a) * (c - a));
+        }
+        else
+        {
+            return b - Math.Sqrt((1 - u) * (b - a) * (b - c));
+        }
+    }
+
+    public double GetNextUniform(double a, double b)
+    {
+        return a + (b - a) * _random.NextDouble();
+    }
+
+    public double GetNextWeibull(double lambda, double k)
+    {
+        return lambda * Math.Pow(-Math.Log(1 - _random.NextDouble()), 1 / k);
+    }
+
+    public double GetNextPoisson(double lambda)
+    {
+        var l = Math.Exp(-lambda);
+        var k = 0;
+        var p = 1.0;
+        do
+        {
+            k++;
+            p *= _random.NextDouble();
+        } while (p > l);
+        return k - 1;
+    }
+
+    public double GetNextBinomial(int n, double p)
+    {
+        var x = 0;
+        for (var i = 0; i < n; i++)
+        {
+            if (_random.NextDouble() < p)
+            {
+                x++;
+            }
+        }
+        return x;
+    }
+
+    public double GetNextGeometric(double p)
+    {
+        return Math.Floor(Math.Log(1 - _random.NextDouble()) / Math.Log(1 - p));
+    }
+
+    public double GetNextHypergeometric(int population, int sample, int success)
+    {
+        var x = 0;
+        var n = population;
+        var m = sample;
+        var k = success;
+        for (var i = 0; i < m; i++)
+        {
+            if (_random.NextDouble() < (double)k / n)
+            {
+                k--;
+                x++;
+            }
+            n--;
+        }
+        return x;
     }
 }
 

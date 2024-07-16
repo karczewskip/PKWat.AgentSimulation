@@ -16,9 +16,8 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
             _colorInitializer = colorInitializer;
         }
 
-        protected override BallState GetInitialState(ISimulationContext<BallsContainer> simulationContext)
+        protected override BallState GetInitialState(BallsContainer environment)
         {
-            var environment = simulationContext.SimulationEnvironment;
             var x = _randomNumbersGenerator.NextDouble() * environment.Width;
             var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height / 2;
 
@@ -28,12 +27,11 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
                 _colorInitializer.GetNext());
         }
 
-        protected override BallState GetNextState(ISimulationContext<BallsContainer> simulationContext)
+        protected override BallState GetNextState(BallsContainer environment, SimulationTime simulationTime)
         {
-            var environment = simulationContext.SimulationEnvironment;
-            var timeInSeconds = simulationContext.SimulationStep.TotalSeconds;
+            var timeInSeconds = simulationTime.Step.TotalSeconds;
 
-            var newVelocity = State.Velocity.ApplyAcceleration(environment.Gravity, simulationContext.SimulationStep);
+            var newVelocity = State.Velocity.ApplyAcceleration(environment.Gravity, simulationTime.Step);
 
             return State with
             {

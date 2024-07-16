@@ -65,19 +65,13 @@ public class BouncingBall : SimulationAgent<BouncingBallBulb, BouncingBallState>
         _bouncingBallStateInitializer = bouncingBallStateInitializer;
     }
 
-    public void Act(ISimulationContext<BouncingBallBulb> simulationContext)
+    protected override BouncingBallState GetInitialState(BouncingBallBulb environment)
     {
+        return _bouncingBallStateInitializer.InitializeNewState(environment);
     }
 
-    protected override BouncingBallState GetInitialState(ISimulationContext<BouncingBallBulb> simulationContext)
+    protected override BouncingBallState GetNextState(BouncingBallBulb environment, SimulationTime simulationTime)
     {
-        return _bouncingBallStateInitializer.InitializeNewState(simulationContext.SimulationEnvironment);
-    }
-
-    protected override BouncingBallState GetNextState(ISimulationContext<BouncingBallBulb> simulationContext)
-    {
-        var environment = simulationContext.SimulationEnvironment;
-
         var newPosition = State.Position with { X = State.Position.X + State.Velocity.X, Y = State.Position.Y + State.Velocity.Y };
         var distanceExceeded = newPosition.DistanceFromCenter + State.Radius - environment.BulbRadius;
 
