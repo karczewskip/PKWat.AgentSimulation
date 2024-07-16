@@ -1,8 +1,10 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
+using PKWat.AgentSimulation.Core.Snapshots;
+
 public interface ISimulationBuilder
 {
-    ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment);
+    ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment) where T : ISnapshotCreator;
 }
 
 internal class SimulationBuilder : ISimulationBuilder
@@ -14,7 +16,7 @@ internal class SimulationBuilder : ISimulationBuilder
         _serviceProvider = serviceProvider;
     }
 
-    public ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment)
+    public ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment) where T : ISnapshotCreator
     {
         return new SimulationBuilderContext<T>(simulationEnvironment, _serviceProvider);
     }

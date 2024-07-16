@@ -1,6 +1,9 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
-public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent
+using PKWat.AgentSimulation.Core.Snapshots;
+using System.Text.Json;
+
+public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent, ISnapshotCreator where ENVIRONMENT : ISnapshotCreator
 {
     void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
     void Prepare(ISimulationContext<ENVIRONMENT> simulationContext);
@@ -26,7 +29,7 @@ public interface IRecognizableAgent : IEquatable<IRecognizableAgent>
     AgentId Id { get; }
 }
 
-public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENVIRONMENT>
+public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENVIRONMENT> where ENVIRONMENT : ISnapshotCreator
 {
     private STATE _nextState;
 
@@ -60,5 +63,10 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
     public bool Equals(IRecognizableAgent? other)
     {
         return other is IRecognizableAgent agent && agent.Id == Id;
+    }
+
+    public virtual string CreateSnapshot()
+    {
+        return JsonSerializer.Serialize(State);
     }
 }

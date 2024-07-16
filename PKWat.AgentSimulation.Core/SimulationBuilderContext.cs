@@ -1,8 +1,9 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using Microsoft.Extensions.DependencyInjection;
+using PKWat.AgentSimulation.Core.Snapshots;
 
-public interface ISimulationBuilderContext<ENVIRONMENT>
+public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISnapshotCreator
 {
     ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
@@ -16,7 +17,7 @@ public interface ISimulationBuilderContext<ENVIRONMENT>
     ISimulation Build();
 }
 
-internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T>
+internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T> where T : ISnapshotCreator
 {
     private readonly T _simulationEnvironment;
     private readonly IServiceProvider _serviceProvider;

@@ -1,5 +1,8 @@
 ﻿namespace PKWat.AgentSimulation.Core
 {
+    using PKWat.AgentSimulation.Core.Snapshots;
+    using System.Reflection;
+
     public interface ISimulation
     {
         public bool Running { get; }
@@ -8,7 +11,7 @@
         Task StopAsync();
     }
 
-    internal class Simulation<T> : ISimulation
+    internal class Simulation<T> : ISimulation where T : ISnapshotCreator
     {
         private readonly SimulationContext<T> _context;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
@@ -37,6 +40,18 @@
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
                     (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context))));
+
+            var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var snapshotDirectory = Path.Combine(binDirectory, "snapshots");
+
+            if(Directory.Exists(snapshotDirectory))
+            {
+                Directory.Delete(snapshotDirectory, true);
+            }
+
+            Directory.CreateDirectory(snapshotDirectory);
+
+            var snapshotStore = new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
 
             while (Running)
             {
@@ -69,6 +84,13 @@
                 }
 
                 _context.Update();
+
+                await snapshotStore.SaveSnapshotAsync(
+                    new SimulationSnapshot(new SimulationTimeSnapshot(_context.SimulationTime), 
+                    new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()), 
+                    _context.Agents.Select(x => new SimulationAgentSnapshot(x.Key, x.Value.CreateSnapshot())).ToArray()),
+                    default);
+
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
             }
         }

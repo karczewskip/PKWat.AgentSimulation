@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using Microsoft.Extensions.DependencyInjection;
+using PKWat.AgentSimulation.Core.Snapshots;
 using System.Collections.Generic;
 
 public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0)
@@ -8,7 +9,7 @@ public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0)
     public SimulationTime AddStep() => this with { Time = Time + Step, StepNo = StepNo + 1 };
 }
 
-public interface ISimulationContext<ENVIRONMENT>
+public interface ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISnapshotCreator
 {
     ENVIRONMENT SimulationEnvironment { get; }
     SimulationTime SimulationTime { get; }
@@ -19,7 +20,7 @@ public interface ISimulationContext<ENVIRONMENT>
     AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>;
 }
 
-internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT>
+internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISnapshotCreator
 {
     private readonly IServiceProvider _serviceProvider;
 
