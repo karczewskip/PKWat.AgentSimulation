@@ -9,7 +9,7 @@ internal record SimulationTimeSnapshot(SimulationTime SimulationTime);
 
 internal record SimulationEnvironmentSnapshot(string Snapshot);
 
-internal record SimulationAgentSnapshot(AgentId Id, string Snapshot);
+internal record SimulationAgentSnapshot(string AgentType, AgentId Id, string Snapshot);
 
 internal record SimulationSnapshotConfiguration(string Directory);
 
@@ -44,7 +44,10 @@ internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulatio
             output.WriteStartObject();
 
             output.WritePropertyName("Id");
-            output.WriteStringValue(agentSnapshot.Id.Id.ToString());
+            output.WriteStringValue(agentSnapshot.Id.ToString());
+
+            output.WritePropertyName("Type");
+            output.WriteStringValue(agentSnapshot.AgentType);
 
             output.WritePropertyName("Snapshot");
             agent.RootElement.WriteTo(output);

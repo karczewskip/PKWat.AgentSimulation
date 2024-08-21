@@ -66,6 +66,14 @@ public class AirportEnvironment : ISnapshotCreator
 
     public string CreateSnapshot()
     {
-        return JsonSerializer.Serialize(this);
+        return JsonSerializer.Serialize(new
+        {
+            AllLandingLines,
+            AirplanesAskingForLand,
+            LandingAirplanes = LandingAirplanes.Select(x => (x.Key, x.Value)).ToArray(),
+            AllowedForLand = AllowedForLand.Select(x => (x.Key, x.Value)).ToArray(),
+            LandedAirplanes = LandedAirplanes.Select(x => (x.Key, x.Value)).ToArray(),
+            PassengersInEachAirplane = PassengersInEachAirplane.Select(x => (x.Key, x.Value)).ToArray()
+        });
     }
 }
