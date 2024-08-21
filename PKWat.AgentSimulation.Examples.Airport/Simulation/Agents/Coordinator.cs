@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core;
+using System.Text.Json;
 
 public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {
@@ -24,6 +25,12 @@ public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
         }
 
         return State with { AllowedAirplanesForLanding = newAllowedAirplanesForLanding };
+    }
+
+    public override string CreateSnapshot()
+    {
+        return JsonSerializer.Serialize(State.AllowedAirplanesForLanding.Select(x => (x.Key, x.Value)).ToArray());
+    
     }
 }
 

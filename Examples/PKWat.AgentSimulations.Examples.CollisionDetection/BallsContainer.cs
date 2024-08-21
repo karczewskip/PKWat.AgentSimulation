@@ -1,6 +1,9 @@
 ﻿namespace PKWat.AgentSimulations.Examples.CollisionDetection
 {
-    public class BallsContainer
+    using PKWat.AgentSimulation.Core.Snapshots;
+    using System.Text.Json;
+
+    public class BallsContainer : ISnapshotCreator
     {
         private Dictionary<Backet, Ball[]> _ballsInBackets = new();
 
@@ -33,6 +36,11 @@
             {
                 _ballsInBackets.Add(ballsGroup.Key, [.. ballsGroup]);
             }
+        }
+
+        public string CreateSnapshot()
+        {
+            return JsonSerializer.Serialize(this);
         }
 
         private record Backet(int x, int y)

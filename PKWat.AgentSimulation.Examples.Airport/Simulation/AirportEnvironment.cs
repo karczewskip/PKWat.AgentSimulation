@@ -1,9 +1,11 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Snapshots;
 using System;
+using System.Text.Json;
 
-public class AirportEnvironment
+public class AirportEnvironment : ISnapshotCreator
 {
     public int[] AllLandingLines { get; private set; } = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
     public AgentId[] AirplanesAskingForLand { get; private set; } = [];
@@ -60,5 +62,18 @@ public class AirportEnvironment
     internal bool PassengerAllowedToCheckout(AgentId passengerId, AgentId airplaneId)
     {
         return PassengersInEachAirplane[airplaneId].First() == passengerId;
+    }
+
+    public string CreateSnapshot()
+    {
+        return JsonSerializer.Serialize(new
+        {
+            AllLandingLines,
+            AirplanesAskingForLand,
+            LandingAirplanes = LandingAirplanes.Select(x => (x.Key, x.Value)).ToArray(),
+            AllowedForLand = AllowedForLand.Select(x => (x.Key, x.Value)).ToArray(),
+            LandedAirplanes = LandedAirplanes.Select(x => (x.Key, x.Value)).ToArray(),
+            PassengersInEachAirplane = PassengersInEachAirplane.Select(x => (x.Key, x.Value)).ToArray()
+        });
     }
 }
