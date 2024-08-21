@@ -53,6 +53,8 @@
 
             var snapshotStore = new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
 
+            snapshotStore.CleanExistingSnapshots();
+
             while (Running)
             {
                 foreach (var environmentUpdate in _environmentUpdates)

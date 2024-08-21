@@ -17,6 +17,16 @@ internal record SimulationSnapshot(SimulationTimeSnapshot TimeSnapshot, Simulati
 
 internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulationSnapshotConfiguration)
 {
+    public void CleanExistingSnapshots()
+    {
+        if (Directory.Exists(simulationSnapshotConfiguration.Directory))
+        {
+            Directory.Delete(simulationSnapshotConfiguration.Directory, true);
+        }
+
+        Directory.CreateDirectory(simulationSnapshotConfiguration.Directory);
+    }
+
     public async Task SaveSnapshotAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken)
     {
         string filePath = Path.Combine(simulationSnapshotConfiguration.Directory, $"{snapshot.TimeSnapshot.SimulationTime.StepNo}.json");
