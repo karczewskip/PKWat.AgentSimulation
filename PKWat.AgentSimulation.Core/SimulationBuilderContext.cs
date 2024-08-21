@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core.Snapshots;
+using System.Reflection;
 
 public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISnapshotCreator
 {
@@ -101,6 +102,21 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T> where 
         _agents.AddRange(_agentsToGenerate.Select(x => x()));
         _events.AddRange(_eventsToGenerate.Select(x => x()));
 
-        return new Simulation<T>(new SimulationContext<T>(_serviceProvider, _simulationEnvironment ,_agents, _simulationStep, _waitingTimeBetweenSteps), _environmentUpdates, _callbacks, _events);
+        var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var snapshotDirectory = Path.Combine(binDirectory, "snapshots");
+
+        var snapshotStore = new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
+
+        return new Simulation<T>(
+            new SimulationContext<T>(
+                _serviceProvider, 
+                _simulationEnvironment ,
+                _agents, 
+                _simulationStep, 
+                _waitingTimeBetweenSteps), 
+            snapshotStore, 
+            _environmentUpdates, 
+            _callbacks, 
+            _events);
     }
 }

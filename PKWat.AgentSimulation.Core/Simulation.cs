@@ -14,6 +14,7 @@
     internal class Simulation<T> : ISimulation where T : ISnapshotCreator
     {
         private readonly SimulationContext<T> _context;
+        private readonly SimulationSnapshotStore _snapshotStore;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly IReadOnlyList<ISimulationEvent<T>> _events;
@@ -21,12 +22,14 @@
         public bool Running { get; private set; } = false;
 
         public Simulation(
-            SimulationContext<T> context, 
+            SimulationContext<T> context,
+            SimulationSnapshotStore simulationSnapshotStore,
             IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
             IReadOnlyList<ISimulationEvent<T>> events)
         {
             _context = context;
+            _snapshotStore = simulationSnapshotStore;
             _environmentUpdates = environmentUpdates;
             _callbacks = callbacks;
             _events = events;
@@ -41,19 +44,7 @@
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
                     (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context))));
 
-            var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var snapshotDirectory = Path.Combine(binDirectory, "snapshots");
-
-            if(Directory.Exists(snapshotDirectory))
-            {
-                Directory.Delete(snapshotDirectory, true);
-            }
-
-            Directory.CreateDirectory(snapshotDirectory);
-
-            var snapshotStore = new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
-
-            snapshotStore.CleanExistingSnapshots();
+            _snapshotStore.CleanExistingSnapshots();
 
             while (Running)
             {
@@ -87,7 +78,7 @@
 
                 _context.Update();
 
-                await snapshotStore.SaveSnapshotAsync(
+                await _snapshotStore.SaveSnapshotAsync(
                     new SimulationSnapshot(new SimulationTimeSnapshot(_context.SimulationTime), 
                     new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()), 
                     _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
