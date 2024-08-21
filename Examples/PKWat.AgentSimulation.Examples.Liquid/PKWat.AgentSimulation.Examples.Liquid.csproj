@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\PKWat.AgentSimulation.ConsoleApp\PKWat.AgentSimulation.ConsoleApp.csproj" />
     <ProjectReference Include="..\..\PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj" />
   </ItemGroup>
 
