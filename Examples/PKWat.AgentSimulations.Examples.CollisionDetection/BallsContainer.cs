@@ -1,9 +1,9 @@
 ﻿namespace PKWat.AgentSimulations.Examples.CollisionDetection
 {
-    using PKWat.AgentSimulation.Core.Snapshots;
+    using PKWat.AgentSimulation.Core;
     using System.Text.Json;
 
-    public class BallsContainer : ISnapshotCreator
+    public class BallsContainer : ISimulationEnvironment
     {
         private Dictionary<Backet, Ball[]> _ballsInBackets = new();
 
@@ -38,9 +38,9 @@
             }
         }
 
-        public string CreateSnapshot()
+        public object CreateSnapshot()
         {
-            return JsonSerializer.Serialize(this);
+            return this;
         }
 
         private record Backet(int x, int y)

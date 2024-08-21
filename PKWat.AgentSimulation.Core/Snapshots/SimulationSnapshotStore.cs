@@ -1,15 +1,14 @@
 ﻿namespace PKWat.AgentSimulation.Core.Snapshots;
 
-using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using PKWat.AgentSimulation.Core;
 
 internal record SimulationTimeSnapshot(SimulationTime SimulationTime);
 
-internal record SimulationEnvironmentSnapshot(string Snapshot);
+internal record SimulationEnvironmentSnapshot(object Snapshot);
 
-internal record SimulationAgentSnapshot(string AgentType, AgentId Id, string Snapshot);
+internal record SimulationAgentSnapshot(string AgentType, AgentId Id, object Snapshot);
 
 internal record SimulationSnapshotConfiguration(string Directory);
 
@@ -39,7 +38,7 @@ internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulatio
         output.WritePropertyName("Time");
         time.RootElement.WriteTo(output);
 
-        using JsonDocument environment = JsonDocument.Parse(snapshot.EnvironmentSnapshot.Snapshot);
+        using JsonDocument environment = JsonDocument.Parse(JsonSerializer.Serialize(snapshot.EnvironmentSnapshot, new JsonSerializerOptions { WriteIndented = true }));
 
         output.WritePropertyName("Environment");
         environment.RootElement.WriteTo(output);
@@ -49,7 +48,7 @@ internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulatio
 
         foreach (var agentSnapshot in snapshot.AgentSnapshots)
         {
-            using JsonDocument agent = JsonDocument.Parse(agentSnapshot.Snapshot);
+            using JsonDocument agent = JsonDocument.Parse(JsonSerializer.Serialize(agentSnapshot.Snapshot, new JsonSerializerOptions { WriteIndented = true }));
 
             output.WriteStartObject();
 

@@ -1,7 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Core
 {
     using PKWat.AgentSimulation.Core.Snapshots;
-    using System.Reflection;
 
     public interface ISimulation
     {
@@ -11,7 +10,7 @@
         Task StopAsync();
     }
 
-    internal class Simulation<T> : ISimulation where T : ISnapshotCreator
+    internal class Simulation<T> : ISimulation where T : ISimulationEnvironment
     {
         private readonly SimulationContext<T> _context;
         private readonly SimulationSnapshotStore _snapshotStore;

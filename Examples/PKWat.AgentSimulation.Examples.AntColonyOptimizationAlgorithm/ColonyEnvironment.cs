@@ -1,12 +1,11 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
-using PKWat.AgentSimulation.Core.Snapshots;
-using System;
+using PKWat.AgentSimulation.Core;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text.Json;
 
-public class ColonyEnvironment : ISnapshotCreator
+public class ColonyEnvironment : ISimulationEnvironment
 {
     public ConcurrentDictionary<ColonyCoordinates, double> FoodPheromones = new();
     public ConcurrentDictionary<ColonyCoordinates, double> HomePheromones = new();
@@ -100,9 +99,9 @@ public class ColonyEnvironment : ISnapshotCreator
         return allConsideringCoordinates.Select(c => (c, GetPheromones(c)));
     }
 
-    public string CreateSnapshot()
+    public object CreateSnapshot()
     {
-        return JsonSerializer.Serialize(this);
+        return this;
     }
 }
 
