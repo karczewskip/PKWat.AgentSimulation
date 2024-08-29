@@ -29,9 +29,10 @@
 
             _simulation
                 = _simulationBuilder
-                    .CreateNewSimulation(new BinEnvironment())
+                    .CreateNewSimulation(new BinEnvironment(1000, 1000))
+                    .AddAgent<Drop>()
                     .AddCallback(RenderAsync)
-                    .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
+                    .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1000))
                     .Build();
 
             await _simulation.StartAsync();
