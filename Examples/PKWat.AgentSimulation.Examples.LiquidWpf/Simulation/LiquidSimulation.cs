@@ -13,7 +13,7 @@
 
             return simulationBuilder
                     .CreateNewSimulation(new BinEnvironment(1000, 1000))
-                    .AddAgent<Drop>()
+                    .AddAgents<Drop>(30)
                     .AddCallback(c => RenderAsync(c, render))
                     .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1000))
                     .Build();

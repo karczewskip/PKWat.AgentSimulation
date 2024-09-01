@@ -2,14 +2,14 @@
 
 namespace PKWat.AgentSimulation.Examples.LiquidWpf.Simulation
 {
-    public class Drop : SimulationAgent<BinEnvironment, DropState>
+    public class Drop(IRandomNumbersGenerator randomNumbersGenerator) : SimulationAgent<BinEnvironment, DropState>
     {
         protected override DropState GetInitialState(BinEnvironment environment)
         {
             var binHeight = environment.BinHeight;
             var binWidth = environment.BinWidth;
 
-            var x = binWidth / 2;
+            var x = binWidth * randomNumbersGenerator.NextDouble();
             var y = binHeight / 2;
 
             return new DropState(new DropCoordinates(x, y), new DropVelocity(0, 0));
