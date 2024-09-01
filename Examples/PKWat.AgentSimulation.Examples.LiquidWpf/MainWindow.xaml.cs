@@ -11,29 +11,18 @@
     {
         private ISimulation _simulation;
 
-        private readonly ISimulationBuilder _simulationBuilder;
-        private readonly LiquidRenderer _liquidRenderer;
+        private readonly LiquidSimulation _liquidSimulation;
 
-        public MainWindow(ISimulationBuilder simulationBuilder, LiquidRenderer liquidRenderer)
+        public MainWindow(LiquidSimulation liquidSimulation)
         {
-            _simulationBuilder = simulationBuilder;
-            _liquidRenderer = liquidRenderer;
+            _liquidSimulation = liquidSimulation;
 
             InitializeComponent();
         }
 
         private async void startSimulationButton_Click(object sender, RoutedEventArgs e)
         {
-
-            _liquidRenderer.Initialize(800, 600);
-
-            _simulation
-                = _simulationBuilder
-                    .CreateNewSimulation(new BinEnvironment(1000, 1000))
-                    .AddAgent<Drop>()
-                    .AddCallback(RenderAsync)
-                    .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1000))
-                    .Build();
+            _simulation = _liquidSimulation.CreateSimulation(b => simulationImage.Source = b);
 
             await _simulation.StartAsync();
         }
@@ -43,10 +32,6 @@
             await _simulation.StopAsync();
         }
 
-        private async Task RenderAsync(ISimulationContext<BinEnvironment> simulationContext)
-        {
-            simulationImage.Source = _liquidRenderer.Draw(simulationContext);
-        }
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             //_centerTransform = new TranslateTransform()

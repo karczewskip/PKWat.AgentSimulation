@@ -20,7 +20,8 @@
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<MainWindow>();
-                    services.AddSingleton<LiquidRenderer>();
+                    services.AddScoped<LiquidSimulation>();
+                    services.AddScoped<LiquidRenderer>();
                     services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
                 })
                 .Build();
