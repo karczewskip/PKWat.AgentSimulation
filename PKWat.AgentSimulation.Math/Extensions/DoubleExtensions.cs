@@ -6,5 +6,10 @@
         {
             return value * newView / previousView;
         }
+
+        public static double Lerp(this double t, double a, double b)
+        {
+            return a + (b - a) * t;
+        }
     }
 }

@@ -20,22 +20,56 @@ public class LiquidRenderer
 
     public BitmapSource Draw(ISimulationContext<BinEnvironment> context)
     {
-        using var graphic = Graphics.FromImage(_bmp);
-        graphic.Clear(Color.Black);
+        using var graphics = Graphics.FromImage(_bmp);
+        graphics.Clear(Color.Black);
 
-        var pen = new Pen(Brushes.White, 0);
-        var drops = context.GetAgents<Drop>();
-        foreach(var drop in drops)
-        {
-            graphic.DrawEllipse(
-                pen, 
-                (float)drop.State.Position.X.ScaleToView(context.SimulationEnvironment.BinWidth, _bmp.Width), 
-                (float)drop.State.Position.Y.ScaleToView(context.SimulationEnvironment.BinHeight, _bmp.Height), 
-                5, 
-                5);
-        }
-
+        DrawLiquid(context, graphics);
+        DrawHeatmap(context, graphics);
 
         return _bmp.ConvertToBitmapSource();
+    }
+
+    private void DrawLiquid(ISimulationContext<BinEnvironment> context, Graphics graphics)
+    {
+        var pen = new Pen(Brushes.White, 0);
+        var drops = context.GetAgents<Drop>();
+        var width = _bmp.Width / 2;
+        foreach (var drop in drops)
+        {
+            graphics.DrawEllipse(
+                pen,
+                (float)drop.State.Position.X.ScaleToView(context.SimulationEnvironment.BinWidth, width),
+                (float)drop.State.Position.Y.ScaleToView(context.SimulationEnvironment.BinHeight, _bmp.Height),
+                5,
+                5);
+        }
+    }
+
+    private void DrawHeatmap(ISimulationContext<BinEnvironment> context, Graphics graphics)
+    {
+        var heatmap = context.SimulationEnvironment.Heatmap;
+        var width = _bmp.Width / 2;
+        var height = _bmp.Height / 2;
+        var coldColor = Color.FromArgb(255, 0, 0, 255);
+        var hotColor = Color.FromArgb(255, 255, 0, 0);
+
+        foreach(var heatmapValue in heatmap.HeatmapValues)
+        {
+            var value = heatmapValue.Counter;
+            var valueNormalized = value / 100.0;
+
+            var color = Color.FromArgb(
+                255,
+                (int)valueNormalized.Lerp(coldColor.R, hotColor.R),
+                (int)valueNormalized.Lerp(coldColor.G, hotColor.G),
+                (int)valueNormalized.Lerp(coldColor.B, hotColor.B));
+
+            graphics.FillRectangle(
+                new SolidBrush(color),
+                (float)heatmapValue.X.ScaleToView(context.SimulationEnvironment.BinWidth, width),
+                (float)heatmapValue.Y.ScaleToView(context.SimulationEnvironment.BinHeight, height),
+                1,
+                1);
+        }
     }
 }
