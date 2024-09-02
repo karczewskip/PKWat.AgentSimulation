@@ -13,8 +13,7 @@
 
             return simulationBuilder
                     .CreateNewSimulation(new BinEnvironment(1000, 1000))
-                    .AddAgents<Drop>(30)
-                    .AddEnvironmentUpdates(UpdateHeatmap)
+                    .AddAgents<Drop>(300)
                     .AddCallback(c => RenderAsync(c, render))
                     .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1000))
                     .Build();
@@ -23,13 +22,6 @@
         private async Task RenderAsync(ISimulationContext<BinEnvironment> simulationContext, Action<BitmapSource> render)
         {
             render(liquidRenderer.Draw(simulationContext));
-        }
-
-        private async Task UpdateHeatmap(ISimulationContext<BinEnvironment> simulationContext)
-        {
-            var environment = simulationContext.SimulationEnvironment;
-            var drops = simulationContext.GetAgents<Drop>().ToArray();
-            environment.UpdateHeatmap(drops);
         }
     }
 }

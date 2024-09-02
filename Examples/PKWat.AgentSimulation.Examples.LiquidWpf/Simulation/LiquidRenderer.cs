@@ -47,16 +47,29 @@ public class LiquidRenderer
 
     private void DrawHeatmap(ISimulationContext<BinEnvironment> context, Graphics graphics)
     {
-        var heatmap = context.SimulationEnvironment.Heatmap;
+        var environment = context.SimulationEnvironment;
+        var heatmap = HeatMap.Create(
+            environment.BinWidth, 
+            environment.BinHeight, 
+            100, 
+            100, 
+            context.GetAgents<Drop>().Select(x => (x.State.Position.X, x.State.Position.Y)).ToArray());
         var width = _bmp.Width / 2;
-        var height = _bmp.Height / 2;
+        var height = _bmp.Height;
         var coldColor = Color.FromArgb(255, 0, 0, 255);
         var hotColor = Color.FromArgb(255, 255, 0, 0);
+
+        graphics.FillRectangle(
+            new SolidBrush(coldColor),
+            width,
+            0,
+            width,
+            height);
 
         foreach(var heatmapValue in heatmap.HeatmapValues)
         {
             var value = heatmapValue.Counter;
-            var valueNormalized = value / 100.0;
+            var valueNormalized = value / 10.0;
 
             var color = Color.FromArgb(
                 255,
@@ -66,10 +79,10 @@ public class LiquidRenderer
 
             graphics.FillRectangle(
                 new SolidBrush(color),
-                (float)heatmapValue.X.ScaleToView(context.SimulationEnvironment.BinWidth, width),
+                (float)heatmapValue.X.ScaleToView(context.SimulationEnvironment.BinWidth, width, width),
                 (float)heatmapValue.Y.ScaleToView(context.SimulationEnvironment.BinHeight, height),
-                1,
-                1);
+                (float)heatmap.CellWidth,
+                (float)heatmap.CellHeight);
         }
     }
 }
