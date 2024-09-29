@@ -2,5 +2,5 @@
 
 public interface ISnapshotCreator
 {
-    string CreateSnapshot();
+    object CreateSnapshot();
 }

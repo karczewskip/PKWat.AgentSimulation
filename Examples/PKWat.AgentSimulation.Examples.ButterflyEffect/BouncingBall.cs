@@ -1,12 +1,11 @@
 ﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect;
 
 using PKWat.AgentSimulation.Core;
-using PKWat.AgentSimulation.Core.Snapshots;
 using System;
 using System.Drawing;
 using System.Text.Json;
 
-public class BouncingBallBulb : ISnapshotCreator
+public class BouncingBallBulb : ISimulationEnvironment
 {
     public double BulbRadius { get;}
     public double BallRadius { get; }
@@ -18,9 +17,9 @@ public class BouncingBallBulb : ISnapshotCreator
         BallRadius = ballRadius;
     }
 
-    public string CreateSnapshot()
+    public object CreateSnapshot()
     {
-        return JsonSerializer.Serialize(this);
+        return this;
     }
 }
 

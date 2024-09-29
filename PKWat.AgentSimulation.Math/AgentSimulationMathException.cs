@@ -15,4 +15,12 @@ public class AgentSimulationMathException : Exception
     public AgentSimulationMathException()
     {
     }
+
+    public static void ThrowIf(bool condition, string message)
+    {
+        if (condition)
+        {
+            throw new AgentSimulationMathException(message);
+        }
+    }
 }

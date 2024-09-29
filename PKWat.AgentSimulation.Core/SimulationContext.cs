@@ -9,7 +9,7 @@ public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0)
     public SimulationTime AddStep() => this with { Time = Time + Step, StepNo = StepNo + 1 };
 }
 
-public interface ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISnapshotCreator
+public interface ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
     ENVIRONMENT SimulationEnvironment { get; }
     SimulationTime SimulationTime { get; }
@@ -20,7 +20,7 @@ public interface ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISnapshotCr
     AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>;
 }
 
-internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISnapshotCreator
+internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
     private readonly IServiceProvider _serviceProvider;
 
