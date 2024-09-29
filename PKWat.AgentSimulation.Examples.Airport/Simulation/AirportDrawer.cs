@@ -10,7 +10,7 @@ using System;
 public class AirportDrawer
 {
     private const int ShiftDetails = 10;
-    private const int AirplaneSize = 10;
+    private const int AirplaneSize = 15;
 
     private Bitmap _bmp;
 
@@ -35,12 +35,44 @@ public class AirportDrawer
 
         var now = context.SimulationTime.Time;
 
-        foreach(var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsLanding(now)))
+        foreach(var landingLine in context.SimulationEnvironment.AllLandingLines)
+        {
+            var landingPlace = GetLandingPlaceForLandingLine(landingLine);
+            graphic.DrawLine(Pens.Black, 0, landingPlace.Y, _bmp.Width, landingPlace.Y);
+            graphic.DrawLine(Pens.Black, 0, landingPlace.Y+AirplaneSize, _bmp.Width, landingPlace.Y+AirplaneSize);
+
+            var landingLineFont = new Font("Arial", 8);
+            var landingLineStringPosition = landingPlace.Y;
+
+            graphic.DrawString(landingLine.ToString(), landingLineFont, Brushes.Black, 0, landingLineStringPosition);
+
+            if(context.SimulationEnvironment.LandingAirplanes.Any(x => x.Value == landingLine))
+            {
+                graphic.DrawString("Landing", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
+            }
+
+            if (context.SimulationEnvironment.AllowedForLand.Any(x => x.Value == landingLine))
+            {
+                graphic.DrawString("Allowed", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
+            }
+
+            if (context.SimulationEnvironment.LandedAirplanes.Any(x => x.Value == landingLine))
+            {
+                graphic.DrawString("Landed", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
+            }
+        }
+
+        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsLanding(now)))
         {
             var coordinates = GetCoordinatesForLandingAirplane(airplane, waitingCordinates, now);
 
             graphic.FillEllipse(Brushes.Blue, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
             graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+
+            if(context.SimulationEnvironment.LandingAirplanes.ContainsKey(airplane.Id))
+            {
+                graphic.DrawString(context.SimulationEnvironment.LandingAirplanes[airplane.Id].ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);
+            }
         }
 
         foreach(var passenger in context.GetAgents<Passenger>().Where(x => x.State.IsCheckouting))
@@ -104,6 +136,9 @@ public class AirportDrawer
         var landingLine = airplane.State.LandingLine.Value;
         return new DrawingCoordinates(100, _bmp.Height - landingLine * 30);
     }
+
+    private DrawingCoordinates GetLandingPlaceForLandingLine(int landingLine)
+        => new DrawingCoordinates(100, _bmp.Height - landingLine * 30);
 
     private record DrawingCoordinates(int X, int Y)
     {
