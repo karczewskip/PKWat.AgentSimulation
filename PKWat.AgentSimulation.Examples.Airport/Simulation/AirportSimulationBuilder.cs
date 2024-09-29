@@ -26,7 +26,7 @@
             _airportDrawer.InitializeIfNeeded(800, 800);
 
             var simulation = _simulationBuilder
-                .CreateNewSimulation(new AirportEnvironment())
+                .CreateNewSimulation(new AirportEnvironment(5))
                 .AddAgent<Coordinator>()
                 .AddEventWithInitialization<NewAirplaneArrived>(e => e.Initialize(10.0, 30))
                 .AddEnvironmentUpdates(UpdateAskingForLand)

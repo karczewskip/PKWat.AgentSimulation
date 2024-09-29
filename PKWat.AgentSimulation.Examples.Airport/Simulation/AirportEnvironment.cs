@@ -4,7 +4,12 @@ using PKWat.AgentSimulation.Core;
 
 public class AirportEnvironment : ISimulationEnvironment
 {
-    public int[] AllLandingLines { get; private set; } = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    public AirportEnvironment(int numberOfLandingLines)
+    {
+        AllLandingLines = Enumerable.Range(1, numberOfLandingLines).ToArray();
+    }
+
+    public int[] AllLandingLines { get; private set; }
     public AgentId[] AirplanesAskingForLand { get; private set; } = [];
     public IReadOnlyDictionary<AgentId, int> LandingAirplanes { get; private set; } = new Dictionary<AgentId, int>();
     public IReadOnlyDictionary<AgentId, int> AllowedForLand { get; private set; } = new Dictionary<AgentId, int>();

@@ -97,10 +97,14 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T> where 
 
     public ISimulationBuilderContext<T> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<T>
     {
-        var newEvent = _serviceProvider.GetRequiredService<U>();
-        initialization(newEvent);
+        _eventsToGenerate.Add(() => 
+            {
+                var newEvent = _serviceProvider.GetRequiredService<U>();
+                initialization(newEvent);
 
-        _eventsToGenerate.Add(() => newEvent);
+                return newEvent;
+            });
+
         return this;
     }
 
