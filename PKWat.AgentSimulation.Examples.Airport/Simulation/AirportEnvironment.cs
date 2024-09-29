@@ -72,10 +72,10 @@ public class AirportEnvironment : ISimulationEnvironment
         {
             AllLandingLines,
             AirplanesAskingForLand,
-            LandingAirplanes = LandingAirplanes.Select(x => (x.Key, x.Value)).ToArray(),
-            AllowedForLand = AllowedForLand.Select(x => (x.Key, x.Value)).ToArray(),
-            LandedAirplanes = LandedAirplanes.Select(x => (x.Key, x.Value)).ToArray(),
-            PassengersInEachAirplane = PassengersInEachAirplane.Select(x => (x.Key, x.Value)).ToArray()
+            LandingAirplanes = LandingAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
+            AllowedForLand = AllowedForLand.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
+            LandedAirplanes = LandedAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
+            PassengersInEachAirplane = PassengersInEachAirplane.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray()
         };
     }
 }
