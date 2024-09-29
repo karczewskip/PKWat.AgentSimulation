@@ -14,8 +14,13 @@ public class AirportDrawer
 
     private Bitmap _bmp;
 
-    public void Initialize(int width, int height)
+    public void InitializeIfNeeded(int width, int height)
     {
+        if(_bmp != null)
+        {
+            return;
+        }
+
         _bmp = new Bitmap(width, height);
         _bmp.SetResolution(96, 96);
     }

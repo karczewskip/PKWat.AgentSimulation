@@ -21,6 +21,7 @@
                 {
                     services.AddSingleton<MainWindow>();
                     services.AddScoped<AirportDrawer>();
+                    services.AddScoped<AirportSimulationBuilder>();
                     services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
                 })
                 .Build();

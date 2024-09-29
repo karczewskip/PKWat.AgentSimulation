@@ -1,7 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation;
 
 using PKWat.AgentSimulation.Core;
-using System.Text.Json;
 
 public class AirportEnvironment : ISimulationEnvironment
 {
