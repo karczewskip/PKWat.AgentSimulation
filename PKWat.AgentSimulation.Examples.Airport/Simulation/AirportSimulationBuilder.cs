@@ -28,7 +28,7 @@
             var simulation = _simulationBuilder
                 .CreateNewSimulation(new AirportEnvironment())
                 .AddAgent<Coordinator>()
-                .AddEvent<NewAirplaneArrived>()
+                .AddEventWithInitialization<NewAirplaneArrived>(e => e.Initialize(10.0, 30))
                 .AddEnvironmentUpdates(UpdateAskingForLand)
                 .AddEnvironmentUpdates(UpdateLandingAirplane)
                 .AddEnvironmentUpdates(UpdateAllowedForLand)

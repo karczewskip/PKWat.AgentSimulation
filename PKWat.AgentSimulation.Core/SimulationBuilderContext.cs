@@ -14,6 +14,7 @@ public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISim
     ISimulationBuilderContext<ENVIRONMENT> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
     ISimulationBuilderContext<ENVIRONMENT> SetRandomSeed(int seed);
     ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddCrashCondition(Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult> crashCondition);
 
     ISimulation Build();
@@ -92,9 +93,14 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T> where 
     }
 
     public ISimulationBuilderContext<T> AddEvent<U>() where U : ISimulationEvent<T>
-    {
-        _eventsToGenerate.Add(() => _serviceProvider.GetRequiredService<U>());
+        => AddEventWithInitialization<U>(_ => { });
 
+    public ISimulationBuilderContext<T> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<T>
+    {
+        var newEvent = _serviceProvider.GetRequiredService<U>();
+        initialization(newEvent);
+
+        _eventsToGenerate.Add(() => newEvent);
         return this;
     }
 

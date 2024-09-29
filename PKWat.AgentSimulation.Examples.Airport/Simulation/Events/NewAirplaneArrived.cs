@@ -12,11 +12,19 @@ public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
     public NewAirplaneArrived(IRandomNumbersGenerator randomNumbersGenerator)
     {
         _randomNumbersGenerator = randomNumbersGenerator;
+    }
+
+    private int _maxNumberOfPassengers = 30;
+    private double _meanTimeBetweenArrivals = 10.0;
+    private TimeSpan _nextExecutingTime = TimeSpan.Zero;
+
+    public void Initialize(double meanTimeBetweenArrivals, int maxNumberOfPassengers)
+    {
+        _meanTimeBetweenArrivals = meanTimeBetweenArrivals;
+        _maxNumberOfPassengers = maxNumberOfPassengers;
 
         _nextExecutingTime = GenerateTimeForNextExecution();
     }
-
-    private TimeSpan _nextExecutingTime;
 
     public async Task Execute(ISimulationContext<AirportEnvironment> context)
     {
