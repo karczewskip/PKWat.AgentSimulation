@@ -52,6 +52,11 @@
 
             while (Running)
             {
+                foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context)))
+                {
+                    _context.Agents.Remove(agentToRemove.Id);
+                }
+
                 foreach (var environmentUpdate in _environmentUpdates)
                 {
                     await environmentUpdate(_context);
