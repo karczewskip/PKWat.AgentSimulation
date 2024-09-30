@@ -30,7 +30,7 @@ public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
     {
         var airplane = context.AddAgent<Airplane>();
         
-        var passengers = _randomNumbersGenerator.Next(30);
+        var passengers = _randomNumbersGenerator.Next(_maxNumberOfPassengers);
         for(int i = 0; i < passengers; i++)
         {
             var passanger = context.AddAgent<Passenger>();
@@ -46,5 +46,5 @@ public class NewAirplaneArrived : ISimulationEvent<AirportEnvironment>
     }
 
     private TimeSpan GenerateTimeForNextExecution()
-        => TimeSpan.FromMinutes(_randomNumbersGenerator.GetNextExponential(1.0 / 10.0));
+        => TimeSpan.FromMinutes(_randomNumbersGenerator.GetNextExponential(1.0 / _meanTimeBetweenArrivals));
 }
