@@ -82,7 +82,7 @@ public class BallsContainerDrawer
     {
         foreach (var ball in context.GetAgents<Ball>())
         {
-            var radius = context.SimulationEnvironment.BallRadius * 10;
+            var radius = context.SimulationEnvironment.GetBallRadius() * 10;
             graphic.FillEllipse(
                 new SolidBrush(Color.FromArgb((int)((1-scale)*255), ball.State.Color)),
                 (float)(ball.State.Coordinates.X * _xScale - radius * scale),

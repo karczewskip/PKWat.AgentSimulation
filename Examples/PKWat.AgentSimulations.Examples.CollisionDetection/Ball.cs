@@ -18,8 +18,8 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
 
         protected override BallState GetInitialState(BallsContainer environment)
         {
-            var x = _randomNumbersGenerator.NextDouble() * environment.Width;
-            var y = environment.Height * 0.1 + _randomNumbersGenerator.NextDouble() * environment.Height / 2;
+            var x = _randomNumbersGenerator.NextDouble() * environment.GetWidth();
+            var y = environment.GetHeight() * 0.1 + _randomNumbersGenerator.NextDouble() * environment.GetHeight() / 2;
 
             return new BallState(
                 new BallCoordinates(x, y),
@@ -31,7 +31,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
         {
             var timeInSeconds = simulationTime.Step.TotalSeconds;
 
-            var newVelocity = State.Velocity.ApplyAcceleration(environment.Gravity, simulationTime.Step);
+            var newVelocity = State.Velocity.ApplyAcceleration(environment.GetGravity(), simulationTime.Step);
 
             return State with
             {

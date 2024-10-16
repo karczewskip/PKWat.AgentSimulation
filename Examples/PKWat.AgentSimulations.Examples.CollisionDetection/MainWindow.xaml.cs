@@ -40,7 +40,7 @@ public partial class MainWindow : Window
         _colorInitializer.Initialize(numberOfBalls);
 
         _simulation = _simulationBuilder
-            .CreateNewSimulation(new BallsContainer(ContainerWidth, ContainerHeight, new BallAcceleration(0, -10), 2))
+            .CreateNewSimulation<BallsContainer, BallsContainerState>(new BallsContainerState(new(), ContainerWidth, ContainerHeight, new BallAcceleration(0, -10), 2, 0.5))
             .AddAgents<Ball>(numberOfBalls)
             .AddCallback(RenderAsync)
             .AddCallback(UpdateBallsCacheAsync)

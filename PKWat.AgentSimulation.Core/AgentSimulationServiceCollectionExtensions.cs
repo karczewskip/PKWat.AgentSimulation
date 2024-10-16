@@ -11,12 +11,12 @@ public static class AgentSimulationServiceCollectionExtensions
         services.AddScoped<RandomNumbersGeneratorFactory>();
         services.AddTransient(s => s.GetRequiredService<RandomNumbersGeneratorFactory>().Create());
 
-        Type[] registeringGenericTypes = [typeof(ISimulationAgent), typeof(ISimulationEvent)];
+        Type[] registeringGenericTypes = [typeof(ISimulationEnvironment), typeof(ISimulationAgent), typeof(ISimulationEvent)];
 
         foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface))
         {
             var interfaces = type.GetInterfaces();
-            if(interfaces.Any(i => i.IsGenericType && registeringGenericTypes.Contains(i.GetGenericTypeDefinition())))
+            if(interfaces.Any(i => registeringGenericTypes.Contains(i)))
             {
                 services.AddTransient(type);
             }

@@ -26,7 +26,7 @@
             return _state;
         }
 
-        public object CreateSnapshot()
+        public virtual object CreateSnapshot()
         {
             return _state;
         }
