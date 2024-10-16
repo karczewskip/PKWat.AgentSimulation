@@ -6,96 +6,96 @@ using System.Reflection;
 
 public interface ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
 {
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT, ENVIRONMENT_STATE>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT, ENVIRONMENT_STATE>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE>, Task> update);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE>, Task> callback);
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetSimulationStep(TimeSpan simulationStep);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetRandomSeed(int seed);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT, ENVIRONMENT_STATE>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT, ENVIRONMENT_STATE>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCrashCondition(Func<ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE>, SimulationCrashResult> crashCondition);
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCrashCondition(Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult> crashCondition);
 
     ISimulation Build();
 }
 
-internal class SimulationBuilderContext<T, ENVIRONMENT_STATE> : ISimulationBuilderContext<T, ENVIRONMENT_STATE> where T : ISimulationEnvironment<ENVIRONMENT_STATE>
+internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
 {
-    private readonly T _simulationEnvironment;
+    private readonly ENVIRONMENT _simulationEnvironment;
     private readonly IServiceProvider _serviceProvider;
 
-    private List<ISimulationAgent<T, ENVIRONMENT_STATE>> _agents = new();
-    private List<Func<ISimulationAgent<T, ENVIRONMENT_STATE>>> _agentsToGenerate = new();
-    private List<Func<ISimulationEvent<T, ENVIRONMENT_STATE>>> _eventsToGenerate = new();
-    private List<Func<ISimulationContext<T, ENVIRONMENT_STATE>, Task>> _environmentUpdates = new();
-    private List<Func<ISimulationContext<T, ENVIRONMENT_STATE>, Task>> _callbacks = new();
-    private List<ISimulationEvent<T, ENVIRONMENT_STATE>> _events = new();
-    private List<Func<ISimulationContext<T, ENVIRONMENT_STATE>, SimulationCrashResult>> _crashConditions = new();
+    private List<ISimulationAgent<ENVIRONMENT>> _agents = new();
+    private List<Func<ISimulationAgent<ENVIRONMENT>>> _agentsToGenerate = new();
+    private List<Func<ISimulationEvent<ENVIRONMENT>>> _eventsToGenerate = new();
+    private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _environmentUpdates = new();
+    private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _callbacks = new();
+    private List<ISimulationEvent<ENVIRONMENT>> _events = new();
+    private List<Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult>> _crashConditions = new();
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
 
-    public SimulationBuilderContext(T simulationEnvironment, IServiceProvider serviceProvider)
+    public SimulationBuilderContext(ENVIRONMENT simulationEnvironment, IServiceProvider serviceProvider)
     {
         _simulationEnvironment = simulationEnvironment;
         _serviceProvider = serviceProvider;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> AddAgent<U>() where U : ISimulationAgent<T, ENVIRONMENT_STATE>
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgent<U>() where U : ISimulationAgent<ENVIRONMENT>
     {
         return AddAgents<U>(1);
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> AddAgents<U>(int number) where U : ISimulationAgent<T, ENVIRONMENT_STATE>
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgents<U>(int number) where U : ISimulationAgent<ENVIRONMENT>
     {
         _agentsToGenerate.AddRange(Enumerable
             .Range(0, number)
-            .Select(x => new Func<ISimulationAgent<T, ENVIRONMENT_STATE>>(
+            .Select(x => new Func<ISimulationAgent<ENVIRONMENT>>(
                 () => _serviceProvider.GetRequiredService<U>())));
 
         return this;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<T, ENVIRONMENT_STATE>, Task> update)
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update)
     {
         _environmentUpdates.Add(update);
 
         return this;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<T, ENVIRONMENT_STATE>, Task> callback)
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback)
     {
         _callbacks.Add(callback);
 
         return this;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> SetSimulationStep(TimeSpan simulationStep)
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetSimulationStep(TimeSpan simulationStep)
     {
         _simulationStep = simulationStep;
 
         return this;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps)
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps)
     {
         _waitingTimeBetweenSteps = waitingTimeBetweenSteps;
 
         return this;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> SetRandomSeed(int seed)
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetRandomSeed(int seed)
     {
         _randomSeed = seed;
 
         return this;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<T, ENVIRONMENT_STATE>
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>
         => AddEventWithInitialization<U>(_ => { });
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<T, ENVIRONMENT_STATE>
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>
     {
         _eventsToGenerate.Add(() => 
             {
@@ -108,7 +108,7 @@ internal class SimulationBuilderContext<T, ENVIRONMENT_STATE> : ISimulationBuild
         return this;
     }
 
-    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> AddCrashCondition(Func<ISimulationContext<T, ENVIRONMENT_STATE>, SimulationCrashResult> crashCondition)
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCrashCondition(Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult> crashCondition)
     {
         _crashConditions.Add(crashCondition);
 
@@ -126,8 +126,8 @@ internal class SimulationBuilderContext<T, ENVIRONMENT_STATE> : ISimulationBuild
 
         var snapshotStore = new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
 
-        return new Simulation<T, ENVIRONMENT_STATE>(
-            new SimulationContext<T, ENVIRONMENT_STATE>(
+        return new Simulation<ENVIRONMENT, ENVIRONMENT_STATE>(
+            new SimulationContext<ENVIRONMENT>(
                 _serviceProvider, 
                 _simulationEnvironment ,
                 _agents, 

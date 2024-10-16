@@ -7,8 +7,8 @@ public interface ISimulationEvent
 
 }
 
-public interface ISimulationEvent<ENVIRONMENT, ENVIRONMENT_STATE> : ISimulationEvent where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
+public interface ISimulationEvent<ENVIRONMENT> : ISimulationEvent where ENVIRONMENT : ISimulationEnvironment
 {
-    Task<bool> ShouldBeExecuted(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> context);
-    Task Execute(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> context);
+    Task<bool> ShouldBeExecuted(ISimulationContext<ENVIRONMENT> context);
+    Task Execute(ISimulationContext<ENVIRONMENT> context);
 }

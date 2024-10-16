@@ -7,12 +7,12 @@ public interface ISimulationAgent
 
 }
 
-public interface ISimulationAgent<ENVIRONMENT, ENVIRONMENT_STATE> : ISimulationAgent, IRecognizableAgent, ISnapshotCreator where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
+public interface ISimulationAgent<ENVIRONMENT> : ISimulationAgent, IRecognizableAgent, ISnapshotCreator where ENVIRONMENT : ISimulationEnvironment
 {
-    void Initialize(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> simulationContext);
-    void Prepare(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> simulationContext);
+    void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
+    void Prepare(ISimulationContext<ENVIRONMENT> simulationContext);
     void Act();
-    bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> simulationContext);
+    bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT> simulationContext);
 }
 
 public record AgentId
@@ -36,7 +36,7 @@ public interface IRecognizableAgent : IEquatable<IRecognizableAgent>
     AgentId Id { get; }
 }
 
-public abstract class SimulationAgent<ENVIRONMENT, ENVIRONMENT_STATE, STATE> : ISimulationAgent<ENVIRONMENT, ENVIRONMENT_STATE> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
+public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
     private STATE _nextState;
 
@@ -44,12 +44,12 @@ public abstract class SimulationAgent<ENVIRONMENT, ENVIRONMENT_STATE, STATE> : I
 
     public AgentId Id { get; } = AgentId.GenerateNew();
 
-    public void Initialize(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> simulationContext)
+    public void Initialize(ISimulationContext<ENVIRONMENT> simulationContext)
     {
         State = GetInitialState(simulationContext.SimulationEnvironment);
     }
 
-    public void Prepare(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> simulationContext)
+    public void Prepare(ISimulationContext<ENVIRONMENT> simulationContext)
     {
         _nextState = GetNextState(simulationContext.SimulationEnvironment, simulationContext.SimulationTime);
     }
@@ -59,7 +59,7 @@ public abstract class SimulationAgent<ENVIRONMENT, ENVIRONMENT_STATE, STATE> : I
         State = _nextState;
     }
 
-    public virtual bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> simulationContext)
+    public virtual bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT> simulationContext)
     {
         return false;
     }

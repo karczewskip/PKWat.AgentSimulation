@@ -2,10 +2,14 @@
 {
     using PKWat.AgentSimulation.Core.Snapshots;
 
-    public interface ISimulationEnvironment<SIMULATION_STATE> : ISnapshotCreator
+    public interface ISimulationEnvironment
+    {
+
+    }
+
+    public interface ISimulationEnvironment<SIMULATION_STATE> : ISimulationEnvironment, ISnapshotCreator
     {
         void LoadState(SIMULATION_STATE state);
-        void UpdateState();
     }
 
     public abstract class DefaultSimulationEnvironment<SIMULATION_STATE> : ISimulationEnvironment<SIMULATION_STATE>
@@ -17,11 +21,14 @@
             _state = state;
         }
 
-        public abstract void UpdateState();
+        protected SIMULATION_STATE GetState()
+        {
+            return _state;
+        }
 
         public object CreateSnapshot()
         {
-            return this;
+            return _state;
         }
     }
 }
