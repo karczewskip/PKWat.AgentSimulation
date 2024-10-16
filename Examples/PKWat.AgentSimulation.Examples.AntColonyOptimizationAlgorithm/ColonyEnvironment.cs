@@ -1,32 +1,23 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
 using PKWat.AgentSimulation.Core;
-using System.Collections.Concurrent;
+using PKWat.AgentSimulation.Extensions;
 using System.Collections.Generic;
-using System.Text.Json;
 
-public class ColonyEnvironment : ISimulationEnvironment
+public record ColonyEnvironmentState(
+    int Width, 
+    int Height, 
+    AntHill AntHill, 
+    FoodSource FoodSource, 
+    Dictionary<ColonyCoordinates, double> FoodPheromones, 
+    Dictionary<ColonyCoordinates, double> HomePheromones);
+
+
+public class ColonyEnvironment : DefaultSimulationEnvironment<ColonyEnvironmentState>
 {
-    public ConcurrentDictionary<ColonyCoordinates, double> FoodPheromones = new();
-    public ConcurrentDictionary<ColonyCoordinates, double> HomePheromones = new();
-
-    public int Width { get; }
-    public int Height { get; }
-
-    public AntHill AntHill { get; }
-    public FoodSource FoodSource { get; }
-
-    public ColonyEnvironment(int width, int height, AntHill antHill, FoodSource foodSource)
-    {
-        Width = width;
-        Height = height;
-        AntHill = antHill;
-        FoodSource = foodSource;
-    }
-
     public bool IsInBounds(ColonyCoordinates coordinates)
     {
-        return coordinates.X >= 0 && coordinates.X < Width && coordinates.Y >= 0 && coordinates.Y < Height;
+        return coordinates.X >= 0 && coordinates.X < GetState().Width && coordinates.Y >= 0 && coordinates.Y < GetState().Height;
     }
 
     public bool IsOutOfBounds(ColonyCoordinates coordinates)
@@ -39,36 +30,36 @@ public class ColonyEnvironment : ISimulationEnvironment
         var minValue = 0.0000001;
         var p = 0.99;
 
-        foreach (var coordinates in FoodPheromones.Keys)
+        foreach (var coordinates in GetState().FoodPheromones.Keys)
         {
-            if (FoodPheromones[coordinates] < minValue)
+            if (GetState().FoodPheromones[coordinates] < minValue)
             {
-                FoodPheromones.Remove(coordinates, out _);
+                GetState().FoodPheromones.Remove(coordinates, out _);
             }
             else
             {
-                FoodPheromones[coordinates] *= p;
+                GetState().FoodPheromones[coordinates] *= p;
             }
         }
 
-        foreach (var coordinates in HomePheromones.Keys)
+        foreach (var coordinates in GetState().HomePheromones.Keys)
         {
-            if (HomePheromones[coordinates] < minValue)
+            if (GetState().HomePheromones[coordinates] < minValue)
             {
-                HomePheromones.Remove(coordinates, out _);
+                GetState().HomePheromones.Remove(coordinates, out _);
             }
             else
             {
-                HomePheromones[coordinates] *= p;
+                GetState().HomePheromones[coordinates] *= p;
             }
         }
     }
 
     public ColonyCoordinates? GetNearestFoodCoordinates(ColonyCoordinates coordinates, int maxDistance)
     {
-        if(maxDistance > coordinates.DistanceFrom(FoodSource.Coordinates))
+        if(maxDistance > coordinates.DistanceFrom(GetState().FoodSource.Coordinates))
         {
-            return FoodSource.Coordinates;
+            return GetState().FoodSource.Coordinates;
         }
 
         return null;
@@ -76,25 +67,25 @@ public class ColonyEnvironment : ISimulationEnvironment
 
     public Pheromones GetPheromones(ColonyCoordinates coordinates)
     {
-        var homePheromoneValue = HomePheromones.GetValueOrDefault(coordinates, 0);
-        var foodPheromoneValue = FoodPheromones.GetValueOrDefault(coordinates, 0);
+        var homePheromoneValue = GetState().HomePheromones.GetValueOrDefault(coordinates, 0);
+        var foodPheromoneValue = GetState().FoodPheromones.GetValueOrDefault(coordinates, 0);
 
         return new Pheromones(homePheromoneValue, foodPheromoneValue);
     }
 
     public void AddFoodPheromones(ColonyCoordinates coordinates, double strength)
     {
-        FoodPheromones.AddOrUpdate(coordinates, strength, (c, v) => v + strength);
+        GetState().FoodPheromones.AddOrUpdate(coordinates, strength, (c, v) => v + strength);
     }
 
     public void AddHomePheromones(ColonyCoordinates coordinates, double strength)
     {
-        HomePheromones.AddOrUpdate(coordinates, strength, (c, v) => v + strength);
+        GetState().HomePheromones.AddOrUpdate(coordinates, strength, (c, v) => v + strength);
     }
 
     internal IEnumerable<(ColonyCoordinates Coordinates, Pheromones Pheromones)> GetAllPheromones()
     {
-        var allConsideringCoordinates = FoodPheromones.Keys.Union(HomePheromones.Keys);
+        var allConsideringCoordinates = GetState().FoodPheromones.Keys.Union(GetState().HomePheromones.Keys);
 
         return allConsideringCoordinates.Select(c => (c, GetPheromones(c)));
     }

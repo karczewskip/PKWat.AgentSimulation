@@ -31,10 +31,16 @@
                 await _simulation.StopAsync();
             }
 
-            var environment = new ColonyEnvironment(Scale * 50, Scale * 50, new AntHill(new ColonyCoordinates(Scale * 10, Scale * 10)), new FoodSource(new ColonyCoordinates(Scale * 40, Scale * 40)));
+            var environmentState = new ColonyEnvironmentState(
+                Scale * 50, 
+                Scale * 50, 
+                new AntHill(new ColonyCoordinates(Scale * 10, Scale * 10)), 
+                new FoodSource(new ColonyCoordinates(Scale * 40, Scale * 40)),
+                new(),
+                new());
 
             _simulation = _simulationBuilder
-                .CreateNewSimulation(environment)
+                .CreateNewSimulation<ColonyEnvironment, ColonyEnvironmentState>(environmentState)
                 .AddAgents<Ant>(1000)
                 .AddEnvironmentUpdates(DecreasePheromones)
                 .AddEnvironmentUpdates(AddPheromones)
