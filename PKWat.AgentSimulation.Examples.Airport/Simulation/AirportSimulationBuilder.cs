@@ -37,7 +37,7 @@
                 .AddCallback(c => RenderAsync(c, drawing))
                 .AddCrashCondition(CheckOnlyOneAirplanePerLine)
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
-                .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
+                .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
                 .SetRandomSeed(100)
                 .Build();
 

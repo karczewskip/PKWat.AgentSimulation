@@ -2,6 +2,7 @@
 
 using PKWat.AgentSimulation.Core;
 using System.Text.Json;
+using PKWat.AgentSimulation.Extensions;
 
 public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {
@@ -12,9 +13,9 @@ public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 
     protected override CoordinatorState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
     {
-        var airplanesAskingForLand = new Queue<AgentId>(environment.AirplanesAskingForLand);
+        var airplanesAskingForLand = environment.AirplanesAskingForLand.ToQueue();
         var busyLandingLines = environment.LandingAirplanes.Values.Union(environment.LandedAirplanes.Values).Union(environment.AllowedForLand.Values);
-        var availableLandingLines = new Queue<int>(environment.AllLandingLines.Except(busyLandingLines));
+        var availableLandingLines = environment.AllLandingLines.Except(busyLandingLines).ToQueue();
 
         var newAllowedAirplanesForLanding = new Dictionary<AgentId, int>();
         while (airplanesAskingForLand.Any() && availableLandingLines.Any())
