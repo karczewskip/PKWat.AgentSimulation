@@ -11,7 +11,7 @@ public static class AgentSimulationServiceCollectionExtensions
         services.AddScoped<RandomNumbersGeneratorFactory>();
         services.AddTransient(s => s.GetRequiredService<RandomNumbersGeneratorFactory>().Create());
 
-        Type[] registeringGenericTypes = [typeof(ISimulationAgent<>), typeof(ISimulationEvent<>)];
+        Type[] registeringGenericTypes = [typeof(ISimulationAgent), typeof(ISimulationEvent)];
 
         foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface))
         {

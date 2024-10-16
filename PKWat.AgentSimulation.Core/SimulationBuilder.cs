@@ -4,7 +4,7 @@ using PKWat.AgentSimulation.Core.Snapshots;
 
 public interface ISimulationBuilder
 {
-    ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment) where T : ISimulationEnvironment;
+    ISimulationBuilderContext<T, ENVIRONMENT_STATE> CreateNewSimulation<T, ENVIRONMENT_STATE>(T simulationEnvironment) where T : ISimulationEnvironment<ENVIRONMENT_STATE>;
 }
 
 internal class SimulationBuilder : ISimulationBuilder
@@ -16,8 +16,8 @@ internal class SimulationBuilder : ISimulationBuilder
         _serviceProvider = serviceProvider;
     }
 
-    public ISimulationBuilderContext<T> CreateNewSimulation<T>(T simulationEnvironment) where T : ISimulationEnvironment
+    public ISimulationBuilderContext<T, ENVIRONMENT_STATE> CreateNewSimulation<T, ENVIRONMENT_STATE>(T simulationEnvironment) where T : ISimulationEnvironment<ENVIRONMENT_STATE>
     {
-        return new SimulationBuilderContext<T>(simulationEnvironment, _serviceProvider);
+        return new SimulationBuilderContext<T, ENVIRONMENT_STATE>(simulationEnvironment, _serviceProvider);
     }
 }
