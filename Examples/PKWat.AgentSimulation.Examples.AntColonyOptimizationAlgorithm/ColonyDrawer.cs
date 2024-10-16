@@ -31,14 +31,14 @@
             //    graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
             //}
 
-            foreach (var (coordinates, pheromone) in context.SimulationEnvironment.HomePheromones)
+            foreach (var (coordinates, pheromone) in context.SimulationEnvironment.GetHomePheromones())
             {
                 var value = CalculateValue(pheromone);
                 var color = Color.FromArgb(value, 255, 0, 255);
                 graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
             }
 
-            foreach (var (coordinates, pheromone) in context.SimulationEnvironment.FoodPheromones)
+            foreach (var (coordinates, pheromone) in context.SimulationEnvironment.GetFoodPheromones())
             {
                 var value = CalculateValue(pheromone);
                 var color = Color.FromArgb(value, 255, 255, 0);
@@ -50,13 +50,13 @@
                 graphic.FillEllipse(ant.State.IsCarryingFood ? Brushes.Green : Brushes.Black, Scale * ant.State.Coordinates.X, Scale * ant.State.Coordinates.Y, AntSize, AntSize);
             }
 
-            var anthillCoordinates = context.SimulationEnvironment.AntHill.Coordinates;
-            var anthillSize = context.SimulationEnvironment.AntHill.Size;
+            var anthillCoordinates = context.SimulationEnvironment.GetAntHill().Coordinates;
+            var anthillSize = context.SimulationEnvironment.GetAntHill().Size;
             graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), Scale * (anthillCoordinates.X - anthillSize), Scale * (anthillCoordinates.Y - anthillSize), anthillSize * AnthillScale, anthillSize * AnthillScale);
 
 
-            var foodSourceCoordinates = context.SimulationEnvironment.FoodSource.Coordinates;
-            var foodSize = context.SimulationEnvironment.FoodSource.Size;
+            var foodSourceCoordinates = context.SimulationEnvironment.GetFoodSource().Coordinates;
+            var foodSize = context.SimulationEnvironment.GetFoodSource().Size;
             graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 255, 255, 0)), Scale * (foodSourceCoordinates.X - foodSize), Scale * (foodSourceCoordinates.Y - foodSize), foodSize * AnthillScale, foodSize * AnthillScale);
 
             return _bmp.ConvertToBitmapSource();

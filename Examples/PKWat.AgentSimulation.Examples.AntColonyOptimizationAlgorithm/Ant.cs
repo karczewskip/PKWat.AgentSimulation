@@ -22,13 +22,13 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
     protected override AntState GetInitialState(ColonyEnvironment environment) 
         => new AntState(
             ColonyDirection.Random(_randomNumbersGenerator),
-            environment.AntHill.Coordinates,
+            environment.GetAntHill().Coordinates,
             false,
             1);
 
     protected override AntState GetNextState(ColonyEnvironment environment, SimulationTime simulationTime)
     {
-        if (!State.IsCarryingFood && environment.FoodSource.Coordinates.DistanceFrom(State.Coordinates) <= environment.FoodSource.Size)
+        if (!State.IsCarryingFood && environment.IsNearFood(State.Coordinates))
         {
             return State with
             {
@@ -37,7 +37,7 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
                 Direction = State.Direction.Opposite()
             };
         }
-        else if (State.IsCarryingFood && environment.AntHill.Coordinates.DistanceFrom(State.Coordinates) <= environment.AntHill.Size)
+        else if (State.IsCarryingFood && environment.IsNearHome(State.Coordinates))
         {
             return State with
             {

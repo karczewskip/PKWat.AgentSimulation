@@ -12,9 +12,53 @@ public record ColonyEnvironmentState(
     Dictionary<ColonyCoordinates, double> FoodPheromones, 
     Dictionary<ColonyCoordinates, double> HomePheromones);
 
-
 public class ColonyEnvironment : DefaultSimulationEnvironment<ColonyEnvironmentState>
 {
+    public override object CreateSnapshot()
+    {
+        var state = GetState();
+
+        return new
+        {
+            Width = state.Width,
+            Height = state.Height,
+            AntHill = state.AntHill,
+            FoodSource = state.FoodSource,
+            FoodPheromones = state.FoodPheromones.Select(x => new { Coordinates = x.Key, Strength = x.Value }).ToArray(),
+            HomePheromones = state.HomePheromones.Select(x => new { Coordinates = x.Key, Strength = x.Value }).ToArray()
+        };
+    }
+
+    public AntHill GetAntHill()
+    {
+        return GetState().AntHill;
+    }
+
+    public FoodSource GetFoodSource()
+    {
+        return GetState().FoodSource;
+    }
+
+    public IReadOnlyDictionary<ColonyCoordinates, double> GetFoodPheromones()
+    {
+        return GetState().FoodPheromones;
+    }
+
+    public IReadOnlyDictionary<ColonyCoordinates, double> GetHomePheromones()
+    {
+        return GetState().HomePheromones;
+    }
+
+    public bool IsNearFood(ColonyCoordinates coordinates)
+    {
+        return coordinates.DistanceFrom(GetState().FoodSource.Coordinates) <= GetState().FoodSource.Size;
+    }
+
+    public bool IsNearHome(ColonyCoordinates coordinates)
+    {
+        return coordinates.DistanceFrom(GetState().AntHill.Coordinates) <= GetState().AntHill.Size;
+    }
+
     public bool IsInBounds(ColonyCoordinates coordinates)
     {
         return coordinates.X >= 0 && coordinates.X < GetState().Width && coordinates.Y >= 0 && coordinates.Y < GetState().Height;
@@ -88,11 +132,6 @@ public class ColonyEnvironment : DefaultSimulationEnvironment<ColonyEnvironmentS
         var allConsideringCoordinates = GetState().FoodPheromones.Keys.Union(GetState().HomePheromones.Keys);
 
         return allConsideringCoordinates.Select(c => (c, GetPheromones(c)));
-    }
-
-    public object CreateSnapshot()
-    {
-        return this;
     }
 }
 
