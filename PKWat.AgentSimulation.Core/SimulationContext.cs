@@ -27,7 +27,7 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
     public SimulationContext(
         IServiceProvider serviceProvider,
         ENVIRONMENT simulationEnvironment,
-        List<ISimulationAgent<ENVIRONMENT>> agents,
+        ISimulationAgent<ENVIRONMENT>[] agents,
         TimeSpan simulationStep,
         TimeSpan waitingTimeBetweenSteps)
     {
