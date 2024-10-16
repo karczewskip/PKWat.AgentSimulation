@@ -1,13 +1,13 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using PKWat.AgentSimulation.Core.Snapshots;
-using System.Text.Json;
 
 public interface ISimulationAgent<ENVIRONMENT> : IRecognizableAgent, ISnapshotCreator where ENVIRONMENT : ISimulationEnvironment
 {
     void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
     void Prepare(ISimulationContext<ENVIRONMENT> simulationContext);
     void Act();
+    bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT> simulationContext);
 }
 
 public record AgentId
@@ -52,6 +52,11 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
     public void Act()
     {
         State = _nextState;
+    }
+
+    public virtual bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT> simulationContext)
+    {
+        return false;
     }
 
     protected abstract STATE GetInitialState(ENVIRONMENT environment);

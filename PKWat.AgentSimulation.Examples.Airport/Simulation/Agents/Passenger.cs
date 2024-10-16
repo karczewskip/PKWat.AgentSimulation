@@ -35,6 +35,11 @@ public class Passenger : SimulationAgent<AirportEnvironment, PassengerState>
 
         return State;
     }
+
+    public override bool ShouldBeRemovedFromSimulation(ISimulationContext<AirportEnvironment> simulationContext)
+    {
+        return State.Checkouted(simulationContext.SimulationTime.Time);
+    }
 }
 
 public record PassengerState(AgentId? AirplaneId = null, bool ReadyForCheckout = false, TimeSpan? CheckoutStarted = null, TimeSpan? CheckoutEnd = null)

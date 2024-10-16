@@ -14,6 +14,8 @@ public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISim
     ISimulationBuilderContext<ENVIRONMENT> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
     ISimulationBuilderContext<ENVIRONMENT> SetRandomSeed(int seed);
     ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddCrashCondition(Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult> crashCondition);
 
     ISimulation Build();
 }
@@ -29,6 +31,7 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T> where 
     private List<Func<ISimulationContext<T>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<T>, Task>> _callbacks = new();
     private List<ISimulationEvent<T>> _events = new();
+    private List<Func<ISimulationContext<T>, SimulationCrashResult>> _crashConditions = new();
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
@@ -90,8 +93,24 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T> where 
     }
 
     public ISimulationBuilderContext<T> AddEvent<U>() where U : ISimulationEvent<T>
+        => AddEventWithInitialization<U>(_ => { });
+
+    public ISimulationBuilderContext<T> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<T>
     {
-        _eventsToGenerate.Add(() => _serviceProvider.GetRequiredService<U>());
+        _eventsToGenerate.Add(() => 
+            {
+                var newEvent = _serviceProvider.GetRequiredService<U>();
+                initialization(newEvent);
+
+                return newEvent;
+            });
+
+        return this;
+    }
+
+    public ISimulationBuilderContext<T> AddCrashCondition(Func<ISimulationContext<T>, SimulationCrashResult> crashCondition)
+    {
+        _crashConditions.Add(crashCondition);
 
         return this;
     }
@@ -117,6 +136,7 @@ internal class SimulationBuilderContext<T> : ISimulationBuilderContext<T> where 
             snapshotStore, 
             _environmentUpdates, 
             _callbacks, 
-            _events);
+            _events,
+            _crashConditions);
     }
 }

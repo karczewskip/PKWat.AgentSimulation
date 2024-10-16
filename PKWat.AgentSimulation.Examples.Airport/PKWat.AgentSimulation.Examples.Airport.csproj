@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj" />
     <ProjectReference Include="..\PKWat.AgentSimulation.Drawing\PKWat.AgentSimulation.Drawing.csproj" />
+    <ProjectReference Include="..\PKWat.AgentSimulation.Extensions\PKWat.AgentSimulation.Extensions.csproj" />
     <ProjectReference Include="..\PKWat.AgentSimulation.Math\PKWat.AgentSimulation.Math.csproj" />
   </ItemGroup>
 

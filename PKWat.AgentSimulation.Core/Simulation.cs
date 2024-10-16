@@ -5,6 +5,7 @@
     public interface ISimulation
     {
         public bool Running { get; }
+        public SimulationCrashResult Crash { get; }
 
         Task StartAsync();
         Task StopAsync();
@@ -17,21 +18,25 @@
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly IReadOnlyList<ISimulationEvent<T>> _events;
+        private readonly IReadOnlyList<Func<SimulationContext<T>, SimulationCrashResult>> _crashConditions;
 
         public bool Running { get; private set; } = false;
+        public SimulationCrashResult Crash { get; private set; } = SimulationCrashResult.NoCrash;
 
         public Simulation(
             SimulationContext<T> context,
             SimulationSnapshotStore simulationSnapshotStore,
             IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
-            IReadOnlyList<ISimulationEvent<T>> events)
+            IReadOnlyList<ISimulationEvent<T>> events,
+            IReadOnlyList<Func<SimulationContext<T>, SimulationCrashResult>> crashConditions)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
             _environmentUpdates = environmentUpdates;
             _callbacks = callbacks;
             _events = events;
+            _crashConditions = crashConditions;
         }
 
         public async Task StartAsync()
@@ -47,6 +52,11 @@
 
             while (Running)
             {
+                foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context)))
+                {
+                    _context.Agents.Remove(agentToRemove.Id);
+                }
+
                 foreach (var environmentUpdate in _environmentUpdates)
                 {
                     await environmentUpdate(_context);
@@ -82,6 +92,18 @@
                     new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()), 
                     _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
                     default);
+
+                foreach (var crashCondition in _crashConditions)
+                {
+                    var crashResult = crashCondition(_context);
+
+                    if (crashResult.IsCrash)
+                    {
+                        Crash = crashResult;
+                        Running = false;
+                        break;
+                    }
+                }
 
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
             }
