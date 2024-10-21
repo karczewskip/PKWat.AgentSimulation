@@ -36,7 +36,7 @@ public partial class MainWindow : Window
 
         _simulation
             = _simulationBuilder
-                .CreateNewSimulation(new BouncingBallBulb(bulbRadius, 10.0))
+                .CreateNewSimulation<BouncingBallBulb, BouncingBallBulbState>(new BouncingBallBulbState(bulbRadius, 10.0, 0.25))
                 .AddAgents<BouncingBall>(ballsCount)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))

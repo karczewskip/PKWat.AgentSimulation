@@ -3,24 +3,14 @@
 using PKWat.AgentSimulation.Core;
 using System;
 using System.Drawing;
-using System.Text.Json;
 
-public class BouncingBallBulb : ISimulationEnvironment
+public record BouncingBallBulbState(double BulbRadius, double BallRadius, double Gravity);
+
+public class BouncingBallBulb : DefaultSimulationEnvironment<BouncingBallBulbState>
 {
-    public double BulbRadius { get;}
-    public double BallRadius { get; }
-    public double Gravity => 0.25;
-
-    public BouncingBallBulb(double bulbRadius, double ballRadius)
-    {
-        BulbRadius = bulbRadius;
-        BallRadius = ballRadius;
-    }
-
-    public object CreateSnapshot()
-    {
-        return this;
-    }
+    public double BulbRadius => GetState().BulbRadius;
+    public double BallRadius => GetState().BallRadius;
+    public double Gravity => GetState().Gravity;
 }
 
 public record BouncingBallPosition(double X, double Y)
