@@ -20,13 +20,14 @@ public interface ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulation
     AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>;
 }
 
-internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
+internal class SimulationContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE> where ENVIRONMENT_STATE : ISnapshotCreator
 {
     private readonly IServiceProvider _serviceProvider;
 
     public SimulationContext(
         IServiceProvider serviceProvider,
         ENVIRONMENT simulationEnvironment,
+        ENVIRONMENT_STATE simulationEnvironmentState,
         ISimulationAgent<ENVIRONMENT>[] agents,
         TimeSpan simulationStep,
         TimeSpan waitingTimeBetweenSteps)
@@ -34,12 +35,14 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
         _serviceProvider = serviceProvider;
 
         SimulationEnvironment = simulationEnvironment;
+        SimulationEnvironmentState = simulationEnvironmentState;
         Agents = agents.ToDictionary(x => x.Id);
         SimulationTime = new SimulationTime(TimeSpan.Zero, simulationStep);
         WaitingTimeBetweenSteps = waitingTimeBetweenSteps;
     }
 
     public ENVIRONMENT SimulationEnvironment { get; }
+    public ENVIRONMENT_STATE SimulationEnvironmentState { get; private set; }
     public SimulationTime SimulationTime { get; private set; }
 
     public Dictionary<AgentId, ISimulationAgent<ENVIRONMENT>> Agents { get; }
