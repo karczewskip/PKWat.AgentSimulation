@@ -8,6 +8,7 @@ public interface ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where
 {
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetSimulationStep(TimeSpan simulationStep);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
@@ -19,13 +20,14 @@ public interface ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where
     ISimulation Build();
 }
 
-internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE> where ENVIRONMENT_STATE : ISnapshotCreator
+internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
 {
     private readonly IServiceProvider _serviceProvider;
 
-    private Func<(ENVIRONMENT, ENVIRONMENT_STATE)> _environmentCreate;
+    private Func<ENVIRONMENT> _environmentCreate;
     private List<Func<ISimulationAgent<ENVIRONMENT>>> _agentsToGenerate = new();
     private List<Func<ISimulationEvent<ENVIRONMENT>>> _eventsToGenerate = new();
+    private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _callbacks = new();
     private List<Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult>> _crashConditions = new();
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
@@ -42,8 +44,9 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         _environmentCreate = () => 
         {
             var environment = _serviceProvider.GetRequiredService<ENVIRONMENT>();
+            environment.LoadState(environmentState);
 
-            return (environment, environmentState);
+            return environment;
         };
 
         return this;
@@ -60,6 +63,13 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
             .Range(0, number)
             .Select(x => new Func<ISimulationAgent<ENVIRONMENT>>(
                 () => _serviceProvider.GetRequiredService<U>())));
+
+        return this;
+    }
+
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update)
+    {
+        _environmentUpdates.Add(update);
 
         return this;
     }
@@ -118,7 +128,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
     public ISimulation Build()
     {
         _serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
-        var (simulationEnvironment, simulationEnvironmentState) = _environmentCreate();
+        var simulationEnvironment = _environmentCreate();
         var agents = _agentsToGenerate.Select(x => x()).ToArray();
         var events = _eventsToGenerate.Select(x => x()).ToArray();
 
@@ -128,15 +138,15 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         var snapshotStore = new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
 
         return new Simulation<ENVIRONMENT, ENVIRONMENT_STATE>(
-            new SimulationContext<ENVIRONMENT, ENVIRONMENT_STATE>(
+            new SimulationContext<ENVIRONMENT>(
                 _serviceProvider,
                 simulationEnvironment,
-                simulationEnvironmentState,
                 agents, 
                 _simulationStep, 
                 _waitingTimeBetweenSteps), 
-            snapshotStore,
-            _callbacks,
+            snapshotStore, 
+            _environmentUpdates, 
+            _callbacks, 
             events,
             _crashConditions);
     }

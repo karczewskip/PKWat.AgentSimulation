@@ -11,26 +11,29 @@
         Task StopAsync();
     }
 
-    internal class Simulation<T, ENVIRONMENT_STATE> : ISimulation where T : ISimulationEnvironment<ENVIRONMENT_STATE> where ENVIRONMENT_STATE : ISnapshotCreator
+    internal class Simulation<T, ENVIRONMENT_STATE> : ISimulation where T : ISimulationEnvironment<ENVIRONMENT_STATE>
     {
-        private readonly SimulationContext<T, ENVIRONMENT_STATE> _context;
+        private readonly SimulationContext<T> _context;
         private readonly SimulationSnapshotStore _snapshotStore;
-        private readonly IReadOnlyList<Func<SimulationContext<T, ENVIRONMENT_STATE>, Task>> _callbacks;
+        private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
+        private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly IReadOnlyList<ISimulationEvent<T>> _events;
-        private readonly IReadOnlyList<Func<SimulationContext<T, ENVIRONMENT_STATE>, SimulationCrashResult>> _crashConditions;
+        private readonly IReadOnlyList<Func<SimulationContext<T>, SimulationCrashResult>> _crashConditions;
 
         public bool Running { get; private set; } = false;
         public SimulationCrashResult Crash { get; private set; } = SimulationCrashResult.NoCrash;
 
         public Simulation(
-            SimulationContext<T, ENVIRONMENT_STATE> context,
+            SimulationContext<T> context,
             SimulationSnapshotStore simulationSnapshotStore,
-            IReadOnlyList<Func<SimulationContext<T, ENVIRONMENT_STATE>, Task>> callbacks,
+            IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
+            IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
             IReadOnlyList<ISimulationEvent<T>> events,
-            IReadOnlyList<Func<SimulationContext<T, ENVIRONMENT_STATE>, SimulationCrashResult>> crashConditions)
+            IReadOnlyList<Func<SimulationContext<T>, SimulationCrashResult>> crashConditions)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
+            _environmentUpdates = environmentUpdates;
             _callbacks = callbacks;
             _events = events;
             _crashConditions = crashConditions;
@@ -54,7 +57,10 @@
                     _context.Agents.Remove(agentToRemove.Id);
                 }
 
-                _context.SimulationEnvironment.Update(_context.SimulationEnvironmentState);
+                foreach (var environmentUpdate in _environmentUpdates)
+                {
+                    await environmentUpdate(_context);
+                }
 
                 foreach (var simulationEvent in _events)
                 {
@@ -83,7 +89,7 @@
 
                 await _snapshotStore.SaveSnapshotAsync(
                     new SimulationSnapshot(new SimulationTimeSnapshot(_context.SimulationTime), 
-                    new SimulationEnvironmentSnapshot(_context.SimulationEnvironmentState.CreateSnapshot()), 
+                    new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()), 
                     _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
                     default);
 
