@@ -2,11 +2,9 @@
 {
     using PKWat.AgentSimulation.Core;
 
-    internal class LiquidEnvironment : ISimulationEnvironment
+    internal record LiquidEnvironmentState();
+
+    internal class LiquidEnvironment : DefaultSimulationEnvironment<LiquidEnvironmentState>
     {
-        public object CreateSnapshot()
-        {
-            return new { SnapshotProp = "test" };
-        }
     }
 }

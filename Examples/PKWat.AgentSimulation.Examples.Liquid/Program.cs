@@ -13,7 +13,7 @@ using IHost host = builder.Build();
 
 var simultaionBuilder = host.Services.GetRequiredService<ISimulationBuilder>();
 
-var simulaiton = simultaionBuilder.CreateNewSimulation(new LiquidEnvironment()).Build();
+var simulaiton = simultaionBuilder.CreateNewSimulation<LiquidEnvironment, LiquidEnvironmentState>(new LiquidEnvironmentState()).Build();
 
 //simulaiton.StartAsync();
 
