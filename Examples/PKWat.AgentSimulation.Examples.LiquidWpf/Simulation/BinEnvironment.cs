@@ -2,18 +2,13 @@
 
 namespace PKWat.AgentSimulation.Examples.LiquidWpf.Simulation
 {
-    public class BinEnvironment : DefaultSimulationEnvironment
+    public record BinEnvironmentState(double BinWidth, double BinHeight, DropAcceleration Gravity);
+
+    public class BinEnvironment : DefaultSimulationEnvironment<BinEnvironmentState>
     {
-        public double BinWidth { get; }
-        public double BinHeight { get; }
-
-        public DropAcceleration Gravity { get; } = new DropAcceleration(0, 9.8);
-
-        public BinEnvironment(double binWidth, double binHeight)
-        {
-            BinWidth = binWidth;
-            BinHeight = binHeight;
-        }
+        public double BinWidth => GetState().BinWidth;
+        public double BinHeight => GetState().BinHeight;
+        public DropAcceleration Gravity => GetState().Gravity;
     }
 
 }

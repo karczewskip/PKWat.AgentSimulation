@@ -12,7 +12,7 @@
             liquidRenderer.Initialize(800, 600);
 
             return simulationBuilder
-                    .CreateNewSimulation(new BinEnvironment(1000, 1000))
+                    .CreateNewSimulation<BinEnvironment, BinEnvironmentState>(new BinEnvironmentState(1000, 1000, new DropAcceleration(0, 9.8)))
                     .AddAgents<Drop>(300)
                     .AddCallback(c => RenderAsync(c, render))
                     .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1000))
