@@ -22,6 +22,18 @@ public record AirportEnvironmentState(
 
 public class AirportEnvironment : DefaultSimulationEnvironment<AirportEnvironmentState>
 {
+    public int[] AllLandingLines => GetState().AllLandingLines;
+
+    public AgentId[] AirplanesAskingForLand => GetState().AirplanesAskingForLand;
+
+    public IReadOnlyDictionary<AgentId, int> AllowedForLand => GetState().AllowedForLand;
+
+    public IReadOnlyDictionary<AgentId, int> LandingAirplanes => GetState().LandingAirplanes;
+
+    public IReadOnlyDictionary<AgentId, int> LandedAirplanes => GetState().LandedAirplanes;
+
+    public IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane => GetState().PassengersInEachAirplane;
+
     public void SetAirplanesAskingForLand(AgentId[] airplanesAskingForLand) 
         => LoadState(
             GetState() with { AirplanesAskingForLand = airplanesAskingForLand });
