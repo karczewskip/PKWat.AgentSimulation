@@ -2,53 +2,47 @@
 
 using PKWat.AgentSimulation.Core;
 
-public class AirportEnvironment : ISimulationEnvironment
+public record AirportEnvironmentState(
+    int[] AllLandingLines,
+    AgentId[] AirplanesAskingForLand,
+    IReadOnlyDictionary<AgentId, int> LandingAirplanes,
+    IReadOnlyDictionary<AgentId, int> AllowedForLand,
+    IReadOnlyDictionary<AgentId, int> LandedAirplanes,
+    IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane);
+
+public class AirportEnvironment : DefaultSimulationEnvironment<AirportEnvironmentState>
 {
-    public AirportEnvironment(int numberOfLandingLines)
-    {
-        AllLandingLines = Enumerable.Range(1, numberOfLandingLines).ToArray();
-    }
-
-    public int[] AllLandingLines { get; private set; }
-    public AgentId[] AirplanesAskingForLand { get; private set; } = [];
-    public IReadOnlyDictionary<AgentId, int> LandingAirplanes { get; private set; } = new Dictionary<AgentId, int>();
-    public IReadOnlyDictionary<AgentId, int> AllowedForLand { get; private set; } = new Dictionary<AgentId, int>();
-    public IReadOnlyDictionary<AgentId, int> LandedAirplanes { get; private set; } = new Dictionary<AgentId, int>();
-    public IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane { get; private set; } = new Dictionary<AgentId, AgentId[]>();
-
-    public void SetAirplanesAskingForLand(AgentId[] airplanesAskingForLand)
-    {
-        AirplanesAskingForLand = airplanesAskingForLand;
-    }
+    public void SetAirplanesAskingForLand(AgentId[] airplanesAskingForLand) 
+        => LoadState(
+            GetState() with { AirplanesAskingForLand = airplanesAskingForLand });
 
     public void SetAllowedForLand(IReadOnlyDictionary<AgentId, int> allowedForLand)
-    {
-        AllowedForLand = allowedForLand;
-    }
+        => LoadState(
+            GetState() with { AllowedForLand = allowedForLand });
 
     public void SetLandingAirplane(IReadOnlyDictionary<AgentId, int> landingAirplanes)
-    {
-        LandingAirplanes = landingAirplanes;
-    }
+        => LoadState(
+            GetState() with { LandingAirplanes = landingAirplanes });
 
     public void SetLandedAirplanes(IReadOnlyDictionary<AgentId, int> landedAirplanes)
-    {
-        LandedAirplanes = landedAirplanes;
-    }
+        => LoadState(
+            GetState() with { LandedAirplanes = landedAirplanes });
 
     public void SetPassengersInEachAirplane(IReadOnlyDictionary<AgentId, AgentId[]> passengersInEachAirplane)
-    {
-        PassengersInEachAirplane = passengersInEachAirplane;
-    }
+        => LoadState(
+            GetState() with { PassengersInEachAirplane = passengersInEachAirplane });
 
     public bool NoPassengerInAirplane(AgentId airplaneId)
     {
-        return PassengersInEachAirplane.ContainsKey(airplaneId) == false || PassengersInEachAirplane[airplaneId].Length == 0;
+        var state = GetState();
+        return state.PassengersInEachAirplane.ContainsKey(airplaneId) == false 
+            || state.PassengersInEachAirplane[airplaneId].Length == 0;
     }
 
     public int? GetAssignedLine(AgentId id)
     {
-        if(AllowedForLand.TryGetValue(id, out var line))
+        var state = GetState();
+        if(state.AllowedForLand.TryGetValue(id, out var line))
         {
             return line;
         }
@@ -58,24 +52,27 @@ public class AirportEnvironment : ISimulationEnvironment
 
     public bool AirplaneLanded(AgentId airplaneId)
     {
-        return LandedAirplanes.ContainsKey(airplaneId);
+        var state = GetState();
+        return state.LandedAirplanes.ContainsKey(airplaneId);
     }
 
     internal bool PassengerAllowedToCheckout(AgentId passengerId, AgentId airplaneId)
     {
-        return PassengersInEachAirplane[airplaneId].First() == passengerId;
+        var state = GetState();
+        return state.PassengersInEachAirplane[airplaneId].First() == passengerId;
     }
 
-    public object CreateSnapshot()
+    public override object CreateSnapshot()
     {
+        var state = GetState();
         return new
         {
-            AllLandingLines,
-            AirplanesAskingForLand,
-            LandingAirplanes = LandingAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
-            AllowedForLand = AllowedForLand.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
-            LandedAirplanes = LandedAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
-            PassengersInEachAirplane = PassengersInEachAirplane.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray()
+            state.AllLandingLines,
+            state.AirplanesAskingForLand,
+            LandingAirplanes = state.LandingAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
+            AllowedForLand = state.AllowedForLand.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
+            LandedAirplanes = state.LandedAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
+            PassengersInEachAirplane = state.PassengersInEachAirplane.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray()
         };
     }
 }
