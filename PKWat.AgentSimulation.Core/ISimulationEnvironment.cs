@@ -4,7 +4,7 @@
 
     public interface ISimulationEnvironment
     {
-
+        SimulationCrashResult CheckCrashConditions();
     }
 
     public interface ISimulationEnvironment<SIMULATION_STATE> : ISimulationEnvironment, ISnapshotCreator
@@ -24,6 +24,11 @@
         protected SIMULATION_STATE GetState()
         {
             return _state;
+        }
+
+        public virtual SimulationCrashResult CheckCrashConditions()
+        {
+            return SimulationCrashResult.NoCrash;
         }
 
         public virtual object CreateSnapshot()

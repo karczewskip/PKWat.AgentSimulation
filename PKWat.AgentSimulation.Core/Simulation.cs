@@ -18,7 +18,6 @@
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly IReadOnlyList<ISimulationEvent<T>> _events;
-        private readonly IReadOnlyList<Func<SimulationContext<T>, SimulationCrashResult>> _crashConditions;
 
         public bool Running { get; private set; } = false;
         public SimulationCrashResult Crash { get; private set; } = SimulationCrashResult.NoCrash;
@@ -28,15 +27,13 @@
             SimulationSnapshotStore simulationSnapshotStore,
             IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
-            IReadOnlyList<ISimulationEvent<T>> events,
-            IReadOnlyList<Func<SimulationContext<T>, SimulationCrashResult>> crashConditions)
+            IReadOnlyList<ISimulationEvent<T>> events)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
             _environmentUpdates = environmentUpdates;
             _callbacks = callbacks;
             _events = events;
-            _crashConditions = crashConditions;
         }
 
         public async Task StartAsync()
@@ -93,16 +90,12 @@
                     _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
                     default);
 
-                foreach (var crashCondition in _crashConditions)
-                {
-                    var crashResult = crashCondition(_context);
+                var crashResult = _context.SimulationEnvironment.CheckCrashConditions();
 
-                    if (crashResult.IsCrash)
-                    {
-                        Crash = crashResult;
-                        Running = false;
-                        break;
-                    }
+                if (crashResult.IsCrash)
+                {
+                    Crash = crashResult;
+                    Running = false;
                 }
 
                 await Task.Delay(_context.WaitingTimeBetweenSteps);

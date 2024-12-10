@@ -8,7 +8,17 @@ public record AirportEnvironmentState(
     IReadOnlyDictionary<AgentId, int> LandingAirplanes,
     IReadOnlyDictionary<AgentId, int> AllowedForLand,
     IReadOnlyDictionary<AgentId, int> LandedAirplanes,
-    IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane);
+    IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane)
+{
+    public static AirportEnvironmentState CreateUsingNumberOfLandingLines(int numberOfLandingLines)
+        => new AirportEnvironmentState(
+            Enumerable.Range(1, numberOfLandingLines).ToArray(),
+            new AgentId[0],
+            new Dictionary<AgentId, int>(),
+            new Dictionary<AgentId, int>(),
+            new Dictionary<AgentId, int>(),
+            new Dictionary<AgentId, AgentId[]>());
+}
 
 public class AirportEnvironment : DefaultSimulationEnvironment<AirportEnvironmentState>
 {
@@ -60,6 +70,35 @@ public class AirportEnvironment : DefaultSimulationEnvironment<AirportEnvironmen
     {
         var state = GetState();
         return state.PassengersInEachAirplane[airplaneId].First() == passengerId;
+    }
+
+    public override SimulationCrashResult CheckCrashConditions()
+    {
+        if (GetState()
+                .LandingAirplanes
+                .GroupBy(x => x.Value)
+                .Any(x => x.Count() > 1))
+        {
+            return SimulationCrashResult.Crash("More than one landing airplanes on the same line.");
+        }
+
+        if (GetState()
+            .LandedAirplanes
+            .GroupBy(x => x.Value)
+            .Any(x => x.Count() > 1))
+        {
+            return SimulationCrashResult.Crash("More than one landed airplanes on the same line.");
+        }
+
+        if (GetState()
+            .AllowedForLand
+            .GroupBy(x => x.Value)
+            .Any(x => x.Count() > 1))
+        {
+            return SimulationCrashResult.Crash("More than one allowed airplanes on the same line.");
+        }
+
+        return SimulationCrashResult.NoCrash;
     }
 
     public override object CreateSnapshot()

@@ -26,7 +26,8 @@
             _airportDrawer.InitializeIfNeeded(800, 800);
 
             var simulation = _simulationBuilder
-                .CreateNewSimulation(new AirportEnvironment(5))
+                .CreateNewSimulation<AirportEnvironment, AirportEnvironmentState>(
+                    AirportEnvironmentState.CreateUsingNumberOfLandingLines(5))
                 .AddAgent<Coordinator>()
                 .AddEventWithInitialization<NewAirplaneArrived>(e => e.Initialize(10.0, 30))
                 .AddEnvironmentUpdates(UpdateAskingForLand)
@@ -35,7 +36,6 @@
                 .AddEnvironmentUpdates(UpdateLandedAirplanes)
                 .AddEnvironmentUpdates(UpdateNumberOfPassangersInEachAirplane)
                 .AddCallback(c => RenderAsync(c, drawing))
-                .AddCrashCondition(CheckOnlyOneAirplanePerLine)
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
                 .SetRandomSeed(100)
@@ -98,37 +98,5 @@
 
         private async Task RenderAsync(ISimulationContext<AirportEnvironment> context, Action<BitmapSource> drawing)
             => drawing(_airportDrawer.Draw(context));
-
-        private SimulationCrashResult CheckOnlyOneAirplanePerLine(ISimulationContext<AirportEnvironment> context)
-        {
-            if(context
-                .SimulationEnvironment
-                .LandingAirplanes
-                .GroupBy(x => x.Value)
-                .Any(x => x.Count() > 1))
-            {
-                return SimulationCrashResult.Crash("More than one landing airplanes on the same line.");
-            }
-
-            if (context
-                .SimulationEnvironment
-                .LandedAirplanes
-                .GroupBy(x => x.Value)
-                .Any(x => x.Count() > 1))
-            {
-                return SimulationCrashResult.Crash("More than one landed airplanes on the same line.");
-            }
-
-            if (context
-                .SimulationEnvironment
-                .AllowedForLand
-                .GroupBy(x => x.Value)
-                .Any(x => x.Count() > 1))
-            {
-                return SimulationCrashResult.Crash("More than one allowed airplanes on the same line.");
-            }
-
-            return SimulationCrashResult.NoCrash;
-        }
     }
 }

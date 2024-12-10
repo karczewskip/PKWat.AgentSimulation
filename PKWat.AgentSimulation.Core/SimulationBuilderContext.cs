@@ -15,8 +15,7 @@ public interface ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetRandomSeed(int seed);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCrashCondition(Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult> crashCondition);
-
+    
     ISimulation Build();
 }
 
@@ -29,7 +28,6 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
     private List<Func<ISimulationEvent<ENVIRONMENT>>> _eventsToGenerate = new();
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _environmentUpdates = new();
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _callbacks = new();
-    private List<Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult>> _crashConditions = new();
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
@@ -118,13 +116,6 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCrashCondition(Func<ISimulationContext<ENVIRONMENT>, SimulationCrashResult> crashCondition)
-    {
-        _crashConditions.Add(crashCondition);
-
-        return this;
-    }
-
     public ISimulation Build()
     {
         _serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
@@ -147,7 +138,6 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
             snapshotStore, 
             _environmentUpdates, 
             _callbacks, 
-            events,
-            _crashConditions);
+            events);
     }
 }
