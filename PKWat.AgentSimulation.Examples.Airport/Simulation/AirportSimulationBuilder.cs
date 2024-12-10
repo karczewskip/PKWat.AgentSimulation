@@ -37,7 +37,7 @@
                 .AddEnvironmentUpdates(UpdateNumberOfPassangersInEachAirplane)
                 .AddCallback(c => RenderAsync(c, drawing))
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
-                .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
+                .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
                 .SetRandomSeed(100)
                 .Build();
 
