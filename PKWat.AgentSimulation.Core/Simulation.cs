@@ -72,11 +72,6 @@
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
                     (x, c) => new ValueTask(Task.Run(() => x.Value.Prepare(_context.SimulationEnvironment, _context.SimulationTime))));
 
-                await Parallel.ForEachAsync(
-                    _context.Agents, 
-                    new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run( () => x.Value.Act())));
-
                 foreach (var callback in _callbacks)
                 {
                     await callback(_context);

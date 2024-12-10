@@ -11,7 +11,6 @@ public interface ISimulationAgent<ENVIRONMENT> : ISimulationAgent, IRecognizable
 {
     void Initialize(ENVIRONMENT environment);
     void Prepare(ENVIRONMENT environment, SimulationTime simulationTime);
-    void Act();
     bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime);
 }
 
@@ -38,8 +37,6 @@ public interface IRecognizableAgent : IEquatable<IRecognizableAgent>
 
 public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
-    private STATE _nextState;
-
     public STATE State { get; private set; }
 
     public AgentId Id { get; } = AgentId.GenerateNew();
@@ -51,12 +48,7 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
 
     public void Prepare(ENVIRONMENT environment, SimulationTime simulationTime)
     {
-        _nextState = GetNextState(environment, simulationTime);
-    }
-
-    public void Act()
-    {
-        State = _nextState;
+        State = GetNextState(environment, simulationTime);
     }
 
     public virtual bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime)
