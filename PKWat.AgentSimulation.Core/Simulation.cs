@@ -43,13 +43,13 @@
             await Parallel.ForEachAsync(
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context))));
+                    (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context.SimulationEnvironment))));
 
             _snapshotStore.CleanExistingSnapshots();
 
             while (Running)
             {
-                foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context)))
+                foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context.SimulationTime)))
                 {
                     _context.Agents.Remove(agentToRemove.Id);
                 }
@@ -70,7 +70,7 @@
                 await Parallel.ForEachAsync(
                     _context.Agents,
                     new ParallelOptions() { MaxDegreeOfParallelism = 2 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Value.Prepare(_context))));
+                    (x, c) => new ValueTask(Task.Run(() => x.Value.Prepare(_context.SimulationEnvironment, _context.SimulationTime))));
 
                 await Parallel.ForEachAsync(
                     _context.Agents, 

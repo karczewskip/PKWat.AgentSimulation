@@ -36,9 +36,9 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
         return State;
     }
 
-    override public bool ShouldBeRemovedFromSimulation(ISimulationContext<AirportEnvironment> simulationContext)
+    override public bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime)
     {
-        return State.HasDeparted(simulationContext.SimulationTime.Time);
+        return State.HasDeparted(simulationTime.Time);
     }
 }
 

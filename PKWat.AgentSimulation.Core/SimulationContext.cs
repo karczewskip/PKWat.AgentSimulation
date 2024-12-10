@@ -62,7 +62,7 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
     public AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
-        agent.Initialize(this);
+        agent.Initialize(SimulationEnvironment);
         Agents.Add(agent.Id, agent);
 
         return agent;

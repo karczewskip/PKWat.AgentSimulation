@@ -9,10 +9,10 @@ public interface ISimulationAgent
 
 public interface ISimulationAgent<ENVIRONMENT> : ISimulationAgent, IRecognizableAgent, ISnapshotCreator where ENVIRONMENT : ISimulationEnvironment
 {
-    void Initialize(ISimulationContext<ENVIRONMENT> simulationContext);
-    void Prepare(ISimulationContext<ENVIRONMENT> simulationContext);
+    void Initialize(ENVIRONMENT environment);
+    void Prepare(ENVIRONMENT environment, SimulationTime simulationTime);
     void Act();
-    bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT> simulationContext);
+    bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime);
 }
 
 public record AgentId
@@ -44,14 +44,14 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
 
     public AgentId Id { get; } = AgentId.GenerateNew();
 
-    public void Initialize(ISimulationContext<ENVIRONMENT> simulationContext)
+    public void Initialize(ENVIRONMENT environment)
     {
-        State = GetInitialState(simulationContext.SimulationEnvironment);
+        State = GetInitialState(environment);
     }
 
-    public void Prepare(ISimulationContext<ENVIRONMENT> simulationContext)
+    public void Prepare(ENVIRONMENT environment, SimulationTime simulationTime)
     {
-        _nextState = GetNextState(simulationContext.SimulationEnvironment, simulationContext.SimulationTime);
+        _nextState = GetNextState(environment, simulationTime);
     }
 
     public void Act()
@@ -59,7 +59,7 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
         State = _nextState;
     }
 
-    public virtual bool ShouldBeRemovedFromSimulation(ISimulationContext<ENVIRONMENT> simulationContext)
+    public virtual bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime)
     {
         return false;
     }
