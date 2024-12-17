@@ -10,7 +10,7 @@ public interface ISimulationAgent
 public interface ISimulationAgent<ENVIRONMENT> : ISimulationAgent, IRecognizableAgent, ISnapshotCreator where ENVIRONMENT : ISimulationEnvironment
 {
     void Initialize(ENVIRONMENT environment);
-    void Prepare(ENVIRONMENT environment, SimulationTime simulationTime);
+    void Act(ENVIRONMENT environment, SimulationTime simulationTime);
     bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime);
 }
 
@@ -46,7 +46,7 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
         State = GetInitialState(environment);
     }
 
-    public void Prepare(ENVIRONMENT environment, SimulationTime simulationTime)
+    public void Act(ENVIRONMENT environment, SimulationTime simulationTime)
     {
         State = GetNextState(environment, simulationTime);
     }
