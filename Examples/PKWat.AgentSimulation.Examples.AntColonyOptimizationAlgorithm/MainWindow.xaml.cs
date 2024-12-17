@@ -46,7 +46,7 @@
                 .AddEnvironmentUpdates(AddPheromones)
                 .AddCallback(RenderAsync)
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
-                .SetRandomSeed(100)
+                .SetRandomSeed(12557)
                 .Build();
 
             await _simulation.StartAsync();
