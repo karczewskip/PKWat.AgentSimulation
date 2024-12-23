@@ -1,0 +1,9 @@
+Wymagania funkcjonalne/niefunkcjonalne
+
+Porównanie do innych rozwiązań poprzez wymagania
+
+Architektura rozwiązania
+
+„bird-oid object”
+automaty komórkowe - gra w życie
+pray and predator

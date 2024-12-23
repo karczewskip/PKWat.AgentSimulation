@@ -1,0 +1,24 @@
+Cele:
+    - Zaprojektowanie i implementacja frameworka umożliwiającego tworzenie symulacji systemów wieloagentowych w języku C#.
+    - Umożliwienie rozszerzalności przez dodawanie kompatybilnych modułów.
+    - Zapewnienie zrównoleglenia obliczeń.
+    - Stworzenie narzędzi ułatwiających generowanie symulacji.
+    - Stworzenie narzędzi ułatwających analizę przebytej symualacji.
+    - Stworzenie narzędzi ułatwiających wizualizację symulacji.
+
+Oczekiwane wyniki:
+    - Gotowy framework w języku C#, pozwalający na definiowanie agentów, ich stanu, interakcji ze środowiskiem i między sobą.
+    - Kilka przykładowych aplikacji pokazujących zastosowanie frameworka.
+    - Dokumentacja użytkownika zawierająca opis architektury frameworka, instrukcję obsługi oraz przykłady kodu.
+    - Testy wydajnościowe dla różynych ilości agentów oraz zrównolegleń
+
+Przegląd istniejących rozwiązań 
+    - https://github.com/florinleon/ActressMas -> akademicki framework w celach edukacyjnych
+    - https://docs.monogame.net/ -> framework do tworzenia gier 
+    - https://github.com/sschmid/Entitas -> Entity Component System Framework pod unity
+    - 
+
+
+Technologie do zastosowania w pracy
+    - C#
+    - WPF
