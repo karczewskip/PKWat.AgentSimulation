@@ -37,7 +37,8 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
                 Direction = State.Direction.Opposite()
             };
         }
-        else if (State.IsCarryingFood && environment.IsNearHome(State.Coordinates))
+        
+        if (State.IsCarryingFood && environment.IsNearHome(State.Coordinates))
         {
             return State with
             {
@@ -46,49 +47,45 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
                 Direction = State.Direction.Opposite(),
             };
         }
-        else
+
+        var possibleDirections = ColonyDirection.GeneratePossibleDirections(State.Direction);
+
+        if (_randomNumbersGenerator.Next(1000) < 1)
         {
-            var possibleDirections = ColonyDirection.GeneratePossibleDirections(State.Direction);
-
-            if (_randomNumbersGenerator.Next(1000) < 1)
+            var newRandomDirection = possibleDirections[_randomNumbersGenerator.Next(possibleDirections.Length)];
+            return State with
             {
-                var newDirection = possibleDirections[_randomNumbersGenerator.Next(possibleDirections.Length)];
-                return State with
-                {
-                    Direction = newDirection,
-                    PathLength = State.PathLength + 1,
-                    Coordinates = MoveCoordinates(environment, State.Coordinates, newDirection)
-                };
+                Direction = newRandomDirection,
+                PathLength = State.PathLength + 1,
+                Coordinates = MoveCoordinates(environment, State.Coordinates, newRandomDirection)
+            };
+        }
+
+        var consideringDirections = new List<ColonyDirection>() { possibleDirections[0] };
+        var pheromonesStrength = GetPheromonesStrength(environment, State.Coordinates.MoveBy(possibleDirections[0]));
+        for (int i = 1; i < possibleDirections.Length; i++)
+        {
+            var consideringCoordinates = State.Coordinates.MoveBy(possibleDirections[i]);
+            var consideringPheromonesStrength = GetPheromonesStrength(environment, consideringCoordinates);
+            if (consideringPheromonesStrength > pheromonesStrength)
+            {
+                consideringDirections.Clear();
+                consideringDirections.Add(possibleDirections[i]);
+                pheromonesStrength = consideringPheromonesStrength;
             }
-            else
+            else if (consideringPheromonesStrength == pheromonesStrength)
             {
-                var consideringDirections = new List<ColonyDirection>() { possibleDirections[0] };
-                var pheromonesStrength = GetPheromonesStrength(environment, State.Coordinates.MoveBy(possibleDirections[0]));
-                for (int i = 1; i < possibleDirections.Length; i++)
-                {
-                    var consideringCoordinates = State.Coordinates.MoveBy(possibleDirections[i]);
-                    var consideringPheromonesStrength = GetPheromonesStrength(environment, consideringCoordinates);
-                    if (consideringPheromonesStrength > pheromonesStrength)
-                    {
-                        consideringDirections.Clear();
-                        consideringDirections.Add(possibleDirections[i]);
-                        pheromonesStrength = consideringPheromonesStrength;
-                    }
-                    else if (consideringPheromonesStrength == pheromonesStrength)
-                    {
-                        consideringDirections.Add(possibleDirections[i]);
-                    }
-                }
-
-                var newDirection = consideringDirections[_randomNumbersGenerator.Next(consideringDirections.Count)];
-                return State with
-                {
-                    Direction = newDirection,
-                    PathLength = State.PathLength + 1,
-                    Coordinates = MoveCoordinates(environment, State.Coordinates, newDirection)
-                };
+                consideringDirections.Add(possibleDirections[i]);
             }
         }
+
+        var newDirection = consideringDirections[_randomNumbersGenerator.Next(consideringDirections.Count)];
+        return State with
+        {
+            Direction = newDirection,
+            PathLength = State.PathLength + 1,
+            Coordinates = MoveCoordinates(environment, State.Coordinates, newDirection)
+        };
     }
 
     private double GetPheromonesStrength(ColonyEnvironment simulationEnvironment, ColonyCoordinates coordinates)
