@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Abstr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.GameOfLife", "Examples\PKWat.AgentSimulation.Examples.GameOfLife\PKWat.AgentSimulation.Examples.GameOfLife.csproj", "{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.GameOfLife.GPU", "Examples\PKWat.AgentSimulation.Examples.GameOfLife.GPU\PKWat.AgentSimulation.Examples.GameOfLife.GPU.csproj", "{E4511F4C-0209-4393-9693-BB349B4F93A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4511F4C-0209-4393-9693-BB349B4F93A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4511F4C-0209-4393-9693-BB349B4F93A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4511F4C-0209-4393-9693-BB349B4F93A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4511F4C-0209-4393-9693-BB349B4F93A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +113,7 @@ Global
 		{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{0D06901E-32F0-4645-AD3F-E4200F3A0077} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
+		{E4511F4C-0209-4393-9693-BB349B4F93A3} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADF5998-4CDB-4A6B-B457-52B27C507580}

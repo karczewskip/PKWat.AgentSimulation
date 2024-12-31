@@ -14,7 +14,7 @@
     internal class Simulation<T, ENVIRONMENT_STATE> : ISimulation where T : ISimulationEnvironment<ENVIRONMENT_STATE>
     {
         private readonly SimulationContext<T> _context;
-        private readonly SimulationSnapshotStore _snapshotStore;
+        private readonly ISimulationSnapshotStore _snapshotStore;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
         private readonly Func<SimulationContext<T>, Task> _environmentInitialization;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
@@ -27,7 +27,7 @@
 
         public Simulation(
             SimulationContext<T> context,
-            SimulationSnapshotStore simulationSnapshotStore,
+            ISimulationSnapshotStore simulationSnapshotStore,
             IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
             Func<SimulationContext<T>, Task> environmentInitialization,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
@@ -49,7 +49,7 @@
 
             await Parallel.ForEachAsync(
                     _context.Agents,
-                    new ParallelOptions() { MaxDegreeOfParallelism = 2 },
+                    new ParallelOptions() { MaxDegreeOfParallelism = 10 },
                     (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context.SimulationEnvironment))));
 
             _snapshotStore.CleanExistingSnapshots();

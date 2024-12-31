@@ -14,7 +14,13 @@ internal record SimulationSnapshotConfiguration(string Directory);
 
 internal record SimulationSnapshot(SimulationTimeSnapshot TimeSnapshot, SimulationEnvironmentSnapshot EnvironmentSnapshot, SimulationAgentSnapshot[] AgentSnapshots);
 
-internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulationSnapshotConfiguration)
+internal interface ISimulationSnapshotStore
+{
+    void CleanExistingSnapshots();
+    Task SaveSnapshotAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken);
+}
+
+internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulationSnapshotConfiguration) : ISimulationSnapshotStore
 {
     public void CleanExistingSnapshots()
     {
@@ -68,5 +74,16 @@ internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulatio
         output.WriteEndObject();
 
         await output.FlushAsync(cancellationToken);
+    }
+}
+
+internal class NullSimulationSnapshotStore : ISimulationSnapshotStore
+{
+    public void CleanExistingSnapshots()
+    {
+    }
+    public Task SaveSnapshotAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

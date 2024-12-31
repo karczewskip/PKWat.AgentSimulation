@@ -23,11 +23,13 @@ internal class Cell : SimulationAgent<LifeMatrixEnvironment, CellState>
         var aliveNeighbours = environment.GetAliveNeighboursCount(Id);
         if (State.IsAlive)
         {
-            return new CellState(aliveNeighbours == 2 || aliveNeighbours == 3);
+            var isStillAlive = aliveNeighbours == 2 || aliveNeighbours == 3;
+            return new CellState(isStillAlive);
         }
         else
         {
-            return new CellState(aliveNeighbours == 3);
+            var isBorn = aliveNeighbours == 3;
+            return new CellState(isBorn);
         }
     }
 }

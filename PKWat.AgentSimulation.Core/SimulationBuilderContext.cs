@@ -17,7 +17,8 @@ public interface ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetRandomSeed(int seed);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
-    
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> WithSnapshots();
+
     ISimulation Build();
 }
 
@@ -34,6 +35,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
+    private bool _doSnapshot = false;
 
     public SimulationBuilderContext(IServiceProvider serviceProvider)
     {
@@ -42,7 +44,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
 
     public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> LoadState(ENVIRONMENT_STATE environmentState)
     {
-        _environmentCreate = () => 
+        _environmentCreate = () =>
         {
             var environment = _serviceProvider.GetRequiredService<ENVIRONMENT>();
             environment.LoadState(environmentState);
@@ -122,7 +124,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
 
     public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEventWithInitialization<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>
     {
-        _eventsToGenerate.Add(() => 
+        _eventsToGenerate.Add(() =>
             {
                 var newEvent = _serviceProvider.GetRequiredService<U>();
                 initialization(newEvent);
@@ -133,6 +135,12 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return this;
     }
 
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> WithSnapshots()
+    {
+        _doSnapshot = true;
+        return this;
+    }
+
     public ISimulation Build()
     {
         _serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
@@ -140,22 +148,29 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         var agents = _agentsToGenerate.Select(x => x()).ToArray();
         var events = _eventsToGenerate.Select(x => x()).ToArray();
 
-        var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        var snapshotDirectory = Path.Combine(binDirectory, "snapshots");
-
-        var snapshotStore = new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
-
         return new Simulation<ENVIRONMENT, ENVIRONMENT_STATE>(
             new SimulationContext<ENVIRONMENT>(
                 _serviceProvider,
                 simulationEnvironment,
-                agents, 
-                _simulationStep, 
-                _waitingTimeBetweenSteps), 
-            snapshotStore, 
+                agents,
+                _simulationStep,
+                _waitingTimeBetweenSteps),
+            CreateSimulationSnapshotStore(),
             _environmentUpdates,
             _environmentInitilization,
-            _callbacks, 
+            _callbacks,
             events);
+    }
+
+    private ISimulationSnapshotStore CreateSimulationSnapshotStore()
+    {
+        if (_doSnapshot)
+        {
+            var binDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var snapshotDirectory = Path.Combine(binDirectory, "snapshots");
+            return new SimulationSnapshotStore(new SimulationSnapshotConfiguration(snapshotDirectory));
+        }
+
+        return new NullSimulationSnapshotStore();
     }
 }
