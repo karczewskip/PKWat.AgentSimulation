@@ -6,6 +6,7 @@ public interface IRandomNumbersGenerator
     double NextDouble();
 
     double GetNextExponential(double lambda);
+    bool GetNextBool() => NextDouble() < 0.5;
 }
 
 internal class MyRandomGenerator(int? seed = null) : IRandomNumbersGenerator

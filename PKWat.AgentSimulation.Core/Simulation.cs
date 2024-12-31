@@ -16,6 +16,7 @@
         private readonly SimulationContext<T> _context;
         private readonly SimulationSnapshotStore _snapshotStore;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
+        private readonly Func<SimulationContext<T>, Task> _environmentInitialization;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly IReadOnlyList<ISimulationEvent<T>> _events;
 
@@ -28,12 +29,14 @@
             SimulationContext<T> context,
             SimulationSnapshotStore simulationSnapshotStore,
             IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
+            Func<SimulationContext<T>, Task> environmentInitialization,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
             IReadOnlyList<ISimulationEvent<T>> events)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
             _environmentUpdates = environmentUpdates;
+            _environmentInitialization = environmentInitialization;
             _callbacks = callbacks;
             _events = events;
         }
@@ -41,6 +44,8 @@
         public async Task StartAsync()
         {
             _runningState = RunningSimulationState.CreateRunningState();
+
+            await _environmentInitialization(_context);
 
             await Parallel.ForEachAsync(
                     _context.Agents,

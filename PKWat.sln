@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Examp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Abstraction", "PKWat.AgentSimulation.Abstraction\PKWat.AgentSimulation.Abstraction.csproj", "{DB9880C5-0E3E-417B-9642-0A59208710D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.GameOfLife", "Examples\PKWat.AgentSimulation.Examples.GameOfLife\PKWat.AgentSimulation.Examples.GameOfLife.csproj", "{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,6 +106,7 @@ Global
 		{6E78C902-369F-427C-BA18-3713BEB87C4D} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{0D06901E-32F0-4645-AD3F-E4200F3A0077} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
+		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADF5998-4CDB-4A6B-B457-52B27C507580}

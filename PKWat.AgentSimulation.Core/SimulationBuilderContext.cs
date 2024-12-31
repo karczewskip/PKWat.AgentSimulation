@@ -9,7 +9,9 @@ public interface ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
+    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetSimulationStep(TimeSpan simulationStep);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
     ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetRandomSeed(int seed);
@@ -27,6 +29,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
     private List<Func<ISimulationAgent<ENVIRONMENT>>> _agentsToGenerate = new();
     private List<Func<ISimulationEvent<ENVIRONMENT>>> _eventsToGenerate = new();
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _environmentUpdates = new();
+    private Func<ISimulationContext<ENVIRONMENT>, Task> _environmentInitilization = async c => { };
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _callbacks = new();
     private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
@@ -72,9 +75,23 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return this;
     }
 
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization)
+    {
+        _environmentInitilization = initialization;
+
+        return this;
+    }
+
     public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback)
     {
         _callbacks.Add(callback);
+
+        return this;
+    }
+
+    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback)
+    {
+        _callbacks.Add(async c => callback(c));
 
         return this;
     }
@@ -136,7 +153,8 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
                 _simulationStep, 
                 _waitingTimeBetweenSteps), 
             snapshotStore, 
-            _environmentUpdates, 
+            _environmentUpdates,
+            _environmentInitilization,
             _callbacks, 
             events);
     }
