@@ -25,5 +25,5 @@ public class GameOfLifeSimulationBuilder(ISimulationBuilder simulationBuilder, G
     }
 
     private async Task UpdateMatrix(ISimulationContext<LifeMatrixEnvironment> context)
-        => context.SimulationEnvironment.Update();
+        => context.SimulationEnvironment.UpdateOnGPU();
 }

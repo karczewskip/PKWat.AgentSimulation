@@ -35,7 +35,7 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU
             {
                 await _simulation.StopAsync();
             }
-            _simulation = _simulationBuilder.Build(bitmapSource => simulationImage.Source = bitmapSource, 1000, 1000);
+            _simulation = _simulationBuilder.Build(bitmapSource => simulationImage.Source = bitmapSource, 100, 100);
 
             await _simulation.StartAsync();
         }

@@ -4,7 +4,9 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation;
 
 public record LifeMatrixEnvironmentState(bool[,] Matrix, int Generation);
 
-public class LifeMatrixEnvironment(IRandomNumbersGenerator randomNumbersGenerator) : DefaultSimulationEnvironment<LifeMatrixEnvironmentState>
+public class LifeMatrixEnvironment(
+    IRandomNumbersGenerator randomNumbersGenerator, 
+    NewMatrixOnGPUGenerator newMatrixOnGPUGenerator) : DefaultSimulationEnvironment<LifeMatrixEnvironmentState>
 {
     public void Initialize(int width, int height)
     {
@@ -91,5 +93,12 @@ public class LifeMatrixEnvironment(IRandomNumbersGenerator randomNumbersGenerato
         }
 
         return aliveNeighbours;
+    }
+
+    public void UpdateOnGPU()
+    {
+        var newMatrix = newMatrixOnGPUGenerator.Generate(GetState().Matrix);
+
+        LoadState(new LifeMatrixEnvironmentState(newMatrix, GetState().Generation + 1));
     }
 }
