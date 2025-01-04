@@ -1,18 +1,12 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using Microsoft.Extensions.DependencyInjection;
-using PKWat.AgentSimulation.Core.Snapshots;
+using PKWat.AgentSimulation.Core.Time;
 using System.Collections.Generic;
 
-public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0)
-{
-    public SimulationTime AddStep() => this with { Time = Time + Step, StepNo = StepNo + 1 };
-}
-
-public interface ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
+public interface ISimulationContext<ENVIRONMENT> : ISimulationTimeProvider where ENVIRONMENT : ISimulationEnvironment
 {
     ENVIRONMENT SimulationEnvironment { get; }
-    SimulationTime SimulationTime { get; }
 
     AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
@@ -23,6 +17,7 @@ public interface ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulation
 internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
     private readonly IServiceProvider _serviceProvider;
+    private SimulationTime _simulationTime;
 
     public SimulationContext(
         IServiceProvider serviceProvider,
@@ -32,15 +27,15 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
         TimeSpan waitingTimeBetweenSteps)
     {
         _serviceProvider = serviceProvider;
+        _simulationTime = new SimulationTime(TimeSpan.Zero, simulationStep);
 
         SimulationEnvironment = simulationEnvironment;
         Agents = agents.ToDictionary(x => x.Id);
-        SimulationTime = new SimulationTime(TimeSpan.Zero, simulationStep);
         WaitingTimeBetweenSteps = waitingTimeBetweenSteps;
     }
 
     public ENVIRONMENT SimulationEnvironment { get; }
-    public SimulationTime SimulationTime { get; private set; }
+    public IReadOnlySimulationTime SimulationTime => _simulationTime;
 
     public Dictionary<AgentId, ISimulationAgent<ENVIRONMENT>> Agents { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
@@ -56,7 +51,7 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
 
     internal void Update()
     {
-        SimulationTime = SimulationTime.AddStep();
+        _simulationTime = _simulationTime.AddStep();
     }
 
     public AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>

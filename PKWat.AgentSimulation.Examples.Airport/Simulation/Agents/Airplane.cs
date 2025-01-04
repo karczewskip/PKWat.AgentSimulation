@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Time;
 using PKWat.AgentSimulation.Math.Extensions;
 
 public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
@@ -10,7 +11,7 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
         return new AirplaneState();
     }
 
-    protected override AirplaneState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
+    protected override AirplaneState GetNextState(AirportEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         if (!State.AskedForLand)
         {
@@ -36,7 +37,7 @@ public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
         return State;
     }
 
-    override public bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime)
+    override public bool ShouldBeRemovedFromSimulation(IReadOnlySimulationTime simulationTime)
     {
         return State.HasDeparted(simulationTime.Time);
     }

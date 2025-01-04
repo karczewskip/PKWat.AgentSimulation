@@ -9,7 +9,8 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CUDAfy.NET" Version="1.29.5576.13786" />
+        <PackageReference Include="ILGPU" Version="1.5.1" />
+        <PackageReference Include="ILGPU.Algorithms" Version="1.5.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     </ItemGroup>

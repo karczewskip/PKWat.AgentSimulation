@@ -1,11 +1,21 @@
-﻿using Cudafy;
-using Cudafy.Host;
-using Cudafy.Translator;
+﻿using ILGPU;
+using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
+using ILGPU.Runtime.Cuda;
 
 namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation
 {
     public class NewMatrixOnGPUGenerator
     {
+        private Context _context;
+        private Accelerator _device;
+
+        public void Initialize()
+        {
+            _context = Context.Create(builder => builder.Cuda().CPU().EnableAlgorithms());
+            _device = _context.GetPreferredDevice(false).CreateAccelerator(_context);
+        }
+
         public bool[,] Generate(bool[,] previousMatrix)
         {
             var width = previousMatrix.GetLength(0);
@@ -20,26 +30,19 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation
                 }
             }
 
-            // Konfiguracja CUDAfy
-            CudafyModes.Target = eGPUType.Cuda;
-            CudafyModes.Compiler = eGPUCompiler.CudaNvcc;
-            var gpu = CudafyHost.GetDevice(eGPUType.Cuda);
+            var gpuData = _device.Allocate1D(data1d);
+            var gpuOuptutDate = _device.Allocate1D<bool>(width * height);
 
-            // Tłumaczenie kernela i ładowanie modułu
-            var module = CudafyTranslator.Cudafy();
-            gpu.LoadModule(module);
+            //var kernel = _device.LoadAutoGroupedStreamKernel<Index1D, ArrayView<bool>, ArrayView<bool>>(UpdateMatrix);
 
-            var gpuData = gpu.Allocate(data1d);
-            var gpuOuptutDate = gpu.Allocate(data1d);
+            //gpu.CopyToDevice(data1d, gpuData);
 
-            gpu.CopyToDevice(data1d, gpuData);
+            //gpu.Launch(width, height).UpdateMatrix(gpuData, gpuOuptutDate, width, height);
 
-            gpu.Launch(width, height).UpdateMatrix(gpuData, gpuOuptutDate, width, height);
+            //gpu.CopyFromDevice(gpuOuptutDate, data1d);
 
-            gpu.CopyFromDevice(gpuOuptutDate, data1d);
-
-            gpu.Free(gpuData);
-            gpu.Free(gpuOuptutDate);
+            //gpu.Free(gpuData);
+            //gpu.Free(gpuOuptutDate);
 
             var matrix = new bool[width, height];
             for (int i = 0; i < width; i++)
@@ -53,11 +56,10 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation
             return matrix;
         }
 
-        [Cudafy]
-        public static void UpdateMatrix(GThread thread, bool[] data, bool[] outputDate, int width, int height)
+        public static void UpdateMatrix(bool[] data, bool[] outputDate, int width, int height)
         {
-            var x = thread.blockIdx.x;
-            var y = thread.blockIdx.y;
+            var x = 1; // thread.blockIdx.x;
+            var y = 1; // thread.blockIdx.y;
 
             var aliveNeighbours = 0;
 

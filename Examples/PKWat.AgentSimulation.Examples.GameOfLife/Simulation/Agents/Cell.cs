@@ -1,6 +1,7 @@
-﻿namespace PKWat.AgentSimulation.Examples.GameOfLife.Simulation.Agents; 
+﻿namespace PKWat.AgentSimulation.Examples.GameOfLife.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Time;
 
 public record CellState(bool IsAlive);
 
@@ -18,7 +19,7 @@ internal class Cell : SimulationAgent<LifeMatrixEnvironment, CellState>
         return new CellState(_randomNumbersGenerator.GetNextBool());
     }
 
-    protected override CellState GetNextState(LifeMatrixEnvironment environment, SimulationTime simulationTime)
+    protected override CellState GetNextState(LifeMatrixEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         var aliveNeighbours = environment.GetAliveNeighboursCount(Id);
         if (State.IsAlive)

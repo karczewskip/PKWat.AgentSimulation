@@ -3,8 +3,9 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Time;
 
-internal record SimulationTimeSnapshot(SimulationTime SimulationTime);
+internal record SimulationTimeSnapshot(IReadOnlySimulationTime SimulationTime);
 
 internal record SimulationEnvironmentSnapshot(object Snapshot);
 

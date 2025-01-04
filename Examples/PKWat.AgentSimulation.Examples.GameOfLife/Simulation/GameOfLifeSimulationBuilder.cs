@@ -16,7 +16,6 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.Simulation
                 .AddEnvironmentUpdates(c => UpdateMatrix(c))
                 .AddCallback(c => drawing(drawer.Draw(c)))
                 .SetSimulationStep(TimeSpan.FromMilliseconds(100))
-                .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(100))
                 .SetRandomSeed(100)
                 .Build();
 

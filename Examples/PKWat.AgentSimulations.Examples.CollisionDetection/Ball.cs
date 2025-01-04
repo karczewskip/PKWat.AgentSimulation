@@ -1,4 +1,5 @@
 ﻿using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Time;
 using System.Drawing;
 
 namespace PKWat.AgentSimulations.Examples.CollisionDetection
@@ -27,7 +28,7 @@ namespace PKWat.AgentSimulations.Examples.CollisionDetection
                 _colorInitializer.GetNext());
         }
 
-        protected override BallState GetNextState(BallsContainer environment, SimulationTime simulationTime)
+        protected override BallState GetNextState(BallsContainer environment, IReadOnlySimulationTime simulationTime)
         {
             var timeInSeconds = simulationTime.Step.TotalSeconds;
 

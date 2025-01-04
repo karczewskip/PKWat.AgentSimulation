@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using PKWat.AgentSimulation.Core.Snapshots;
+using PKWat.AgentSimulation.Core.Time;
 
 public interface ISimulationAgent
 {
@@ -10,8 +11,8 @@ public interface ISimulationAgent
 public interface ISimulationAgent<ENVIRONMENT> : ISimulationAgent, IRecognizableAgent, ISnapshotCreator where ENVIRONMENT : ISimulationEnvironment
 {
     void Initialize(ENVIRONMENT environment);
-    void Act(ENVIRONMENT environment, SimulationTime simulationTime);
-    bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime);
+    void Act(ENVIRONMENT environment, IReadOnlySimulationTime simulationTime);
+    bool ShouldBeRemovedFromSimulation(IReadOnlySimulationTime simulationTime);
 }
 
 public record AgentId
@@ -46,18 +47,18 @@ public abstract class SimulationAgent<ENVIRONMENT, STATE> : ISimulationAgent<ENV
         State = GetInitialState(environment);
     }
 
-    public void Act(ENVIRONMENT environment, SimulationTime simulationTime)
+    public void Act(ENVIRONMENT environment, IReadOnlySimulationTime simulationTime)
     {
         State = GetNextState(environment, simulationTime);
     }
 
-    public virtual bool ShouldBeRemovedFromSimulation(SimulationTime simulationTime)
+    public virtual bool ShouldBeRemovedFromSimulation(IReadOnlySimulationTime simulationTime)
     {
         return false;
     }
 
     protected abstract STATE GetInitialState(ENVIRONMENT environment);
-    protected abstract STATE GetNextState(ENVIRONMENT environment, SimulationTime simulationTime);
+    protected abstract STATE GetNextState(ENVIRONMENT environment, IReadOnlySimulationTime simulationTime);
 
     protected void SetState(STATE nextState)
     {

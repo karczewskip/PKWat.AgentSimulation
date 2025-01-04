@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Time;
 using System;
 using System.Drawing;
 
@@ -66,7 +67,7 @@ public class BouncingBall : SimulationAgent<BouncingBallBulb, BouncingBallState>
         return _bouncingBallStateInitializer.InitializeNewState(environment);
     }
 
-    protected override BouncingBallState GetNextState(BouncingBallBulb environment, SimulationTime simulationTime)
+    protected override BouncingBallState GetNextState(BouncingBallBulb environment, IReadOnlySimulationTime simulationTime)
     {
         var newPosition = State.Position with { X = State.Position.X + State.Velocity.X, Y = State.Position.Y + State.Velocity.Y };
         var distanceExceeded = newPosition.DistanceFromCenter + State.Radius - environment.BulbRadius;

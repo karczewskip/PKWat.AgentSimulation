@@ -76,7 +76,7 @@
 
                 await Parallel.ForEachAsync(
                     _context.Agents,
-                    new ParallelOptions() { MaxDegreeOfParallelism = 2 },
+                    new ParallelOptions() { MaxDegreeOfParallelism = 16 },
                     (x, c) => new ValueTask(Task.Run(() => x.Value.Act(_context.SimulationEnvironment, _context.SimulationTime))));
 
                 foreach (var callback in _callbacks)

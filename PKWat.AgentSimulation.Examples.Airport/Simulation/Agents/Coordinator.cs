@@ -3,6 +3,7 @@
 using PKWat.AgentSimulation.Core;
 using System.Text.Json;
 using PKWat.AgentSimulation.Extensions;
+using PKWat.AgentSimulation.Core.Time;
 
 public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {
@@ -11,7 +12,7 @@ public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
         return new CoordinatorState(new Dictionary<AgentId, int>());
     }
 
-    protected override CoordinatorState GetNextState(AirportEnvironment environment, SimulationTime simulationTime)
+    protected override CoordinatorState GetNextState(AirportEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         var airplanesAskingForLand = environment.AirplanesAskingForLand.ToQueue();
         var busyLandingLines = environment.LandingAirplanes.Values.Union(environment.LandedAirplanes.Values).Union(environment.AllowedForLand.Values);

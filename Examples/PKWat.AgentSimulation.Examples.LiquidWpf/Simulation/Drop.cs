@@ -1,4 +1,5 @@
 ﻿using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Time;
 
 namespace PKWat.AgentSimulation.Examples.LiquidWpf.Simulation
 {
@@ -15,7 +16,7 @@ namespace PKWat.AgentSimulation.Examples.LiquidWpf.Simulation
             return new DropState(new DropCoordinates(x, y), new DropVelocity(0, 0));
         }
 
-        protected override DropState GetNextState(BinEnvironment environment, SimulationTime simulationTime)
+        protected override DropState GetNextState(BinEnvironment environment, IReadOnlySimulationTime simulationTime)
         {
             var timeInSeconds = simulationTime.Step.TotalSeconds;
 

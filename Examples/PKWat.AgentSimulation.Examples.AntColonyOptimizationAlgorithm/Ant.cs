@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Time;
 using System;
 
 public record AntState(ColonyDirection Direction, ColonyCoordinates Coordinates, bool IsCarryingFood, int PathLength)
@@ -26,7 +27,7 @@ public class Ant : SimulationAgent<ColonyEnvironment, AntState>
             false,
             1);
 
-    protected override AntState GetNextState(ColonyEnvironment environment, SimulationTime simulationTime)
+    protected override AntState GetNextState(ColonyEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         if (!State.IsCarryingFood && environment.IsNearFood(State.Coordinates))
         {
