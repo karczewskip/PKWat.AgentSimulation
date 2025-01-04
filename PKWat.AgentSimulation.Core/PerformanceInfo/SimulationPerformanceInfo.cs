@@ -44,7 +44,7 @@ public class SimulationPerformanceInfo : IReadOnlySimulationPerformanceInfo
 
     public string GetPerformanceInfo()
     {
-        var fpsLine = $"FPS: {CalculateFpsBasedOnLastCycles(10)}";
+        var fpsLine = $"FPS: {CalculateFpsBasedOnLastCycles(10):F2}";
         var currentStepsInfo = string.Join("\n", _currentCycleSteps.Select(x => $"{x.Name}: {x.Ellapsed.Milliseconds} ms"));
 
         return string.Join("\n", fpsLine, currentStepsInfo);
@@ -52,7 +52,12 @@ public class SimulationPerformanceInfo : IReadOnlySimulationPerformanceInfo
 
     private double CalculateFpsBasedOnLastCycles(int numberOfCycles)
     {
-        var usingCycles = _cycles.SkipLast(1).TakeLast(numberOfCycles);
+        var usingCycles = _cycles.SkipLast(1).TakeLast(numberOfCycles).ToArray();
+
+        if(usingCycles.Length == 0)
+        {
+            return 0;
+        }
 
         var meanTime = usingCycles.Select(x => x.Ellapsed.TotalMilliseconds).Average();
         var fps = 1000 / meanTime;

@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.GameOfLife.Simulation;
 
 using PKWat.AgentSimulation.Core;
+using System.Drawing;
 using System.Windows.Media.Imaging;
 
 public class GameOfLifeDrawer
@@ -9,8 +10,9 @@ public class GameOfLifeDrawer
     {
         var width = context.SimulationEnvironment.GetWidth();
         var height = context.SimulationEnvironment.GetHeight();
+        var stride = width * 4;
 
-        var bmp = new WriteableBitmap(width, height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null);
+        var writableBitmap = new WriteableBitmap(width, height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null);
         var pixels = new byte[width * height * 4];
         for (int i = 0; i < width; i++)
         {
@@ -33,8 +35,21 @@ public class GameOfLifeDrawer
                 }
             }
         }
-        bmp.WritePixels(new System.Windows.Int32Rect(0, 0, width, height), pixels, width * 4, 0);
-        return bmp;
+        writableBitmap.WritePixels(new System.Windows.Int32Rect(0, 0, width, height), pixels, width * 4, 0);
+
+        var pixelPtr = writableBitmap.BackBuffer;
+        var bitmap = new Bitmap(width, height, stride, System.Drawing.Imaging.PixelFormat.Format32bppRgb, pixelPtr);
+
+        writableBitmap.Lock();
+
+        using var graphic = Graphics.FromImage(bitmap);
+
+        graphic.DrawString(context.PerformanceInfo.GetPerformanceInfo(), new Font("Arial", 8), Brushes.Red, 0, 0);
+
+        writableBitmap.AddDirtyRect(new System.Windows.Int32Rect(0, 0, width, height));
+        writableBitmap.Unlock();
+
+        return writableBitmap;
     }
 
 }

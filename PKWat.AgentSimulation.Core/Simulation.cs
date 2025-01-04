@@ -60,7 +60,7 @@
                     new SimulationSnapshot(new SimulationTimeSnapshot(_context.SimulationTime),
                     new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()),
                     _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
-                    default);
+                    _runningState.CancellationToken);
 
                 _context.StartNewCycle();
 
