@@ -56,6 +56,14 @@
 
             while (Running)
             {
+                await _snapshotStore.SaveSnapshotAsync(
+                    new SimulationSnapshot(new SimulationTimeSnapshot(_context.SimulationTime),
+                    new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()),
+                    _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
+                    default);
+
+                _context.StartNewCycle();
+
                 foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context.SimulationTime)))
                 {
                     _context.Agents.Remove(agentToRemove.Id);
@@ -83,14 +91,6 @@
                 {
                     await callback(_context);
                 }
-
-                _context.Update();
-
-                await _snapshotStore.SaveSnapshotAsync(
-                    new SimulationSnapshot(new SimulationTimeSnapshot(_context.SimulationTime), 
-                    new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()), 
-                    _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
-                    default);
 
                 var crashResult = _context.SimulationEnvironment.CheckCrashConditions();
 
