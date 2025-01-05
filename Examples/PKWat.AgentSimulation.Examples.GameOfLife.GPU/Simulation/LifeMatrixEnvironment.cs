@@ -8,9 +8,22 @@ public class LifeMatrixEnvironment(
     IRandomNumbersGenerator randomNumbersGenerator, 
     NewMatrixOnGPUGenerator newMatrixOnGPUGenerator) : DefaultSimulationEnvironment<LifeMatrixEnvironmentState>
 {
+    private bool[][,] matrices;
+    private int currentMatrixIndex = 0;
+    private int width;
+    private int height;
+
     public void Initialize(int width, int height)
     {
-        var matrix = new bool[width, height];
+        this.width = width;
+        this.height = height;
+
+        matrices = new bool[2][,];
+        matrices[0] = new bool[width, height];
+        matrices[1] = new bool[width, height];
+        var matrix = matrices[currentMatrixIndex];
+        currentMatrixIndex = (currentMatrixIndex + 1) % 2;
+
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -25,27 +38,33 @@ public class LifeMatrixEnvironment(
     {
         var state = GetState();
 
-        var width = GetWidth();
-        var height = GetHeight();
+        var newMatrix = matrices[currentMatrixIndex];
+        currentMatrixIndex = (currentMatrixIndex + 1) % 2;
 
-        var newMatrix = new bool[width, height];
-        for (int i = 0; i < width; i++)
+        var numberOfThreads = 8;
+
+        Parallel.For(0, numberOfThreads, i =>
         {
-            for (int j = 0; j < height; j++)
+            var start = i * width / numberOfThreads;
+            var end = (i + 1) * width / numberOfThreads;
+            for (int x = start; x < end; x++)
             {
-                var aliveNeighbours = GetAliveNeighboursCount(i, j);
-                if (state.Matrix[i, j])
+                for (int y = 0; y < height; y++)
                 {
-                    var isStillAlive = aliveNeighbours == 2 || aliveNeighbours == 3;
-                    newMatrix[i, j] = isStillAlive;
-                }
-                else
-                {
-                    var isBorn = aliveNeighbours == 3;
-                    newMatrix[i, j] = isBorn;
+                    var aliveNeighbours = GetAliveNeighboursCount(x, y, width, height);
+                    if (state.Matrix[x, y])
+                    {
+                        var isStillAlive = aliveNeighbours == 2 || aliveNeighbours == 3;
+                        newMatrix[x, y] = isStillAlive;
+                    }
+                    else
+                    {
+                        var isBorn = aliveNeighbours == 3;
+                        newMatrix[x, y] = isBorn;
+                    }
                 }
             }
-        }
+        });
 
         LoadState(new LifeMatrixEnvironmentState(newMatrix, state.Generation + 1));
     }
@@ -68,12 +87,9 @@ public class LifeMatrixEnvironment(
         return state.Matrix[x, y];
     }
 
-    private int GetAliveNeighboursCount(int x, int y)
+    private int GetAliveNeighboursCount(int x, int y, int width, int height)
     {
         var state = GetState();
-
-        var width = GetWidth();
-        var height = GetHeight();
 
         var aliveNeighbours = 0;
 
