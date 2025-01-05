@@ -3,7 +3,6 @@ using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.Snapshots;
 using PKWat.AgentSimulation.Core.Time;
 
-
 public interface ISimulationAgent
 {
 
