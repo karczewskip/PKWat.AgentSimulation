@@ -29,6 +29,11 @@ public record AgentId
     public static AgentId GenerateNew() => new AgentId(Guid.NewGuid());
 
     public override string ToString() => Id.ToString();
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }
 
 public interface IRecognizableAgent : IEquatable<IRecognizableAgent>

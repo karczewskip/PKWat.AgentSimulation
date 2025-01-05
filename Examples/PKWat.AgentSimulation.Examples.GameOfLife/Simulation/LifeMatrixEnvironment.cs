@@ -1,4 +1,5 @@
 ﻿using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 
 namespace PKWat.AgentSimulation.Examples.GameOfLife.Simulation;
 
@@ -6,15 +7,15 @@ public record LifeMatrixCellState(AgentId AgentId, bool IsAlive);
 
 public record LifeMatrixEnvironmentState(Dictionary<AgentId, (int X, int Y)> AgentsCoordinates, bool[,] Matrix, int Generation);
 
-public class LifeMatrixEnvironment : DefaultSimulationEnvironment<LifeMatrixEnvironmentState>
+public class LifeMatrixEnvironment(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : DefaultSimulationEnvironment<LifeMatrixEnvironmentState>
 {
     public void PlaceAgents(IReadOnlyCollection<AgentId> Agents)
     {
         var agentsCoordinates = new Dictionary<AgentId, (int X, int Y)>();
         for (int i = 0; i < Agents.Count; i++)
         {
-            var x = i / GetWidth();
-            var y = i % GetWidth();
+            var x = i % GetWidth();
+            var y = i / GetWidth();
             agentsCoordinates[Agents.ElementAt(i)] = (x, y);
         }
 
@@ -37,6 +38,7 @@ public class LifeMatrixEnvironment : DefaultSimulationEnvironment<LifeMatrixEnvi
 
     public int GetAliveNeighboursCount(AgentId id)
     {
+        //using var step = simulationCyclePerformanceInfo.AddStep("GetAliveNeighboursCount");
         var state = GetState();
         var coordinates = state.AgentsCoordinates[id];
         var aliveNeighbours = 0;

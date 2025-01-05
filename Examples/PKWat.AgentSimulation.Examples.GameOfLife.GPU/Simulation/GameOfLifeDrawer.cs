@@ -7,8 +7,16 @@ using System.Windows.Media.Imaging;
 
 public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoProvider)
 {
+    private WriteableBitmap _lastWritableBitmap;
+    private DateTime _lastDrawTime = DateTime.MinValue;
+
     public BitmapSource Draw(ISimulationContext<LifeMatrixEnvironment> context)
     {
+        if (_lastWritableBitmap != null && DateTime.Now - _lastDrawTime < TimeSpan.FromMilliseconds(30))
+        {
+            return _lastWritableBitmap;
+        }
+
         var width = context.SimulationEnvironment.GetWidth();
         var height = context.SimulationEnvironment.GetHeight();
         var stride = width * 4;
@@ -45,10 +53,13 @@ public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoPro
 
         using var graphic = Graphics.FromImage(bitmap);
 
-        graphic.DrawString(performanceInfoProvider.GetPerformanceInfo(), new Font("Arial", 8), Brushes.Red, 0, 0);
+        graphic.DrawString(performanceInfoProvider.GetPerformanceInfo(), new Font("Consolas", 8), Brushes.Red, 0, 0);
 
         writableBitmap.AddDirtyRect(new System.Windows.Int32Rect(0, 0, width, height));
         writableBitmap.Unlock();
+
+        _lastWritableBitmap = writableBitmap;
+        _lastDrawTime = DateTime.Now;
 
         return writableBitmap;
     }

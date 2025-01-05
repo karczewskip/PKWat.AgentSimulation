@@ -69,7 +69,7 @@
                     _context.Agents.Remove(agentToRemove.Id);
                 }
 
-                using (_context.PerformanceInfo.AddStep("Environment update"))
+                //using (_context.PerformanceInfo.AddStep("Environment update"))
                 {
                     foreach (var environmentUpdate in _environmentUpdates)
                     {
@@ -85,21 +85,51 @@
                     }
                 }
 
-                using (_context.PerformanceInfo.AddStep("Agents update"))
+                //using (_context.PerformanceInfo.AddStep("Agents update"))
                 {
-                    var numberOfThreads = 8;
-                    var chunkedAgents = _context.Agents.Values.Chunk(numberOfThreads).ToArray();
+                    var agentsCount = _context.Agents.Count;
 
-                    await Parallel.ForEachAsync(
-                        chunkedAgents,
-                        new ParallelOptions() { MaxDegreeOfParallelism = numberOfThreads },
-                        (chunk, c) => new ValueTask(Task.Run(() =>
-                        {
-                            foreach (var agent in chunk)
+                    if(agentsCount > 0)
+                    {
+                        var numberOfThreads = 8;
+                        var chunkSize = agentsCount / numberOfThreads;
+                        var chunkedAgents = _context.Agents.Values.Chunk(chunkSize).ToArray();
+
+                        await Parallel.ForEachAsync(
+                            chunkedAgents,
+                            new ParallelOptions() { MaxDegreeOfParallelism = numberOfThreads },
+                            (chunk, c) => new ValueTask(Task.Run(() =>
                             {
-                                agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
-                            }
-                        })));
+                                using var step = _context.PerformanceInfo.AddStep("Chunk");
+                                foreach (var agent in chunk)
+                                {
+                                    agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
+                                }
+                            })));
+
+                        //var chankedTasks = chunkedAgents.Select(chunk => Task.Run(() =>
+                        //{
+                        //    using var step = _context.PerformanceInfo.AddStep("Chunk");
+                        //    foreach (var agent in chunk)
+                        //    {
+                        //        agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
+                        //    }
+                        //}));
+
+                        //await Task.WhenAll(chankedTasks);
+
+                        //await Task.Run(() =>
+                        //{
+                        //    foreach (var chunk in chunkedAgents)
+                        //    {
+                        //        using var step = _context.PerformanceInfo.AddStep("Chunk");
+                        //        foreach (var agent in chunk)
+                        //        {
+                        //            agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
+                        //        }
+                        //    }
+                        //});
+                    }
                 }
 
                 foreach (var callback in _callbacks)

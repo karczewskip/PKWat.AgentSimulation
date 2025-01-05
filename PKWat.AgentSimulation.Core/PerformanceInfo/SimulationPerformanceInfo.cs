@@ -40,10 +40,14 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
 
     public string GetPerformanceInfo()
     {
-        var fpsLine = $"FPS: {CalculateFpsBasedOnLastCycles(10):F2}";
-        var existingSteps = _currentCycleSteps.ToArray();
-        var calculatedSteps = existingSteps.GroupBy(x => x.Name).Select(x => (Name: x.Key, Avg: x.Select(y => y.Ellapsed.Milliseconds).Average()));
-        var currentStepsInfo = string.Join("\n", calculatedSteps.Select(x => $"{x.Name}: {x.Avg} ms"));
+        var fpsLine = $"FPS: {CalculateFpsBasedOnLastCycles(100000):F2}";
+        var existingSteps = _currentCycleSteps.GroupBy(x => x.Name).ToArray();
+        var calculatedSteps = existingSteps.Select(x => new[] 
+        { 
+            (Name: $"{x.Key}(avg)", Value: x.Select(y => y.Ellapsed.TotalNanoseconds).Average()),
+            (Name: $"{x.Key}(total)", Value: x.Select(y => y.Ellapsed.TotalNanoseconds).Sum()),
+        }).SelectMany(x => x);
+        var currentStepsInfo = string.Join("\n", calculatedSteps.Select(x => $"{x.Name}: {x.Value:F2} ns"));
 
         return string.Join("\n", fpsLine, currentStepsInfo);
     }

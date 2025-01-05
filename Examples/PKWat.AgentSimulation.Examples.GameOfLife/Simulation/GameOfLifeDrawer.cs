@@ -45,7 +45,7 @@ public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoPro
 
         using var graphic = Graphics.FromImage(bitmap);
 
-        graphic.DrawString(performanceInfoProvider.GetPerformanceInfo(), new Font("Arial", 8), Brushes.Red, 0, 0);
+        graphic.DrawString(performanceInfoProvider.GetPerformanceInfo(), new Font("Consolas", 6), Brushes.Red, 0, 0);
 
         writableBitmap.AddDirtyRect(new System.Windows.Int32Rect(0, 0, width, height));
         writableBitmap.Unlock();
