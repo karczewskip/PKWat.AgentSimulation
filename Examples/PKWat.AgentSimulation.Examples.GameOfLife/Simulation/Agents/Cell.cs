@@ -15,18 +15,16 @@ internal class Cell(IRandomNumbersGenerator randomNumbersGenerator, ISimulationC
 
     protected override CellState GetNextState(LifeMatrixEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
-        var step = simulationCyclePerformanceInfo.AddStep("Cell");
+        using var step = simulationCyclePerformanceInfo.AddStep("Cell");
         var aliveNeighbours = environment.GetAliveNeighboursCount(Id);
         if (State.IsAlive)
         {
             var isStillAlive = aliveNeighbours == 2 || aliveNeighbours == 3;
-            step.Stop();
             return new CellState(isStillAlive);
         }
         else
         {
             var isBorn = aliveNeighbours == 3;
-            step.Stop();
             return new CellState(isBorn);
         }
     }

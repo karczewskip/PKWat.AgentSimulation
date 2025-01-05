@@ -4,7 +4,7 @@ namespace PKWat.AgentSimulation.Core.PerformanceInfo;
 
 public interface ISimulationCyclePerformanceInfo
 {
-    SimulationPerformanceInfoStep AddStep(string name);
+    IDisposable AddStep(string name);
     string GetPerformanceInfo();
 }
 
@@ -30,12 +30,12 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
         _cycles.Add(newCycle);
     }
 
-    public SimulationPerformanceInfoStep AddStep(string name)
+    public IDisposable AddStep(string name)
     {
         var newStep = SimulationPerformanceInfoStep.Start(name);
         _currentCycleSteps.Add(newStep);
 
-        return newStep;
+        return new DisposeAfterFinish(() => newStep.Stop());
     }
 
     public string GetPerformanceInfo()
@@ -66,5 +66,18 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
     private static string GetCycleName(int cycleNumber)
     {
         return $"Cycle {cycleNumber}";
+    }
+
+    private class DisposeAfterFinish : IDisposable
+    {
+        private readonly Action _onDispose;
+        public DisposeAfterFinish(Action onDispose)
+        {
+            _onDispose = onDispose;
+        }
+        public void Dispose()
+        {
+            _onDispose();
+        }
     }
 }
