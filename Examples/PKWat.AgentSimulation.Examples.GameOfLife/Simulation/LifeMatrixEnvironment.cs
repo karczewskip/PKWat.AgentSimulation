@@ -1,4 +1,5 @@
 ﻿using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
 
 namespace PKWat.AgentSimulation.Examples.GameOfLife.Simulation;

@@ -1,9 +1,9 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
-using PKWat.AgentSimulation.Core;
 using System.Text.Json;
 using PKWat.AgentSimulation.Extensions;
 using PKWat.AgentSimulation.Core.Time;
+using PKWat.AgentSimulation.Core.Agent;
 
 public class Coordinator : SimulationAgent<AirportEnvironment, CoordinatorState>
 {

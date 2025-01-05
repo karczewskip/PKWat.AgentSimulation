@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using Microsoft.Extensions.DependencyInjection;
+using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Snapshots;
 using System.Reflection;
 

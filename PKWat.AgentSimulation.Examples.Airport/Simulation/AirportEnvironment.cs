@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Agent;
 
 public record AirportEnvironmentState(
     int[] AllLandingLines,

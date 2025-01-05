@@ -2,7 +2,7 @@
 
 using System.Text.Json;
 using System.Threading.Tasks;
-using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Time;
 
 internal record SimulationTimeSnapshot(IReadOnlySimulationTime SimulationTime);

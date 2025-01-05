@@ -1,6 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
-using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Time;
 using PKWat.AgentSimulation.Math.Extensions;
 
