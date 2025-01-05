@@ -69,10 +69,14 @@
                     _context.Agents.Remove(agentToRemove.Id);
                 }
 
+                var step = _context.PerformanceInfo.AddStep("Environment update");
+
                 foreach (var environmentUpdate in _environmentUpdates)
                 {
                     await environmentUpdate(_context);
                 }
+
+                step.Stop();
 
                 foreach (var simulationEvent in _events)
                 {
@@ -82,10 +86,14 @@
                     }
                 }
 
+                step = _context.PerformanceInfo.AddStep("Agents update");
+
                 await Parallel.ForEachAsync(
                     _context.Agents,
-                    new ParallelOptions() { MaxDegreeOfParallelism = 16 },
+                    new ParallelOptions() { MaxDegreeOfParallelism = 4 },
                     (x, c) => new ValueTask(Task.Run(() => x.Value.Act(_context.SimulationEnvironment, _context.SimulationTime))));
+
+                step.Stop();
 
                 foreach (var callback in _callbacks)
                 {

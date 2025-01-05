@@ -40,6 +40,8 @@ public class LifeMatrixEnvironment : DefaultSimulationEnvironment<LifeMatrixEnvi
         var state = GetState();
         var coordinates = state.AgentsCoordinates[id];
         var aliveNeighbours = 0;
+        var width = GetWidth();
+        var height = GetHeight();
         for (int i = coordinates.X - 1; i <= coordinates.X + 1; i++)
         {
             for (int j = coordinates.Y - 1; j <= coordinates.Y + 1; j++)
@@ -48,7 +50,7 @@ public class LifeMatrixEnvironment : DefaultSimulationEnvironment<LifeMatrixEnvi
                 {
                     continue;
                 }
-                if (i >= 0 && i < state.Matrix.GetLength(0) && j >= 0 && j < state.Matrix.GetLength(1) && state.Matrix[i, j])
+                if (i >= 0 && i < width && j >= 0 && j < height && state.Matrix[i, j])
                 {
                     aliveNeighbours++;
                 }

@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core;
 
 using Microsoft.Extensions.DependencyInjection;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 using System.Reflection;
 
 public static class AgentSimulationServiceCollectionExtensions
@@ -10,6 +11,8 @@ public static class AgentSimulationServiceCollectionExtensions
         services.AddSingleton<ISimulationBuilder, SimulationBuilder>();
         services.AddScoped<RandomNumbersGeneratorFactory>();
         services.AddTransient(s => s.GetRequiredService<RandomNumbersGeneratorFactory>().Create());
+        services.AddScoped<SimulationPerformanceInfo>();
+        services.AddScoped<ISimulationCyclePerformanceInfo>(c => c.GetRequiredService<SimulationPerformanceInfo>());
 
         Type[] registeringGenericTypes = [typeof(ISimulationEnvironment), typeof(ISimulationAgent), typeof(ISimulationEvent)];
 

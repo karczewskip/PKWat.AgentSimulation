@@ -1,28 +1,24 @@
-﻿namespace PKWat.AgentSimulation.Core.PerformanceInfo;
+﻿using System.Collections.Concurrent;
 
-public interface IReadOnlySimulationPerformanceInfo
+namespace PKWat.AgentSimulation.Core.PerformanceInfo;
+
+public interface ISimulationCyclePerformanceInfo
 {
+    SimulationPerformanceInfoStep AddStep(string name);
     string GetPerformanceInfo();
 }
 
-public class SimulationPerformanceInfo : IReadOnlySimulationPerformanceInfo
+internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
 {
-    private List<SimulationPerformanceInfoStep> _cycles = new List<SimulationPerformanceInfoStep>();
-    private List<SimulationPerformanceInfoStep> _currentCycleSteps = new List<SimulationPerformanceInfoStep>();
+    private List<SimulationPerformanceInfoStep> _cycles = new();
+    private ConcurrentBag<SimulationPerformanceInfoStep> _currentCycleSteps = new();
 
     private SimulationPerformanceInfoStep? CurrentCycle => _cycles.LastOrDefault();
 
-    private SimulationPerformanceInfo()
+    public void Clear()
     {
-    }
-
-    public static SimulationPerformanceInfo CreateWithFirstCycle()
-    {
-        var performanceInfo = new SimulationPerformanceInfo();
-
-        performanceInfo.StartNewCycle();
-
-        return performanceInfo;
+        _cycles.Clear();
+        _currentCycleSteps.Clear();
     }
 
     public void StartNewCycle()
@@ -45,7 +41,9 @@ public class SimulationPerformanceInfo : IReadOnlySimulationPerformanceInfo
     public string GetPerformanceInfo()
     {
         var fpsLine = $"FPS: {CalculateFpsBasedOnLastCycles(10):F2}";
-        var currentStepsInfo = string.Join("\n", _currentCycleSteps.Select(x => $"{x.Name}: {x.Ellapsed.Milliseconds} ms"));
+        var existingSteps = _currentCycleSteps.ToArray();
+        var calculatedSteps = existingSteps.GroupBy(x => x.Name).Select(x => (Name: x.Key, Avg: x.Select(y => y.Ellapsed.Milliseconds).Average()));
+        var currentStepsInfo = string.Join("\n", calculatedSteps.Select(x => $"{x.Name}: {x.Avg} ms"));
 
         return string.Join("\n", fpsLine, currentStepsInfo);
     }

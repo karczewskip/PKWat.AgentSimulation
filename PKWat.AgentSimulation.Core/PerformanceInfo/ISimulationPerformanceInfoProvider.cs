@@ -2,5 +2,5 @@
 
 public interface ISimulationPerformanceInfoProvider
 {
-    IReadOnlySimulationPerformanceInfo PerformanceInfo { get; }
+    ISimulationCyclePerformanceInfo PerformanceInfo { get; }
 }
