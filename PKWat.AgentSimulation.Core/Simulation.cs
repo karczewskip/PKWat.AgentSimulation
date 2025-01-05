@@ -1,5 +1,8 @@
 ﻿namespace PKWat.AgentSimulation.Core
 {
+    using PKWat.AgentSimulation.Core.Crash;
+    using PKWat.AgentSimulation.Core.Environment;
+    using PKWat.AgentSimulation.Core.Event;
     using PKWat.AgentSimulation.Core.Snapshots;
 
     public interface ISimulation

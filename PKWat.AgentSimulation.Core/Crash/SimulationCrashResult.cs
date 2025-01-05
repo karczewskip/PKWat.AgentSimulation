@@ -1,4 +1,4 @@
-﻿namespace PKWat.AgentSimulation.Core;
+﻿namespace PKWat.AgentSimulation.Core.Crash;
 
 public record SimulationCrashResult(bool IsCrash, string CrashReason)
 {

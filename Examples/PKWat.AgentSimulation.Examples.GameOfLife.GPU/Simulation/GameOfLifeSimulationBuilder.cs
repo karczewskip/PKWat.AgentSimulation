@@ -1,4 +1,5 @@
 ﻿using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Builder;
 using System;
 using System.Collections.Generic;
 using System.Linq;

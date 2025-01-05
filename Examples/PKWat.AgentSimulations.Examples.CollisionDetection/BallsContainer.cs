@@ -1,6 +1,6 @@
 ﻿namespace PKWat.AgentSimulations.Examples.CollisionDetection
 {
-    using PKWat.AgentSimulation.Core;
+    using PKWat.AgentSimulation.Core.Environment;
     using System.Net.Http.Headers;
     using static PKWat.AgentSimulations.Examples.CollisionDetection.BallsContainerState;
 

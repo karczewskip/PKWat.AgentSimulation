@@ -1,4 +1,4 @@
-﻿using PKWat.AgentSimulation.Core;
+﻿using PKWat.AgentSimulation.Core.Environment;
 
 namespace PKWat.AgentSimulation.Examples.LiquidWpf.Simulation
 {

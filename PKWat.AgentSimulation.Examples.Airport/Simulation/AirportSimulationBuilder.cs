@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation
 {
     using PKWat.AgentSimulation.Core;
+    using PKWat.AgentSimulation.Core.Builder;
     using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
     using PKWat.AgentSimulation.Examples.Airport.Simulation.Events;
     using System;

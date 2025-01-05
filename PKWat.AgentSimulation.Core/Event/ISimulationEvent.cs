@@ -1,5 +1,6 @@
-﻿namespace PKWat.AgentSimulation.Core;
-
+﻿namespace PKWat.AgentSimulation.Core.Event;
+using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Environment;
 using System.Threading.Tasks;
 
 public interface ISimulationEvent

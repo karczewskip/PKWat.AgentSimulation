@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.Time;
 using System.Collections.Generic;

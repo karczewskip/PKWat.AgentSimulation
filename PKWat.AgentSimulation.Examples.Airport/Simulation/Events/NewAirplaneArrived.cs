@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Events;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 using System;

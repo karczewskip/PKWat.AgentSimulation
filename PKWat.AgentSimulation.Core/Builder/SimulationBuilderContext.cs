@@ -1,7 +1,10 @@
-﻿namespace PKWat.AgentSimulation.Core;
+﻿namespace PKWat.AgentSimulation.Core.Builder;
 
 using Microsoft.Extensions.DependencyInjection;
+using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.Core.Environment;
+using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Snapshots;
 using System.Reflection;

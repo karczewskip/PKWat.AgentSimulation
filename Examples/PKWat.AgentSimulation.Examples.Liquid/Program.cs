@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Examples.Liquid.Simulation.Environment;
 using PKWat.AgentSimulation.ConsoleApp;
+using PKWat.AgentSimulation.Core.Builder;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 

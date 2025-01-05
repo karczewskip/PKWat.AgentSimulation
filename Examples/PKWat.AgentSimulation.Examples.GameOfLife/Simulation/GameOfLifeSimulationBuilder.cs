@@ -1,5 +1,6 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.Core.Builder;
 using PKWat.AgentSimulation.Examples.GameOfLife.Simulation.Agents;
 using System.Windows.Media.Imaging;
 

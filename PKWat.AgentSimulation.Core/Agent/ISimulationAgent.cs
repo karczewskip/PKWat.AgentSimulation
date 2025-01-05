@@ -1,6 +1,5 @@
 ﻿namespace PKWat.AgentSimulation.Core.Agent;
-using PKWat.AgentSimulation.Core;
-
+using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.Snapshots;
 using PKWat.AgentSimulation.Core.Time;
 

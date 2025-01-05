@@ -1,6 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
-using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Extensions;
 using System.Collections.Generic;
 

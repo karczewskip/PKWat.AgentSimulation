@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.LiquidWpf.Simulation
 {
     using PKWat.AgentSimulation.Core;
+    using PKWat.AgentSimulation.Core.Builder;
     using System;
     using System.Threading.Tasks;
     using System.Windows.Media.Imaging;

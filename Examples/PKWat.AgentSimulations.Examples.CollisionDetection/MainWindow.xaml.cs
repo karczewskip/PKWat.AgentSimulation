@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulations.Examples.CollisionDetection;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.Builder;
 using System.Windows;
 
 /// <summary>

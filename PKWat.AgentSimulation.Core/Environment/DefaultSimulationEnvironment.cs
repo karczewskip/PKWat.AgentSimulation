@@ -1,16 +1,6 @@
-﻿namespace PKWat.AgentSimulation.Core
+﻿namespace PKWat.AgentSimulation.Core.Environment
 {
-    using PKWat.AgentSimulation.Core.Snapshots;
-
-    public interface ISimulationEnvironment
-    {
-        SimulationCrashResult CheckCrashConditions();
-    }
-
-    public interface ISimulationEnvironment<SIMULATION_STATE> : ISimulationEnvironment, ISnapshotCreator
-    {
-        void LoadState(SIMULATION_STATE state);
-    }
+    using PKWat.AgentSimulation.Core.Crash;
 
     public abstract class DefaultSimulationEnvironment<SIMULATION_STATE> : ISimulationEnvironment<SIMULATION_STATE>
     {
