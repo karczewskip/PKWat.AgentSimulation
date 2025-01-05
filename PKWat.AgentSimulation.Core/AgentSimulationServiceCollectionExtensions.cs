@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
+using PKWat.AgentSimulation.Core.RandomNumbers;
 using System.Reflection;
 
 public static class AgentSimulationServiceCollectionExtensions

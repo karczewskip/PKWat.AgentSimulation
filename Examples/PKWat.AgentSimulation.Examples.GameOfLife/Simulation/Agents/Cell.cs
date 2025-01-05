@@ -1,8 +1,8 @@
 ﻿namespace PKWat.AgentSimulation.Examples.GameOfLife.Simulation.Agents;
 
-using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
+using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Time;
 
 public record CellState(bool IsAlive);

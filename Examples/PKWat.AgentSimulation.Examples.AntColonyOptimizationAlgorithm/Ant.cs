@@ -1,7 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
-using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Time;
 using System;
 

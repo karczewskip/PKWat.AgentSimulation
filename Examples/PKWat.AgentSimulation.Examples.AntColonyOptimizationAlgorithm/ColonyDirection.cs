@@ -1,6 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
-using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.RandomNumbers;
 using System;
 
 public record ColonyDirection(int X, int Y)
