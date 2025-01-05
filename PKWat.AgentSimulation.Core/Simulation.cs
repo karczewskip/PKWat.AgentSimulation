@@ -109,29 +109,6 @@
                                     agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
                                 }
                             })));
-
-                        //var chankedTasks = chunkedAgents.Select(chunk => Task.Run(() =>
-                        //{
-                        //    using var step = _context.PerformanceInfo.AddStep("Chunk");
-                        //    foreach (var agent in chunk)
-                        //    {
-                        //        agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
-                        //    }
-                        //}));
-
-                        //await Task.WhenAll(chankedTasks);
-
-                        //await Task.Run(() =>
-                        //{
-                        //    foreach (var chunk in chunkedAgents)
-                        //    {
-                        //        using var step = _context.PerformanceInfo.AddStep("Chunk");
-                        //        foreach (var agent in chunk)
-                        //        {
-                        //            agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
-                        //        }
-                        //    }
-                        //});
                     }
                 }
 

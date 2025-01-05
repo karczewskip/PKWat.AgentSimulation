@@ -62,6 +62,8 @@ public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoPro
         _lastWritableBitmap = writableBitmap;
         _lastDrawTime = DateTime.Now;
 
+        writableBitmap.Freeze();
+
         return writableBitmap;
     }
 

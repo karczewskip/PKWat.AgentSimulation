@@ -1,15 +1,6 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU
 {
@@ -39,10 +30,10 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU
             _simulation = _simulationBuilder.Build(bitmapSource =>
             {
                 if(counter++ % 1 == 0)
-                    simulationImage.Source = bitmapSource;
-            }, 1000, 1000);
+                    Dispatcher.Invoke(() => simulationImage.Source = bitmapSource);
+            }, 400, 400);
 
-            _simulation.StartAsync();
+            await Task.Run(async () => await _simulation.StartAsync());
         }
 
         private async void stopSimulationButton_Click(object sender, RoutedEventArgs e)
