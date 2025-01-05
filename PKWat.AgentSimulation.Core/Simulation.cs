@@ -87,10 +87,19 @@
 
                 using (_context.PerformanceInfo.AddStep("Agents update"))
                 {
+                    var numberOfThreads = 8;
+                    var chunkedAgents = _context.Agents.Values.Chunk(numberOfThreads).ToArray();
+
                     await Parallel.ForEachAsync(
-                        _context.Agents,
-                        new ParallelOptions() { MaxDegreeOfParallelism = 4 },
-                        (x, c) => new ValueTask(Task.Run(() => x.Value.Act(_context.SimulationEnvironment, _context.SimulationTime))));
+                        chunkedAgents,
+                        new ParallelOptions() { MaxDegreeOfParallelism = numberOfThreads },
+                        (chunk, c) => new ValueTask(Task.Run(() =>
+                        {
+                            foreach (var agent in chunk)
+                            {
+                                agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
+                            }
+                        })));
                 }
 
                 foreach (var callback in _callbacks)

@@ -5,15 +5,8 @@ using PKWat.AgentSimulation.Core.PerformanceInfo;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 
-public class GameOfLifeDrawer
+public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoProvider)
 {
-    private readonly ISimulationCyclePerformanceInfo _performanceInfoProvider;
-
-    public GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoProvider)
-    {
-        _performanceInfoProvider = performanceInfoProvider;
-    }
-
     public BitmapSource Draw(ISimulationContext<LifeMatrixEnvironment> context)
     {
         var width = context.SimulationEnvironment.GetWidth();
@@ -52,7 +45,7 @@ public class GameOfLifeDrawer
 
         using var graphic = Graphics.FromImage(bitmap);
 
-        graphic.DrawString(_performanceInfoProvider.GetPerformanceInfo(), new Font("Arial", 8), Brushes.Red, 0, 0);
+        graphic.DrawString(performanceInfoProvider.GetPerformanceInfo(), new Font("Arial", 8), Brushes.Red, 0, 0);
 
         writableBitmap.AddDirtyRect(new System.Windows.Int32Rect(0, 0, width, height));
         writableBitmap.Unlock();
