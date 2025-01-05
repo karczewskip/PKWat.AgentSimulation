@@ -19,6 +19,7 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU
     public partial class MainWindow : Window
     {
         private ISimulation _simulation;
+        private int counter = 0;
 
         private readonly GameOfLifeSimulationBuilder _simulationBuilder;
 
@@ -35,7 +36,11 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU
             {
                 await _simulation.StopAsync();
             }
-            _simulation = _simulationBuilder.Build(bitmapSource => simulationImage.Source = bitmapSource, 1000, 1000);
+            _simulation = _simulationBuilder.Build(bitmapSource =>
+            {
+                if(counter++ % 1 == 0)
+                    simulationImage.Source = bitmapSource;
+            }, 1000, 1000);
 
             _simulation.StartAsync();
         }
