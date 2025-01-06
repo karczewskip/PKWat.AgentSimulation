@@ -51,7 +51,7 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
         var calculatedSteps = existingSteps.Select(x => new[] 
         { 
             (Name: $"{x.Key}(avg)", Value: x.Select(y => y.Ellapsed.TotalNanoseconds).Average()),
-            (Name: $"{x.Key}(total)", Value: x.Select(y => y.Ellapsed.TotalNanoseconds).Sum()),
+            //(Name: $"{x.Key}(total)", Value: x.Select(y => y.Ellapsed.TotalNanoseconds).Sum()),
         }).SelectMany(x => x);
         var currentStepsInfo = string.Join("\n", calculatedSteps.Select(x => $"{x.Name}: {x.Value:F2} ns"));
 

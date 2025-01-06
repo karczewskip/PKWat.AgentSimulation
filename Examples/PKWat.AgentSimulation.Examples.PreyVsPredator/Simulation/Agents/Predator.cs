@@ -31,8 +31,6 @@ public record PredatorState(MovingDirection MovingDirection, HealthStatus Health
 internal class Predator(IRandomNumbersGenerator randomNumbersGenerator) :
     SimulationAgent<PreyVsPredatorEnvironment, PredatorState>
 {
-    private readonly MovingDirection[] possibleDirections = [MovingDirection.Up, MovingDirection.Down, MovingDirection.Left, MovingDirection.Right];
-
     protected override PredatorState GetInitialState(PreyVsPredatorEnvironment environment)
     {
         return PredatorState.NewBorn();
@@ -40,11 +38,7 @@ internal class Predator(IRandomNumbersGenerator randomNumbersGenerator) :
 
     protected override PredatorState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
-        var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
-        return State with
-        {
-            MovingDirection = newDirection
-        };
+        return State;
     }
 
     internal HealthStatus DecreaseHealth(double starvationIncrement)

@@ -3,12 +3,13 @@
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Event;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class BornNewPreyers : ISimulationEvent<PreyVsPredatorEnvironment>
+internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationEvent<PreyVsPredatorEnvironment>
 {
     private double pregnancyUpdate = 0.001;
 
@@ -19,6 +20,7 @@ internal class BornNewPreyers : ISimulationEvent<PreyVsPredatorEnvironment>
 
     public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
     {
+        using var _ = simulationCyclePerformanceInfo.AddStep("Born new preyers");
         var newBornPreyersWithParents = new List<(AgentId NewBorn, AgentId Parent)>();
         var allPreys = context.GetAgents<Prey>().ToArray();
 

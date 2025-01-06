@@ -1,9 +1,8 @@
-﻿namespace PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents; 
+﻿namespace PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Time;
-using System;
 
 public record PregnancyStatus(double Progress = 0)
 {
@@ -31,8 +30,6 @@ public record PreyState(MovingDirection MovingDirection, PregnancyStatus Pregnan
 internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
     SimulationAgent<PreyVsPredatorEnvironment, PreyState>
 {
-    private readonly MovingDirection[] possibleDirections = [MovingDirection.Up, MovingDirection.Down, MovingDirection.Left, MovingDirection.Right];
-
     protected override PreyState GetInitialState(PreyVsPredatorEnvironment environment)
     {
         return PreyState.NewBorn();
@@ -40,11 +37,7 @@ internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
 
     protected override PreyState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
-        var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
-        return State with
-        {
-            MovingDirection = newDirection
-        };
+        return State;
     }
 
     internal void ResetAfterLabour()
