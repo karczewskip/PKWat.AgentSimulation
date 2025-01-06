@@ -41,12 +41,22 @@ internal class Predator(IRandomNumbersGenerator randomNumbersGenerator) :
     protected override PredatorState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
-        var newHealth = State.Health.DecreaseHealth(0.0008);
         return State with
         {
-            MovingDirection = newDirection,
-            Health = newHealth
+            MovingDirection = newDirection
         };
+    }
+
+    internal HealthStatus DecreaseHealth(double starvationIncrement)
+    {
+        var newHealth = State.Health.DecreaseHealth(starvationIncrement);
+        SetState(
+            State with
+            {
+                Health = newHealth
+            });
+
+        return newHealth;
     }
 
     internal void ResetAfterEaten()

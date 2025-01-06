@@ -41,12 +41,9 @@ internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
     protected override PreyState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
-        var pregnancyUpdate = environment.AnotherPrey(Id) ? 0 : 0.001;
-        var newPregnancy = State.Pregnancy.UpdateProgress(pregnancyUpdate);
         return State with
         {
-            MovingDirection = newDirection,
-            Pregnancy = newPregnancy
+            MovingDirection = newDirection
         };
     }
 
@@ -57,5 +54,17 @@ internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
             {
                 Pregnancy = PregnancyStatus.StartPregnancy()
             });
+    }
+
+    internal PregnancyStatus UpdatePregnancy(double pregnancyUpdate)
+    {
+        var newPregnancy = State.Pregnancy.UpdateProgress(pregnancyUpdate);
+        SetState(
+            State with
+            {
+                Pregnancy = newPregnancy
+            });
+
+        return newPregnancy;
     }
 }

@@ -3,14 +3,30 @@
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
-using System.Linq;
 using System.Threading.Tasks;
 
-internal class PredatorsDied : ISimulationEvent<PreyVsPredatorEnvironment>
+internal class PredatorsStarved : ISimulationEvent<PreyVsPredatorEnvironment>
 {
+    private double starvationIncrement = 0.0008;
+
+    public void ChangeStarvationIncrement(double newIncrement)
+    {
+        starvationIncrement = newIncrement;
+    }
+
     public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
     {
-        var deadPredators = context.GetAgents<Predator>().Where(x => x.State.Health.Died).ToArray();
+        var deadPredators = new List<Predator>();
+        var allPredators = context.GetAgents<Predator>();
+        foreach (var predator in allPredators)
+        {
+            var newHealth = predator.DecreaseHealth(starvationIncrement);
+            if (newHealth.Died)
+            {
+                deadPredators.Add(predator);
+            }
+        }
+
         foreach (var predator in deadPredators)
         {
             context.SimulationEnvironment.RemovePredator(predator.Id);

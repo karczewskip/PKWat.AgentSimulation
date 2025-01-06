@@ -10,17 +10,33 @@ using System.Threading.Tasks;
 
 internal class BornNewPreyers : ISimulationEvent<PreyVsPredatorEnvironment>
 {
+    private double pregnancyUpdate = 0.001;
+
+    public void ChangePregnancyUpdate(double newPregnancyUpdate)
+    {
+        pregnancyUpdate = newPregnancyUpdate;
+    }
+
     public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
     {
         var newBornPreyersWithParents = new List<(AgentId NewBorn, AgentId Parent)>();
-        var preysInLabor = context.GetAgents<Prey>().Where(x => x.State.Pregnancy.InLabour).ToArray();
+        var allPreys = context.GetAgents<Prey>().ToArray();
 
-        foreach (var prey in preysInLabor)
+        foreach (var prey in allPreys)
         {
-            var newBornPrey = context.AddAgent<Prey>();
-            newBornPreyersWithParents.Add((newBornPrey.Id, prey.Id));
+            if(context.SimulationEnvironment.AnotherPrey(prey.Id))
+            {
+                continue;
+            }
 
-            prey.ResetAfterLabour();
+            var newPregnancy = prey.UpdatePregnancy(pregnancyUpdate);
+            if (newPregnancy.InLabour)
+            {
+                var newBornPrey = context.AddAgent<Prey>();
+                newBornPreyersWithParents.Add((newBornPrey.Id, prey.Id));
+
+                prey.ResetAfterLabour();
+            }
         }
 
         context.SimulationEnvironment.PlaceNewBornPreys(newBornPreyersWithParents);

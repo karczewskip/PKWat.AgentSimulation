@@ -30,7 +30,7 @@
                 .CreateNewSimulation<AirportEnvironment, AirportEnvironmentState>(
                     AirportEnvironmentState.CreateUsingNumberOfLandingLines(5))
                 .AddAgent<Coordinator>()
-                .AddEventWithInitialization<NewAirplaneArrived>(e => e.Initialize(10.0, 30))
+                .AddEvent<NewAirplaneArrived>(e => e.Initialize(10.0, 30))
                 .AddEnvironmentUpdates(UpdateAskingForLand)
                 .AddEnvironmentUpdates(UpdateLandingAirplane)
                 .AddEnvironmentUpdates(UpdateAllowedForLand)
