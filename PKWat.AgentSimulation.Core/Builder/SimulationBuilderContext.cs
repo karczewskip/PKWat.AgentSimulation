@@ -37,7 +37,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _environmentUpdates = new();
     private Func<ISimulationContext<ENVIRONMENT>, Task> _environmentInitilization = async c => { };
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _callbacks = new();
-    private TimeSpan _simulationStep = TimeSpan.FromSeconds(1);
+    private TimeSpan _simulationStep = TimeSpan.Zero;
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
     private bool _doSnapshot = false;

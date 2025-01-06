@@ -20,7 +20,6 @@ public class GameOfLifeSimulationBuilder(ISimulationBuilder simulationBuilder, G
             .AddEnvironmentUpdates(c => UpdateMatrix(c))
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
             .Build();
 
         return simulation;

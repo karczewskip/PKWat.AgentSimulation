@@ -40,6 +40,7 @@
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
                 .SetRandomSeed(100)
+                .WithSnapshots()
                 .Build();
 
             return simulation;
