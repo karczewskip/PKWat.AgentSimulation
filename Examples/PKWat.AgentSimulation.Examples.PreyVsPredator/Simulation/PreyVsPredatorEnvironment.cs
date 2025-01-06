@@ -201,4 +201,16 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
 
         return eatenPrey;
     }
+
+    internal void RemovePredator(AgentId id)
+    {
+        var state = GetState();
+        var coordinates = state.AgentCoordinates[id];
+        state.Predators[(coordinates.X, coordinates.Y)].Remove(id);
+        state.AgentCoordinates.Remove(id);
+        if (state.Predators[(coordinates.X, coordinates.Y)].Any() == false)
+        {
+            state.Predators.Remove((coordinates.X, coordinates.Y));
+        }
+    }
 }

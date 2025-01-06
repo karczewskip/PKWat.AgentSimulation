@@ -22,6 +22,7 @@ public class PreyVsPredatorSimulationBuilder(
                 c.SimulationEnvironment.PlaceInitialPreys(c.GetAgents<Prey>().Select(x => x.Id).ToArray());
                 c.SimulationEnvironment.PlaceInitialPredators(c.GetAgents<Predator>().Select(x => x.Id).ToArray());
             })
+            .AddEvent<PredatorsDied>()
             .AddEvent<MovedPreyers>()
             .AddEvent<MovedPredators>()
             .AddEvent<BornNewPreyers>()

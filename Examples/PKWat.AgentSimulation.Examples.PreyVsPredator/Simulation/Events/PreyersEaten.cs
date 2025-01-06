@@ -22,6 +22,8 @@ internal class PreyersEaten : ISimulationEvent<PreyVsPredatorEnvironment>
 
                 var newBornPredator = context.AddAgent<Predator>();
                 newBornPredators.Add((newBornPredator.Id, predator.Id));
+
+                predator.ResetAfterEaten();
             }
         }
 

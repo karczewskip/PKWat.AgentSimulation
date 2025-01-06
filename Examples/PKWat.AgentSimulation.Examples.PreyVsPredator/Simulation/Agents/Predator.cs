@@ -3,21 +3,23 @@
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Time;
+using System;
 
-public record HealthStatus(double Health = 1, bool Died = false)
+public record HealthStatus(double Health = 1)
 {
+    public bool Died => Health <= 0;
+
     public HealthStatus DecreaseHealth(double substractingHealth)
     {
         var newHealth = Health - substractingHealth;
 
         return new HealthStatus(
-            Health: newHealth, 
-            Died: newHealth <= 0);
+            Health: newHealth);
     }
 
     public HealthStatus Recover()
     {
-        return new HealthStatus(Health: 1, Died: false);
+        return new HealthStatus(Health: 1);
     }
 }
 
@@ -39,11 +41,20 @@ internal class Predator(IRandomNumbersGenerator randomNumbersGenerator) :
     protected override PredatorState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
-        var newHealth = State.Health.DecreaseHealth(0.1);
+        var newHealth = State.Health.DecreaseHealth(0.0008);
         return State with
         {
             MovingDirection = newDirection,
             Health = newHealth
         };
+    }
+
+    internal void ResetAfterEaten()
+    {
+        SetState(
+            State with
+            {
+                Health = State.Health.Recover()
+            });
     }
 }
