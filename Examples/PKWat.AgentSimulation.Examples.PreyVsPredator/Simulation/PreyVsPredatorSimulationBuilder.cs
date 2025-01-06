@@ -22,9 +22,10 @@ public class PreyVsPredatorSimulationBuilder(
                 c.SimulationEnvironment.PlaceInitialPreys(c.GetAgents<Prey>().Select(x => x.Id).ToArray());
                 c.SimulationEnvironment.PlaceInitialPredators(c.GetAgents<Predator>().Select(x => x.Id).ToArray());
             })
-            .AddEnvironmentUpdates(async c 
-                => c.SimulationEnvironment.MovePreys(c.GetAgents<Prey>().Select(x => (x.Id, x.State.MovingDirection))))
+            .AddEvent<MovedPreyers>()
+            .AddEvent<MovedPredators>()
             .AddEvent<BornNewPreyers>()
+            .AddEvent<PreyersEaten>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)
             .Build();

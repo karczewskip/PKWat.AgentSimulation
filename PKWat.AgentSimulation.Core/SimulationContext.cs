@@ -12,6 +12,7 @@ public interface ISimulationContext<ENVIRONMENT> : ISimulationTimeProvider, ISim
     ENVIRONMENT SimulationEnvironment { get; }
 
     AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    void RemoveAgent(AgentId agentId);
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>;
@@ -76,5 +77,10 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
         Agents.Add(agent.Id, agent);
 
         return agent;
+    }
+
+    public void RemoveAgent(AgentId agentId)
+    {
+        Agents.Remove(agentId);
     }
 }

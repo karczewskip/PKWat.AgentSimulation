@@ -66,6 +66,18 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
         }
     }
 
+    internal void PlaceNewBornPredators(IEnumerable<(AgentId NewBorn, AgentId Parent)> newBornPredators)
+    {
+        foreach (var newBornPredator in newBornPredators)
+        {
+            var parentCoordinates = GetState().AgentCoordinates[newBornPredator.Parent];
+            var x = parentCoordinates.X;
+            var y = parentCoordinates.Y;
+            GetState().AgentCoordinates[newBornPredator.NewBorn] = (x, y);
+            GetState().Predators[(x, y)].Add(newBornPredator.NewBorn);
+        }
+    }
+
     public void MovePreys(IEnumerable<(AgentId Id, MovingDirection Direction)> preysDirections)
     {
         var state = GetState();
@@ -88,6 +100,31 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
         foreach(var preysCoordinates in state.Preys.Where(x => x.Value.Any() == false).Select(x => x.Key))
         {
             state.Preys.Remove(preysCoordinates);
+        }
+    }
+
+    public void MovePredators(IEnumerable<(AgentId Id, MovingDirection Direction)> predatorsDirections)
+    {
+        var state = GetState();
+
+        foreach (var id in predatorsDirections)
+        {
+            var (x, y) = state.AgentCoordinates[id.Id];
+            var (newX, newY) = GetNewCoordinates(x, y, id.Direction);
+            if (x == newX && y == newY)
+            {
+                continue;
+            }
+
+            state.Predators[(x, y)].Remove(id.Id);
+            state.AgentCoordinates[id.Id] = (newX, newY);
+            state.Predators.TryAdd((newX, newY), new HashSet<AgentId>());
+            state.Predators[(newX, newY)].Add(id.Id);
+        }
+
+        foreach (var predatorsCoordinates in state.Predators.Where(x => x.Value.Any() == false).Select(x => x.Key))
+        {
+            state.Predators.Remove(predatorsCoordinates);
         }
     }
 
@@ -140,5 +177,28 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
         var state = GetState();
         var coordinates = state.AgentCoordinates[id];
         return state.Preys[(coordinates.X, coordinates.Y)].Count > 1;
+    }
+
+    internal AgentId? EatPreyByPredator(AgentId id)
+    {
+        var state = GetState();
+        var coordinates = state.AgentCoordinates[id];
+
+        if(state.Preys.ContainsKey((coordinates.X, coordinates.Y)) == false)
+        {
+            return null;
+        }
+
+        var preys = state.Preys[(coordinates.X, coordinates.Y)];
+        var eatenPrey = preys.First();
+        preys.Remove(eatenPrey);
+        state.AgentCoordinates.Remove(eatenPrey);
+
+        if(preys.Any() == false)
+        {
+            state.Preys.Remove((coordinates.X, coordinates.Y));
+        }
+
+        return eatenPrey;
     }
 }
