@@ -22,7 +22,6 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
     private readonly IServiceProvider _serviceProvider;
     private readonly TimeSpan _simulationStep;
 
-    private bool _anyCycleStarted = false;
     private SimulationTime _simulationTime;
     private SimulationPerformanceInfo _performanceInfo;
 
@@ -57,27 +56,17 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
     public AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>
         => (AGENT)Agents[agentId];
 
-    internal void UpdateSimulationTime()
+    internal void StartCycleZero()
     {
-        _simulationTime = _simulationTime.AddStep();
+        _performanceInfo = _serviceProvider.GetRequiredService<SimulationPerformanceInfo>();
+        _performanceInfo.Clear();
+        _simulationTime = new SimulationTime(TimeSpan.Zero, _simulationStep);
     }
 
     internal void StartNewCycle()
     {
-        if (_anyCycleStarted)
-        {
-            _simulationTime = _simulationTime.AddStep();
-        }
-        else
-        {
-            _anyCycleStarted = true;
-            _performanceInfo = _serviceProvider.GetRequiredService<SimulationPerformanceInfo>();
-            _performanceInfo.Clear();
-            _simulationTime = new SimulationTime(TimeSpan.Zero, _simulationStep);
-        }
-
+        _simulationTime = _simulationTime.AddStep();
         _performanceInfo.StartNewCycle();
-
     }
 
     public AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>

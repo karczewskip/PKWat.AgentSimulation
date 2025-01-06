@@ -57,6 +57,8 @@
 
             _snapshotStore.CleanExistingSnapshots();
 
+            _context.StartCycleZero();
+
             while (Running)
             {
                 await _snapshotStore.SaveSnapshotAsync(
@@ -95,7 +97,7 @@
                     if(agentsCount > 0)
                     {
                         var numberOfThreads = 8;
-                        var chunkSize = agentsCount / numberOfThreads;
+                        var chunkSize = 1 + (agentsCount - 1) / numberOfThreads;
                         var chunkedAgents = _context.Agents.Values.Chunk(chunkSize).ToArray();
 
                         await Parallel.ForEachAsync(
