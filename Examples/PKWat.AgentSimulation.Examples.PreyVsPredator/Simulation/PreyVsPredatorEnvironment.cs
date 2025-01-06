@@ -40,6 +40,18 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
         }
     }
 
+    public void PlaceNewBornPreys(IEnumerable<(AgentId NewBorn, AgentId Parent)> newBornPreys)
+    {
+        foreach (var newBornPrey in newBornPreys)
+        {
+            var parentCoordinates = GetState().AgentCoordinates[newBornPrey.Parent];
+            var x = parentCoordinates.X;
+            var y = parentCoordinates.Y;
+            GetState().AgentCoordinates[newBornPrey.NewBorn] = (x, y);
+            GetState().Preys[(x, y)].Add(newBornPrey.NewBorn);
+        }
+    }
+
     public void PlaceInitialPredators(IEnumerable<AgentId> agentIds)
     {
         var width = GetState().Width;
@@ -121,5 +133,12 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
     internal bool IsPreyAt(int i, int j)
     {
         return GetState().Preys.ContainsKey((i, j));
+    }
+
+    internal bool AnotherPrey(AgentId id)
+    {
+        var state = GetState();
+        var coordinates = state.AgentCoordinates[id];
+        return state.Preys[(coordinates.X, coordinates.Y)].Count > 1;
     }
 }

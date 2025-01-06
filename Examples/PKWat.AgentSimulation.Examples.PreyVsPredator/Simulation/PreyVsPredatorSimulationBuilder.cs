@@ -3,6 +3,7 @@
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Builder;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
+using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Events;
 using System.Windows.Media.Imaging;
 
 public class PreyVsPredatorSimulationBuilder(
@@ -23,6 +24,7 @@ public class PreyVsPredatorSimulationBuilder(
             })
             .AddEnvironmentUpdates(async c 
                 => c.SimulationEnvironment.MovePreys(c.GetAgents<Prey>().Select(x => (x.Id, x.State.MovingDirection))))
+            .AddEvent<BornNewPreyers>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)
             .Build();

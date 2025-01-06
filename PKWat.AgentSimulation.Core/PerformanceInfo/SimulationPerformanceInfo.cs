@@ -10,6 +10,8 @@ public interface ISimulationCyclePerformanceInfo
 
 internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
 {
+    private const int MaxCycleNumbers = 1000;
+
     private List<SimulationPerformanceInfoStep> _cycles = new();
     private ConcurrentBag<SimulationPerformanceInfoStep> _currentCycleSteps = new();
 
@@ -28,6 +30,10 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
 
         var newCycle = SimulationPerformanceInfoStep.Start(GetCycleName(_cycles.Count + 1));
         _cycles.Add(newCycle);
+        if(_cycles.Count > MaxCycleNumbers)
+        {
+            _cycles.RemoveAt(0);
+        }
     }
 
     public IDisposable AddStep(string name)
@@ -40,7 +46,7 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
 
     public string GetPerformanceInfo()
     {
-        var fpsLine = $"FPS: {CalculateFpsBasedOnLastCycles(100000):F2}";
+        var fpsLine = $"FPS: {CalculateFpsBasedOnLastCycles():F2}";
         var existingSteps = _currentCycleSteps.GroupBy(x => x.Name).ToArray();
         var calculatedSteps = existingSteps.Select(x => new[] 
         { 
@@ -52,9 +58,9 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
         return string.Join("\n", fpsLine, currentStepsInfo);
     }
 
-    private double CalculateFpsBasedOnLastCycles(int numberOfCycles)
+    private double CalculateFpsBasedOnLastCycles()
     {
-        var usingCycles = _cycles.SkipLast(1).TakeLast(numberOfCycles).ToArray();
+        var usingCycles = _cycles.SkipLast(1).ToArray();
 
         if(usingCycles.Length == 0)
         {

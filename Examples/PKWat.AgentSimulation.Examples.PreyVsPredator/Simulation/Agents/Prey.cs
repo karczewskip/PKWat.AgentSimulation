@@ -3,23 +3,29 @@
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Time;
+using System;
 
-public record PregnancyStatus(double Progress = 0, bool InLabour = false)
+public record PregnancyStatus(double Progress = 0)
 {
+    public bool InLabour => Progress >= 1;
+
     public PregnancyStatus UpdateProgress(double addingProgress)
     {
         var newProgress = Progress + addingProgress;
-        var InLabour = newProgress >= 1;
 
         return new PregnancyStatus(
-            Progress: newProgress > 1 ? 1 : newProgress, 
-            InLabour: InLabour);
+            Progress: newProgress > 1 ? 1 : newProgress);
+    }
+
+    public static PregnancyStatus StartPregnancy()
+    {
+        return new PregnancyStatus();
     }
 }
 
 public record PreyState(MovingDirection MovingDirection, PregnancyStatus Pregnancy)
 {
-    public static PreyState NewBorn() => new PreyState(MovingDirection.None, new PregnancyStatus());
+    public static PreyState NewBorn() => new PreyState(MovingDirection.None, PregnancyStatus.StartPregnancy());
 }
 
 internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
@@ -35,11 +41,21 @@ internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
     protected override PreyState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
     {
         var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
-        var newPregnancy = State.Pregnancy.UpdateProgress(0.1);
+        var pregnancyUpdate = environment.AnotherPrey(Id) ? 0 : 0.001;
+        var newPregnancy = State.Pregnancy.UpdateProgress(pregnancyUpdate);
         return State with
         {
             MovingDirection = newDirection,
             Pregnancy = newPregnancy
         };
+    }
+
+    internal void ResetAfterLabour()
+    {
+        SetState(
+            State with
+            {
+                Pregnancy = PregnancyStatus.StartPregnancy()
+            });
     }
 }
