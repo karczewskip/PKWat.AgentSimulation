@@ -1,12 +1,12 @@
-﻿namespace PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Events;
+﻿namespace PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Stages;
 
 using PKWat.AgentSimulation.Core;
-using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
+using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using System.Threading.Tasks;
 
-internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationEvent<PreyVsPredatorEnvironment>
+internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage<PreyVsPredatorEnvironment>
 {
     private double starvationIncrement = 0.0008;
 
@@ -34,10 +34,5 @@ internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCycleP
             context.SimulationEnvironment.RemovePredator(predator.Id);
             context.RemoveAgent(predator.Id);
         }
-    }
-
-    public async Task<bool> ShouldBeExecuted(ISimulationContext<PreyVsPredatorEnvironment> context)
-    {
-        return true;
     }
 }

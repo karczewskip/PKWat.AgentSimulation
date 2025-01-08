@@ -1,15 +1,15 @@
-﻿namespace PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Events;
+﻿namespace PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Stages;
 
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
-using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
+using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationEvent<PreyVsPredatorEnvironment>
+internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage<PreyVsPredatorEnvironment>
 {
     private double pregnancyUpdate = 0.001;
 
@@ -26,7 +26,7 @@ internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePer
 
         foreach (var prey in allPreys)
         {
-            if(context.SimulationEnvironment.AnotherPrey(prey.Id))
+            if (context.SimulationEnvironment.AnotherPrey(prey.Id))
             {
                 continue;
             }
@@ -42,10 +42,5 @@ internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePer
         }
 
         context.SimulationEnvironment.PlaceNewBornPreys(newBornPreyersWithParents);
-    }
-
-    public async Task<bool> ShouldBeExecuted(ISimulationContext<PreyVsPredatorEnvironment> context)
-    {
-        return true;
     }
 }
