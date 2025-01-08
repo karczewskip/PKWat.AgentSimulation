@@ -31,8 +31,8 @@ internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePer
                 continue;
             }
 
-            var newPregnancy = prey.UpdatePregnancy(pregnancyUpdate);
-            if (newPregnancy.InLabour)
+            prey.UpdatePregnancy(pregnancyUpdate);
+            if (prey.IsInLabour)
             {
                 var newBornPrey = context.AddAgent<Prey>();
                 newBornPreyersWithParents.Add((newBornPrey.Id, prey.Id));

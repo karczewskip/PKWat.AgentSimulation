@@ -2,62 +2,55 @@
 
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.RandomNumbers;
-using PKWat.AgentSimulation.Core.Time;
 
-public record PregnancyStatus(double Progress = 0)
+public class PregnancyStatus
 {
+    public double Progress { get; private set; }
+
     public bool InLabour => Progress >= 1;
 
-    public PregnancyStatus UpdateProgress(double addingProgress)
+    private PregnancyStatus(double initialValue)
+    {
+        Progress = initialValue;
+    }
+
+    public void UpdateProgress(double addingProgress)
     {
         var newProgress = Progress + addingProgress;
 
-        return new PregnancyStatus(
-            Progress: newProgress > 1 ? 1 : newProgress);
+        if (newProgress > 1)
+        {
+            newProgress = 1;
+        }
+
+        Progress = newProgress;
+    }
+
+    public void Reset()
+    {
+        Progress = 0;
     }
 
     public static PregnancyStatus StartPregnancy()
     {
-        return new PregnancyStatus();
+        return new PregnancyStatus(initialValue: 0);
     }
-}
-
-public record PreyState(MovingDirection MovingDirection, PregnancyStatus Pregnancy)
-{
-    public static PreyState NewBorn() => new PreyState(MovingDirection.None, PregnancyStatus.StartPregnancy());
 }
 
 internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
-    SimulationAgent<PreyVsPredatorEnvironment, PreyState>
+    SimpleSimulationAgent<PreyVsPredatorEnvironment>
 {
-    protected override PreyState GetInitialState(PreyVsPredatorEnvironment environment)
-    {
-        return PreyState.NewBorn();
-    }
+    private PregnancyStatus _pregnancy = PregnancyStatus.StartPregnancy();
 
-    protected override PreyState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
-    {
-        return State;
-    }
+    public bool IsInLabour => _pregnancy.InLabour;
 
     internal void ResetAfterLabour()
     {
-        SetState(
-            State with
-            {
-                Pregnancy = PregnancyStatus.StartPregnancy()
-            });
+        _pregnancy.Reset();
     }
 
-    internal PregnancyStatus UpdatePregnancy(double pregnancyUpdate)
+    internal void UpdatePregnancy(double pregnancyUpdate)
     {
-        var newPregnancy = State.Pregnancy.UpdateProgress(pregnancyUpdate);
-        SetState(
-            State with
-            {
-                Pregnancy = newPregnancy
-            });
-
-        return newPregnancy;
+        _pregnancy.UpdateProgress(pregnancyUpdate);
     }
 }

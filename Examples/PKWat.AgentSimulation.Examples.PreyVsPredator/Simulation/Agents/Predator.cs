@@ -2,63 +2,47 @@
 
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.RandomNumbers;
-using PKWat.AgentSimulation.Core.Time;
-using System;
 
-public record HealthStatus(double Health = 1)
+public class HealthStatus
 {
+    public double Health { get; private set; }
+
     public bool Died => Health <= 0;
 
-    public HealthStatus DecreaseHealth(double substractingHealth)
+    private HealthStatus(double health)
+    {
+        Health = health;
+    }
+
+    public void DecreaseHealth(double substractingHealth)
     {
         var newHealth = Health - substractingHealth;
 
-        return new HealthStatus(
-            Health: newHealth);
+        Health = newHealth < 0 ? 0 : newHealth;
     }
 
-    public HealthStatus Recover()
+    public void Recover()
     {
-        return new HealthStatus(Health: 1);
+        Health = 1;
     }
-}
 
-public record PredatorState(MovingDirection MovingDirection, HealthStatus Health)
-{
-    public static PredatorState NewBorn() => new PredatorState(MovingDirection.None, new HealthStatus());
+    public static HealthStatus FullHealth() => new HealthStatus(1);
 }
 
 internal class Predator(IRandomNumbersGenerator randomNumbersGenerator) :
-    SimulationAgent<PreyVsPredatorEnvironment, PredatorState>
+    SimpleSimulationAgent<PreyVsPredatorEnvironment>
 {
-    protected override PredatorState GetInitialState(PreyVsPredatorEnvironment environment)
-    {
-        return PredatorState.NewBorn();
-    }
+    private HealthStatus _healthStatus = HealthStatus.FullHealth();
 
-    protected override PredatorState GetNextState(PreyVsPredatorEnvironment environment, IReadOnlySimulationTime simulationTime)
-    {
-        return State;
-    }
+    public bool IsDied => _healthStatus.Died;
 
-    internal HealthStatus DecreaseHealth(double starvationIncrement)
+    internal void DecreaseHealth(double starvationIncrement)
     {
-        var newHealth = State.Health.DecreaseHealth(starvationIncrement);
-        SetState(
-            State with
-            {
-                Health = newHealth
-            });
-
-        return newHealth;
+        _healthStatus.DecreaseHealth(starvationIncrement);
     }
 
     internal void ResetAfterEaten()
     {
-        SetState(
-            State with
-            {
-                Health = State.Health.Recover()
-            });
+        _healthStatus.Recover();
     }
 }

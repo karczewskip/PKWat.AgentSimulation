@@ -22,8 +22,8 @@ internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCycleP
         var allPredators = context.GetAgents<Predator>();
         foreach (var predator in allPredators)
         {
-            var newHealth = predator.DecreaseHealth(starvationIncrement);
-            if (newHealth.Died)
+            predator.DecreaseHealth(starvationIncrement);
+            if (predator.IsDied)
             {
                 deadPredators.Add(predator);
             }
