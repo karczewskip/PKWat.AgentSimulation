@@ -15,7 +15,7 @@
         Task StopAsync();
     }
 
-    internal class Simulation<T, ENVIRONMENT_STATE> : ISimulation where T : ISimulationEnvironment<ENVIRONMENT_STATE>
+    internal class Simulation<T> : ISimulation where T : ISimulationEnvironment
     {
         private readonly SimulationContext<T> _context;
         private readonly ISimulationSnapshotStore _snapshotStore;

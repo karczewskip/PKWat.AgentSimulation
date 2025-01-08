@@ -10,34 +10,33 @@ using PKWat.AgentSimulation.Core.Snapshots;
 using PKWat.AgentSimulation.Core.Stage;
 using System.Reflection;
 
-public interface ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
+public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetSimulationStep(TimeSpan simulationStep);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetRandomSeed(int seed);
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddInitializationStage<U>() where U : ISimulationStage<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddInitializationStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddStage<U>() where U : ISimulationStage<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> WithSnapshots();
-    ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> StopAgents();
+    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
+    ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization);
+    ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
+    ISimulationBuilderContext<ENVIRONMENT> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback);
+    ISimulationBuilderContext<ENVIRONMENT> SetSimulationStep(TimeSpan simulationStep);
+    ISimulationBuilderContext<ENVIRONMENT> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
+    ISimulationBuilderContext<ENVIRONMENT> SetRandomSeed(int seed);
+    ISimulationBuilderContext<ENVIRONMENT> AddInitializationStage<U>() where U : ISimulationStage<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddInitializationStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddStage<U>() where U : ISimulationStage<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> WithSnapshots();
+    ISimulationBuilderContext<ENVIRONMENT> StopAgents();
 
     ISimulation Build();
 }
 
-internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> where ENVIRONMENT : ISimulationEnvironment<ENVIRONMENT_STATE>
+internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
     private readonly IServiceProvider _serviceProvider;
 
-    private Func<ENVIRONMENT> _environmentCreate;
     private List<Func<ISimulationAgent<ENVIRONMENT>>> _agentsToGenerate = new();
     private List<Func<ISimulationEvent<ENVIRONMENT>>> _eventsToGenerate = new();
     private List<Func<ISimulationStage<ENVIRONMENT>>> _initializationStagesToGenerate = new();
@@ -56,25 +55,12 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         _serviceProvider = serviceProvider;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> LoadState(ENVIRONMENT_STATE environmentState)
-    {
-        _environmentCreate = () =>
-        {
-            var environment = _serviceProvider.GetRequiredService<ENVIRONMENT>();
-            environment.LoadState(environmentState);
-
-            return environment;
-        };
-
-        return this;
-    }
-
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgent<U>() where U : ISimulationAgent<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddAgent<U>() where U : ISimulationAgent<ENVIRONMENT>
     {
         return AddAgents<U>(1);
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddAgents<U>(int number) where U : ISimulationAgent<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddAgents<U>(int number) where U : ISimulationAgent<ENVIRONMENT>
     {
         _agentsToGenerate.AddRange(Enumerable
             .Range(0, number)
@@ -84,59 +70,59 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update)
+    public ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update)
     {
         _environmentUpdates.Add(update);
 
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization)
+    public ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization)
     {
         _environmentInitilization = initialization;
 
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback)
+    public ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback)
     {
         _callbacks.Add(callback);
 
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback)
+    public ISimulationBuilderContext<ENVIRONMENT> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback)
     {
         _callbacks.Add(async c => callback(c));
 
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetSimulationStep(TimeSpan simulationStep)
+    public ISimulationBuilderContext<ENVIRONMENT> SetSimulationStep(TimeSpan simulationStep)
     {
         _simulationStep = simulationStep;
 
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps)
+    public ISimulationBuilderContext<ENVIRONMENT> SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps)
     {
         _waitingTimeBetweenSteps = waitingTimeBetweenSteps;
 
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> SetRandomSeed(int seed)
+    public ISimulationBuilderContext<ENVIRONMENT> SetRandomSeed(int seed)
     {
         _randomSeed = seed;
 
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>
         => AddEvent<U>(_ => { });
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddEvent<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>
     {
         _eventsToGenerate.Add(() =>
             {
@@ -149,7 +135,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> WithSnapshots()
+    public ISimulationBuilderContext<ENVIRONMENT> WithSnapshots()
     {
         _doSnapshot = true;
         return this;
@@ -158,13 +144,13 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
     public ISimulation Build()
     {
         _serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
-        var simulationEnvironment = _environmentCreate();
+        var simulationEnvironment = _serviceProvider.GetRequiredService<ENVIRONMENT>();
         var agents = _agentsToGenerate.Select(x => x()).ToArray();
         var events = _eventsToGenerate.Select(x => x()).ToArray();
         var initializationStages = _initializationStagesToGenerate.Select(x => x()).ToArray();
         var stages = _stagesToGenerate.Select(x => x()).ToArray();
 
-        return new Simulation<ENVIRONMENT, ENVIRONMENT_STATE>(
+        return new Simulation<ENVIRONMENT>(
             new SimulationContext<ENVIRONMENT>(
                 _serviceProvider,
                 simulationEnvironment,
@@ -193,10 +179,10 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return new NullSimulationSnapshotStore();
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddInitializationStage<U>() where U : ISimulationStage<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddInitializationStage<U>() where U : ISimulationStage<ENVIRONMENT>
         => AddInitializationStage<U>(_ => { });
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddInitializationStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddInitializationStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>
     {
         _initializationStagesToGenerate.Add(() =>
         {
@@ -209,10 +195,10 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddStage<U>() where U : ISimulationStage<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddStage<U>() where U : ISimulationStage<ENVIRONMENT>
         => AddStage<U>(_ => { });
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> AddStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>
     {
         _stagesToGenerate.Add(() =>
         {
@@ -225,7 +211,7 @@ internal class SimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> : ISimul
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT, ENVIRONMENT_STATE> StopAgents()
+    public ISimulationBuilderContext<ENVIRONMENT> StopAgents()
     {
         _runAgentsInParallel = false;
         return this;

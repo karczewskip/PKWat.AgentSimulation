@@ -5,38 +5,30 @@ using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 
 namespace PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation;
 
-public record PreyVsPredatorEnvironmentState(
-    int Width,
-    int Height,
-    Dictionary<AgentId, (int X, int Y)> AgentCoordinates,
-    Dictionary<(int X, int Y), HashSet<AgentId>> Preys,
-    Dictionary<(int X, int Y), HashSet<AgentId>> Predators)
+public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGenerator) : DefaultSimulationEnvironment
 {
-    public static PreyVsPredatorEnvironmentState New(int width, int height)
-    {
-        return new PreyVsPredatorEnvironmentState(
-            Width: width,
-            Height: height,
-            AgentCoordinates: new Dictionary<AgentId, (int X, int Y)>(),
-            Preys: new Dictionary<(int X, int Y), HashSet<AgentId>>(),
-            Predators: new Dictionary<(int X, int Y), HashSet<AgentId>>());
-    }
-}
+    private int width;
+    private int height;
 
-public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGenerator) : DefaultSimulationEnvironment<PreyVsPredatorEnvironmentState>
-{
+    private Dictionary<AgentId, (int X, int Y)> AgentCoordinates = new();
+    private Dictionary<(int X, int Y), HashSet<AgentId>> Preys = new();
+    private Dictionary<(int X, int Y), HashSet<AgentId>> Predators = new();
+
+    public void SetSize(int width, int height)
+    {
+        this.width = width;
+        this.height = height;
+    }
+
     public void PlaceInitialPreys(IEnumerable<AgentId> agentIds)
     {
-        var width = GetState().Width;
-        var height = GetState().Height;
-
         foreach (var agentId in agentIds)
         {
             var x = randomNumbersGenerator.Next(width);
             var y = randomNumbersGenerator.Next(height);
-            GetState().AgentCoordinates[agentId] = (x, y);
-            GetState().Preys.TryAdd((x, y), new HashSet<AgentId>());
-            GetState().Preys[(x, y)].Add(agentId);
+            AgentCoordinates[agentId] = (x, y);
+            Preys.TryAdd((x, y), new HashSet<AgentId>());
+            Preys[(x, y)].Add(agentId);
         }
     }
 
@@ -44,25 +36,23 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
     {
         foreach (var newBornPrey in newBornPreys)
         {
-            var parentCoordinates = GetState().AgentCoordinates[newBornPrey.Parent];
+            var parentCoordinates = AgentCoordinates[newBornPrey.Parent];
             var x = parentCoordinates.X;
             var y = parentCoordinates.Y;
-            GetState().AgentCoordinates[newBornPrey.NewBorn] = (x, y);
-            GetState().Preys[(x, y)].Add(newBornPrey.NewBorn);
+            AgentCoordinates[newBornPrey.NewBorn] = (x, y);
+            Preys[(x, y)].Add(newBornPrey.NewBorn);
         }
     }
 
     public void PlaceInitialPredators(IEnumerable<AgentId> agentIds)
     {
-        var width = GetState().Width;
-        var height = GetState().Height;
         foreach (var agentId in agentIds)
         {
             var x = randomNumbersGenerator.Next(width);
             var y = randomNumbersGenerator.Next(height);
-            GetState().AgentCoordinates[agentId] = (x, y);
-            GetState().Predators.TryAdd((x, y), new HashSet<AgentId>());
-            GetState().Predators[(x, y)].Add(agentId);
+            AgentCoordinates[agentId] = (x, y);
+            Predators.TryAdd((x, y), new HashSet<AgentId>());
+            Predators[(x, y)].Add(agentId);
         }
     }
 
@@ -70,68 +60,62 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
     {
         foreach (var newBornPredator in newBornPredators)
         {
-            var parentCoordinates = GetState().AgentCoordinates[newBornPredator.Parent];
+            var parentCoordinates = AgentCoordinates[newBornPredator.Parent];
             var x = parentCoordinates.X;
             var y = parentCoordinates.Y;
-            GetState().AgentCoordinates[newBornPredator.NewBorn] = (x, y);
-            GetState().Predators[(x, y)].Add(newBornPredator.NewBorn);
+            AgentCoordinates[newBornPredator.NewBorn] = (x, y);
+            Predators[(x, y)].Add(newBornPredator.NewBorn);
         }
     }
 
     public void MovePreys(IEnumerable<(AgentId Id, MovingDirection Direction)> preysDirections)
     {
-        var state = GetState();
-
         foreach (var id in preysDirections)
         {
-            var (x, y) = state.AgentCoordinates[id.Id];
+            var (x, y) = AgentCoordinates[id.Id];
             var (newX, newY) = GetNewCoordinates(x, y, id.Direction);
             if(x == newX && y == newY)
             {
                 continue;
             }
 
-            state.Preys[(x, y)].Remove(id.Id);
-            state.AgentCoordinates[id.Id] = (newX, newY);
-            state.Preys.TryAdd((newX, newY), new HashSet<AgentId>());
-            state.Preys[(newX, newY)].Add(id.Id);
+            Preys[(x, y)].Remove(id.Id);
+            AgentCoordinates[id.Id] = (newX, newY);
+            Preys.TryAdd((newX, newY), new HashSet<AgentId>());
+            Preys[(newX, newY)].Add(id.Id);
         }
 
-        foreach(var preysCoordinates in state.Preys.Where(x => x.Value.Any() == false).Select(x => x.Key))
+        foreach(var preysCoordinates in Preys.Where(x => x.Value.Any() == false).Select(x => x.Key))
         {
-            state.Preys.Remove(preysCoordinates);
+            Preys.Remove(preysCoordinates);
         }
     }
 
     public void MovePredators(IEnumerable<(AgentId Id, MovingDirection Direction)> predatorsDirections)
     {
-        var state = GetState();
-
         foreach (var id in predatorsDirections)
         {
-            var (x, y) = state.AgentCoordinates[id.Id];
+            var (x, y) = AgentCoordinates[id.Id];
             var (newX, newY) = GetNewCoordinates(x, y, id.Direction);
             if (x == newX && y == newY)
             {
                 continue;
             }
 
-            state.Predators[(x, y)].Remove(id.Id);
-            state.AgentCoordinates[id.Id] = (newX, newY);
-            state.Predators.TryAdd((newX, newY), new HashSet<AgentId>());
-            state.Predators[(newX, newY)].Add(id.Id);
+            Predators[(x, y)].Remove(id.Id);
+            AgentCoordinates[id.Id] = (newX, newY);
+            Predators.TryAdd((newX, newY), new HashSet<AgentId>());
+            Predators[(newX, newY)].Add(id.Id);
         }
 
-        foreach (var predatorsCoordinates in state.Predators.Where(x => x.Value.Any() == false).Select(x => x.Key))
+        foreach (var predatorsCoordinates in Predators.Where(x => x.Value.Any() == false).Select(x => x.Key))
         {
-            state.Predators.Remove(predatorsCoordinates);
+            Predators.Remove(predatorsCoordinates);
         }
     }
 
     private (int X, int Y) GetNewCoordinates(int x, int y, MovingDirection direction)
     {
-        var width = GetState().Width;
-        var height = GetState().Height;
         var newX = x;
         var newY = y;
         switch (direction)
@@ -154,49 +138,47 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
 
     public int GetWidth()
     {
-        return GetState().Width;
+        return width;
     }
 
     public int GetHeight()
     {
-        return GetState().Height;
+        return height;
     }
 
     internal bool IsPredatorAt(int i, int j)
     {
-        return GetState().Predators.ContainsKey((i, j));
+        return Predators.ContainsKey((i, j));
     }
 
     internal bool IsPreyAt(int i, int j)
     {
-        return GetState().Preys.ContainsKey((i, j));
+        return Preys.ContainsKey((i, j));
     }
 
     internal bool AnotherPrey(AgentId id)
     {
-        var state = GetState();
-        var coordinates = state.AgentCoordinates[id];
-        return state.Preys[(coordinates.X, coordinates.Y)].Count > 1;
+        var coordinates = AgentCoordinates[id];
+        return Preys[(coordinates.X, coordinates.Y)].Count > 1;
     }
 
     internal AgentId? EatPreyByPredator(AgentId id)
     {
-        var state = GetState();
-        var coordinates = state.AgentCoordinates[id];
+        var coordinates = AgentCoordinates[id];
 
-        if(state.Preys.ContainsKey((coordinates.X, coordinates.Y)) == false)
+        if(Preys.ContainsKey((coordinates.X, coordinates.Y)) == false)
         {
             return null;
         }
 
-        var preys = state.Preys[(coordinates.X, coordinates.Y)];
+        var preys = Preys[(coordinates.X, coordinates.Y)];
         var eatenPrey = preys.First();
         preys.Remove(eatenPrey);
-        state.AgentCoordinates.Remove(eatenPrey);
+        AgentCoordinates.Remove(eatenPrey);
 
         if(preys.Any() == false)
         {
-            state.Preys.Remove((coordinates.X, coordinates.Y));
+            Preys.Remove((coordinates.X, coordinates.Y));
         }
 
         return eatenPrey;
@@ -204,13 +186,12 @@ public class PreyVsPredatorEnvironment(IRandomNumbersGenerator randomNumbersGene
 
     internal void RemovePredator(AgentId id)
     {
-        var state = GetState();
-        var coordinates = state.AgentCoordinates[id];
-        state.Predators[(coordinates.X, coordinates.Y)].Remove(id);
-        state.AgentCoordinates.Remove(id);
-        if (state.Predators[(coordinates.X, coordinates.Y)].Any() == false)
+        var coordinates = AgentCoordinates[id];
+        Predators[(coordinates.X, coordinates.Y)].Remove(id);
+        AgentCoordinates.Remove(id);
+        if (Predators[(coordinates.X, coordinates.Y)].Any() == false)
         {
-            state.Predators.Remove((coordinates.X, coordinates.Y));
+            Predators.Remove((coordinates.X, coordinates.Y));
         }
     }
 }
