@@ -7,6 +7,7 @@ using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.RandomNumbers;
+using PKWat.AgentSimulation.Core.Stage;
 using System.Reflection;
 
 public static class AgentSimulationServiceCollectionExtensions
@@ -19,7 +20,11 @@ public static class AgentSimulationServiceCollectionExtensions
         services.AddScoped<SimulationPerformanceInfo>();
         services.AddScoped<ISimulationCyclePerformanceInfo>(c => c.GetRequiredService<SimulationPerformanceInfo>());
 
-        Type[] registeringGenericTypes = [typeof(ISimulationEnvironment), typeof(ISimulationAgent), typeof(ISimulationEvent)];
+        Type[] registeringGenericTypes = [
+            typeof(ISimulationEnvironment), 
+            typeof(ISimulationAgent), 
+            typeof(ISimulationEvent),
+            typeof(ISimulationStage)];
 
         foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface))
         {

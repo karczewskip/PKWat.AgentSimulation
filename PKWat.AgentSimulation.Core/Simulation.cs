@@ -4,6 +4,7 @@
     using PKWat.AgentSimulation.Core.Environment;
     using PKWat.AgentSimulation.Core.Event;
     using PKWat.AgentSimulation.Core.Snapshots;
+    using PKWat.AgentSimulation.Core.Stage;
 
     public interface ISimulation
     {
@@ -22,6 +23,9 @@
         private readonly Func<SimulationContext<T>, Task> _environmentInitialization;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly IReadOnlyList<ISimulationEvent<T>> _events;
+        private readonly ISimulationStage<T>[] _initializationStages;
+        private readonly ISimulationStage<T>[] _stages;
+        private readonly bool _runAgentsInParallel;
 
         private RunningSimulationState _runningState = RunningSimulationState.CreateNotRunningState();
 
@@ -34,7 +38,10 @@
             IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
             Func<SimulationContext<T>, Task> environmentInitialization,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
-            IReadOnlyList<ISimulationEvent<T>> events)
+            IReadOnlyList<ISimulationEvent<T>> events,
+            ISimulationStage<T>[] initializationStages,
+            ISimulationStage<T>[] stages,
+            bool runAgentsInParallel)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
@@ -42,11 +49,19 @@
             _environmentInitialization = environmentInitialization;
             _callbacks = callbacks;
             _events = events;
+            _initializationStages = initializationStages;
+            _stages = stages;
+            _runAgentsInParallel = runAgentsInParallel;
         }
 
         public async Task StartAsync()
         {
             _runningState = RunningSimulationState.CreateRunningState();
+
+            foreach (var stage in _initializationStages)
+            {
+                await stage.Execute(_context);
+            }
 
             await _environmentInitialization(_context);
 
@@ -90,7 +105,13 @@
                     }
                 }
 
+                foreach (var stage in _stages)
+                {
+                    await stage.Execute(_context);
+                }
+
                 //using (_context.PerformanceInfo.AddStep("Agents update"))
+                if (_runAgentsInParallel)
                 {
                     var agentsCount = _context.Agents.Count;
 

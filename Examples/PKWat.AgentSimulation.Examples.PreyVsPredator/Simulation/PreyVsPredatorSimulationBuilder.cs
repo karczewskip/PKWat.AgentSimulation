@@ -4,6 +4,7 @@ using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Builder;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Events;
+using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Stages;
 using System.Windows.Media.Imaging;
 
 public class PreyVsPredatorSimulationBuilder(
@@ -17,11 +18,7 @@ public class PreyVsPredatorSimulationBuilder(
                 PreyVsPredatorEnvironmentState.New(200, 200))
             .AddAgents<Prey>(100)
             .AddAgents<Predator>(100)
-            .AddEnvironmentInitialization(async c =>
-            {
-                c.SimulationEnvironment.PlaceInitialPreys(c.GetAgents<Prey>().Select(x => x.Id).ToArray());
-                c.SimulationEnvironment.PlaceInitialPredators(c.GetAgents<Predator>().Select(x => x.Id).ToArray());
-            })
+            .AddInitializationStage<ActorsPlaced>()
             .AddEvent<PredatorsStarved>(c => c.ChangeStarvationIncrement(0.04))
             .AddEvent<MovedPreyers>()
             .AddEvent<MovedPredators>()
@@ -29,6 +26,7 @@ public class PreyVsPredatorSimulationBuilder(
             .AddEvent<PreyersEaten>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)
+            .StopAgents()
             .Build();
 
         return simulation;
