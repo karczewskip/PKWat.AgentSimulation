@@ -12,7 +12,7 @@ public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoPro
 
     public BitmapSource Draw(ISimulationContext<LifeMatrixEnvironment> context)
     {
-        if (_lastWritableBitmap != null && DateTime.Now - _lastDrawTime < TimeSpan.FromMilliseconds(30))
+        if (_lastWritableBitmap != null && DateTime.Now - _lastDrawTime < TimeSpan.FromMilliseconds(60))
         {
             return _lastWritableBitmap;
         }
