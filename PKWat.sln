@@ -13,21 +13,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Examp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Drawing", "PKWat.AgentSimulation.Drawing\PKWat.AgentSimulation.Drawing.csproj", "{7CC1ACE4-BF5D-4F78-A252-09CDF19AC550}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulations.Examples.CollisionDetection", "Examples\PKWat.AgentSimulations.Examples.CollisionDetection\PKWat.AgentSimulations.Examples.CollisionDetection.csproj", "{3F36208A-F7CC-4DA2-8C82-1A837B86DA01}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Examples.Airport", "PKWat.AgentSimulation.Examples.Airport\PKWat.AgentSimulation.Examples.Airport.csproj", "{6E78C902-369F-427C-BA18-3713BEB87C4D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Math", "PKWat.AgentSimulation.Math\PKWat.AgentSimulation.Math.csproj", "{005815F0-3719-4DFA-AE9B-9201BF39CA28}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Examples.Liquid", "Examples\PKWat.AgentSimulation.Examples.Liquid\PKWat.AgentSimulation.Examples.Liquid.csproj", "{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Extensions", "PKWat.AgentSimulation.Extensions\PKWat.AgentSimulation.Extensions.csproj", "{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplicationTest2", "AvaloniaApplicationTest2\AvaloniaApplicationTest2.csproj", "{9FF7E683-8171-4C64-B766-AC8274049B53}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.ConsoleApp", "PKWat.AgentSimulation.ConsoleApp\PKWat.AgentSimulation.ConsoleApp.csproj", "{13E1046A-36E2-49EE-8D26-E104218BC45F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Examples.LiquidWpf", "Examples\PKWat.AgentSimulation.Examples.LiquidWpf\PKWat.AgentSimulation.Examples.LiquidWpf.csproj", "{0D06901E-32F0-4645-AD3F-E4200F3A0077}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Abstraction", "PKWat.AgentSimulation.Abstraction\PKWat.AgentSimulation.Abstraction.csproj", "{DB9880C5-0E3E-417B-9642-0A59208710D8}"
 EndProject
@@ -59,10 +53,6 @@ Global
 		{7CC1ACE4-BF5D-4F78-A252-09CDF19AC550}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CC1ACE4-BF5D-4F78-A252-09CDF19AC550}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CC1ACE4-BF5D-4F78-A252-09CDF19AC550}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3F36208A-F7CC-4DA2-8C82-1A837B86DA01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3F36208A-F7CC-4DA2-8C82-1A837B86DA01}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3F36208A-F7CC-4DA2-8C82-1A837B86DA01}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3F36208A-F7CC-4DA2-8C82-1A837B86DA01}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6E78C902-369F-427C-BA18-3713BEB87C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6E78C902-369F-427C-BA18-3713BEB87C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E78C902-369F-427C-BA18-3713BEB87C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -71,10 +61,6 @@ Global
 		{005815F0-3719-4DFA-AE9B-9201BF39CA28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{005815F0-3719-4DFA-AE9B-9201BF39CA28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{005815F0-3719-4DFA-AE9B-9201BF39CA28}.Release|Any CPU.Build.0 = Release|Any CPU
-		{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,10 +73,6 @@ Global
 		{13E1046A-36E2-49EE-8D26-E104218BC45F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13E1046A-36E2-49EE-8D26-E104218BC45F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13E1046A-36E2-49EE-8D26-E104218BC45F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0D06901E-32F0-4645-AD3F-E4200F3A0077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D06901E-32F0-4645-AD3F-E4200F3A0077}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D06901E-32F0-4645-AD3F-E4200F3A0077}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D06901E-32F0-4645-AD3F-E4200F3A0077}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -114,10 +96,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{370C45EA-1760-4AF6-952E-8BC077378A8A} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{F6C13B9F-29D3-4EBB-A26C-836D39F8157A} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
-		{3F36208A-F7CC-4DA2-8C82-1A837B86DA01} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{6E78C902-369F-427C-BA18-3713BEB87C4D} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
-		{435EF911-CA5C-44C6-BAD6-1BBF9FDE0A3C} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
-		{0D06901E-32F0-4645-AD3F-E4200F3A0077} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{BE5536A6-B930-4A0E-9B7F-64EA70A9E2A6} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{E4511F4C-0209-4393-9693-BB349B4F93A3} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
 		{331DC0F9-D151-457C-906E-36031448A7D9} = {1B211E5A-54B5-479F-8F95-6DE60C9155F0}
