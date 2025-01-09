@@ -38,7 +38,7 @@ public class LifeMatrixEnvironment(
         var newMatrix = matrices[currentMatrixIndex];
         currentMatrixIndex = (currentMatrixIndex + 1) % 2;
 
-        Parallel.For(0, numberOfThreads, i =>
+        Parallel.For(0, numberOfThreads, new ParallelOptions() { MaxDegreeOfParallelism = numberOfThreads }, i =>
         {
             var start = i * width / numberOfThreads;
             var end = (i + 1) * width / numberOfThreads;

@@ -16,10 +16,8 @@ public class ButterflyEffectSimulationBuilder(ISimulationBuilder simulationBuild
             .AddInitializationStage<InitializeSize>(s => s.UseSize(400, 10, 0.25))
             .AddInitializationStage<MoveBallsSlightly>()
             .AddStage<MoveBall>()
-            .AddAgents<BouncingBall>(100)
+            .AddAgents<BouncingBall>(20_000)
             .AddCallback(c => drawing(pictureRenderer.Draw(c)))
-            .SetRandomSeed(100)
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
             .Build();
         return simulation;
     }

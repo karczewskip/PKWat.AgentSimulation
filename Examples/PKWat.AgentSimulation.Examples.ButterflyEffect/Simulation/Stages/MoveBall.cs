@@ -4,21 +4,20 @@ using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation;
 using PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation.Agents;
-using System;
 using System.Threading.Tasks;
 
 internal class MoveBall : ISimulationStage<BouncingBallBulb>
 {
     public async Task Execute(ISimulationContext<BouncingBallBulb> context)
     {
-        foreach(var ball in context.GetAgents<BouncingBall>())
+        Parallel.ForEach(context.GetAgents<BouncingBall>(), new ParallelOptions() { MaxDegreeOfParallelism = 32 }, ball =>
         {
             UpdateBall(
-                ball, 
-                context.SimulationEnvironment.BallRadius, 
-                context.SimulationEnvironment.BulbRadius, 
+                ball,
+                context.SimulationEnvironment.BallRadius,
+                context.SimulationEnvironment.BulbRadius,
                 context.SimulationEnvironment.Gravity);
-        }
+        });
     }
 
     private void UpdateBall(BouncingBall ball, double ballRadius, double bulbRadius, double gravity)
