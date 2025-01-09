@@ -4,8 +4,7 @@ using PKWat.AgentSimulation.Core.RandomNumbers;
 namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation;
 
 public class LifeMatrixEnvironment(
-    IRandomNumbersGenerator randomNumbersGenerator, 
-    NewMatrixOnGPUGenerator newMatrixOnGPUGenerator) : DefaultSimulationEnvironment
+    IRandomNumbersGenerator randomNumbersGenerator) : DefaultSimulationEnvironment
 {
     public bool[,] Matrix => matrices[currentMatrixIndex];
 
