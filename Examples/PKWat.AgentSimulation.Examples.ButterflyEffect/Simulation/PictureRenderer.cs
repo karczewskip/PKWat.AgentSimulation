@@ -1,39 +1,66 @@
-﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect
+﻿namespace PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation
 {
     using PKWat.AgentSimulation.Core;
+    using PKWat.AgentSimulation.Core.Agent;
     using PKWat.AgentSimulation.Drawing;
+    using PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation.Agents;
     using System.Drawing;
     using System.Windows.Media.Imaging;
 
-    public class PictureRenderer
+    public class PictureRenderer(ColorsGenerator colorsGenerator)
     {
         private const int Scale = 1;
 
         private Bitmap _bmp;
+        private Color[] _colors;
+        private Dictionary<AgentId, Brush> _brushes;
 
-        public void Initialize(int width, int height)
+        public void Initialize(int width, int height, AgentId[] balls)
         {
             _bmp = new Bitmap(Scale * width, Scale * height);
             _bmp.SetResolution(96, 96);
+
+            _colors = colorsGenerator.Generate(balls.Length);
+            _brushes = new Dictionary<AgentId, Brush>();
+            for (int i = 0; i < balls.Length; i++)
+            {
+                _brushes.Add(balls[i], new SolidBrush(_colors[i % _colors.Length]));
+            }
         }
 
         public BitmapSource Draw(ISimulationContext<BouncingBallBulb> context)
         {
+            var bouncingBalls = context.GetAgents<BouncingBall>().ToArray();
+
+            if(_brushes == null)
+            {
+                _brushes = new Dictionary<AgentId, Brush>();
+                for(int i = 0; i < bouncingBalls.Length; i++)
+                {
+                    var b = bouncingBalls[i];
+                    _brushes.Add(b.Id, new SolidBrush(_colors[i % _colors.Length]));
+                }
+            }
+
             using var graphic = Graphics.FromImage(_bmp);
             graphic.Clear(Color.Black);
             var pen = new Pen(Brushes.White, 0);
             graphic.DrawEllipse(pen, 0, 0, (float)context.SimulationEnvironment.BulbRadius * 2, (float)context.SimulationEnvironment.BulbRadius * 2);
 
-            graphic.TranslateTransform(_bmp.Width/2, _bmp.Height / 2);
+            graphic.TranslateTransform(_bmp.Width / 2, _bmp.Height / 2);
             //graphic.Clear(Color.White);
 
-            var bouncingBalls = context.GetAgents<BouncingBall>();
             foreach (var b in bouncingBalls)
             {
-                graphic.FillEllipse(b.State.Brush, (int)b.State.Position.X, (int)b.State.Position.Y, (float)b.State.Radius, (float)b.State.Radius);
+                var brush = _brushes[b.Id];
+                graphic.FillEllipse(brush, (int)b.Position.X, (int)b.Position.Y, (float)context.SimulationEnvironment.BallRadius, (float)context.SimulationEnvironment.BallRadius);
             }
 
-            return _bmp.ConvertToBitmapSource();
+            var bitmapSource = _bmp.ConvertToBitmapSource();
+
+            bitmapSource.Freeze();
+
+            return bitmapSource;
 
             //var imageSize = (int)radius * 2;
 
