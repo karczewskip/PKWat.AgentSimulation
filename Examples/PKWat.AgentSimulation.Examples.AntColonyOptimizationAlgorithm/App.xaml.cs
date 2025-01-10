@@ -3,6 +3,7 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using PKWat.AgentSimulation.Core;
+    using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
     using System.Reflection;
     using System.Windows;
 
@@ -19,7 +20,8 @@
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<MainWindow>();
-                    services.AddTransient<ColonyDrawer>();
+                    services.AddScoped<AntColonySimulationBuilder>();
+                    services.AddScoped<ColonyDrawer>();
                     services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
                 })
                 .Build();
