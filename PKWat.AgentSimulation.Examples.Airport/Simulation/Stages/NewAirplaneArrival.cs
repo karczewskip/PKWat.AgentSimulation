@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 internal class NewAirplaneArrival(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage<AirportEnvironment>
 {
     private int maxNumberOfPassengers = 30;
-    private double meanTimeBetweenArrivals = 10.0;
+    private double meanTimeBetweenArrivalsInMinutes = 10.0;
 
     public async Task Execute(ISimulationContext<AirportEnvironment> context)
     {
@@ -44,7 +44,7 @@ internal class NewAirplaneArrival(IRandomNumbersGenerator randomNumbersGenerator
     private void ScheduleNextAirplaneArrival(ISimulationContext<AirportEnvironment> context, TimeSpan? lastArrival = null)
     {
         var nextArrival = (lastArrival ?? context.SimulationTime.Time)
-            + TimeSpan.FromMinutes(randomNumbersGenerator.GetNextExponential(1.0 / meanTimeBetweenArrivals));
+            + TimeSpan.FromMinutes(randomNumbersGenerator.GetNextExponential(1.0 / meanTimeBetweenArrivalsInMinutes));
 
         context.SimulationEnvironment.ScheduleNewAirplaneArrival(nextArrival);
     }
