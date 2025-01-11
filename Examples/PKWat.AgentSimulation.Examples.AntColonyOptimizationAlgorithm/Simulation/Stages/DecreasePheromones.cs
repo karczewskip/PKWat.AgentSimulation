@@ -13,7 +13,7 @@ internal class DecreasePheromones : ISimulationStage<ColonyEnvironment>
             for (var y = 0; y < context.SimulationEnvironment.Height; y++)
             {
                 var pheromones = context.SimulationEnvironment.Pheromones[x, y];
-                pheromones.Decrease(0.99);
+                pheromones.Decrease(0.95);
             }
         }
     }

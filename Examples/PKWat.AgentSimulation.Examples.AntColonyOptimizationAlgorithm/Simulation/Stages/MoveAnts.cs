@@ -25,17 +25,32 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
     {
         foreach (var ant in context.GetAgents<Ant>())
         {
-            var coordinates = ant.Coordinates;
-            var newDirection = GetNewDirection(ant.Direction);
-
-            coordinates.MoveBy(newDirection, context.SimulationEnvironment.Width - 1, context.SimulationEnvironment.Height - 1);
-            ant.PathLength++;
+            SetNewPosition(ant, context.SimulationEnvironment);
         }
     }
 
-    private ColonyDirection GetNewDirection(ColonyDirection direction)
+    private void SetNewPosition(Ant ant, ColonyEnvironment colonyEnvironment)
     {
-        var directions = possibleDirections[direction];
-        return directions[randomNumbersGenerator.Next(directions.Length)];
+        var possibleDirections = this.possibleDirections[ant.Direction];
+
+        if (SetUsingPheromones(ant, colonyEnvironment, colonyEnvironment))
+        {
+            return;
+        }
+
+        SetNewRandomPostion(ant, colonyEnvironment, possibleDirections);
+    }
+
+    private void SetNewRandomPostion(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection[] possibleDirections)
+    {
+        var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
+        ant.Coordinates.MoveBy(newDirection, colonyEnvironment.Width - 1, colonyEnvironment.Height - 1);
+        ant.Direction = newDirection;
+        ant.PathLength++;
+    }
+
+    private bool SetUsingPheromones(Ant ant, ColonyEnvironment environment, ColonyEnvironment colonyEnvironment)
+    {
+        return false;
     }
 }

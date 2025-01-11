@@ -5,9 +5,9 @@ using PKWat.AgentSimulation.Core.Agent;
 public class Ant : SimpleSimulationAgent<ColonyEnvironment>
 {
     public ColonyCoordinates Coordinates { get; private set; } = ColonyCoordinates.CreateAtOrigin();
-    public ColonyDirection Direction { get; private set; } = ColonyDirection.None;
     public bool IsCarryingFood { get; private set; } = false;
     public bool IsAfterHillVisit { get; private set; } = false;
+    public ColonyDirection Direction { get; set; } = ColonyDirection.None;
     public int PathLength { get; set; } = 1;
 
     public void GetFood()
