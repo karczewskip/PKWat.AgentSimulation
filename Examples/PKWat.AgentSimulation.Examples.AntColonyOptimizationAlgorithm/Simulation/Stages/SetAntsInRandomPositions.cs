@@ -6,7 +6,7 @@ using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System.Threading.Tasks;
 
-internal class  SetAntsInRandomPositions(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage<ColonyEnvironment>
+internal class SetAntsInRandomPositions(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage<ColonyEnvironment>
 {
     public async Task Execute(ISimulationContext<ColonyEnvironment> context)
     {

@@ -23,12 +23,13 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             })
             .AddAgents<Ant>(1000)
             .AddInitializationStage<SetAntsInRandomPositions>()
+            .AddStage<MoveAnts>()
             //.AddEnvironmentUpdates(DecreasePheromones)
             //.AddEnvironmentUpdates(AddPheromones)
             .AddCallback(c => drawing(colonyDrawer.Draw(c)))
             .SetRandomSeed(12557)
             .StopAgents()
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
+            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(100))
             .Build();
 
         return simulation;
