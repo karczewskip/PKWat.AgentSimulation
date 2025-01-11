@@ -98,6 +98,10 @@ public class AirportDrawer
 
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
             graphic.DrawString(airplane.Passengers.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            if (airplane.LandingLine.HasValue)
+            {
+                graphic.DrawString(airplane.LandingLine.Value.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);
+            }
             i++;
         }
 

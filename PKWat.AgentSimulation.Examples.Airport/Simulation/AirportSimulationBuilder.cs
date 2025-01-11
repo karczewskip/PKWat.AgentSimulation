@@ -28,6 +28,7 @@
                 .CreateNewSimulation<AirportEnvironment>()
                 .AddInitializationStage<SetLindingLines>()
                 .AddStage<NewAirplaneArrival>()
+                .AddStage<AssignWaitingAirplanesToAvailableLines>()
                 .AddCallback(c => RenderAsync(c, drawing))
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))

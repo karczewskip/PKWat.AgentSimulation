@@ -10,12 +10,17 @@ public class AirportEnvironment : DefaultSimulationEnvironment
     public bool IsNewAirplaneArrivalScheduled => NewAirplaneArrival.HasValue;
 
     public Queue<AgentId> WaitingAirplanes { get; } = new();
+    public Queue<int> AvailableLines { get; } = new();
 
-    public int[] AllLandingLines { get; private set; } = new int[] { 1 };
+    public int[] AllLandingLines { get; private set; } = new int[0];
 
     internal void SetLandingLines(int[] landingLines)
     {
         AllLandingLines = landingLines;
+        foreach (var line in landingLines)
+        {
+            AvailableLines.Enqueue(line);
+        }
     }
 
     internal void ScheduleNewAirplaneArrival(TimeSpan nextArrival)
