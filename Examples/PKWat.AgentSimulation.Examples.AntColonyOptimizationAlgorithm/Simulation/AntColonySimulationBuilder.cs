@@ -12,7 +12,6 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
     {
         var simulation = simulationBuilder
             .CreateNewSimulation<ColonyEnvironment>()
-            .AddAgents<Ant>(1000)
             .AddInitializationStage<SetColonySize>(s => s.SetSize(100, 100))
             .AddInitializationStage<AddAntHills>(s =>
             {
@@ -22,6 +21,8 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             {
                 s.AddFoodSource(new FoodSource(10, ColonyCoordinates.CreateAt(50, 50)));
             })
+            .AddAgents<Ant>(1000)
+            .AddInitializationStage<SetAntsInRandomPositions>()
             //.AddEnvironmentUpdates(DecreasePheromones)
             //.AddEnvironmentUpdates(AddPheromones)
             .AddCallback(c => drawing(colonyDrawer.Draw(c)))

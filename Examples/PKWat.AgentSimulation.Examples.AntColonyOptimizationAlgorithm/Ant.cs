@@ -5,18 +5,23 @@ using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System;
 
-public record AntState(ColonyDirection Direction, ColonyCoordinates Coordinates, bool IsCarryingFood, int PathLength)
-{
-    private const int PheromonesStrengthInitialValue = 1000000;
-    public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.7, PathLength);
-}
-
 public class Ant : SimpleSimulationAgent<ColonyEnvironment>
 {
-    private const int PheromonesStrengthInitialValue = 1000000;
+    private readonly ColonyCoordinates coordinates = ColonyCoordinates.CreateAtOrigin();
 
-    public int PathLength { get; private set; } = 0;
-    public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.7, PathLength);
+    public int X => coordinates.X;
+    public int Y => coordinates.Y;
+
+    public void SetCoordinates(int x, int y)
+    {
+        coordinates.SetCoordinates(x, y);
+    }
+
+
+    //private const int PheromonesStrengthInitialValue = 1000000;
+
+    //public int PathLength { get; private set; } = 0;
+    //public double PheromonesStrength => PheromonesStrengthInitialValue * Math.Pow(0.7, PathLength);
 
     //protected override AntState GetInitialState(ColonyEnvironment environment) 
     //    => new AntState(
@@ -36,7 +41,7 @@ public class Ant : SimpleSimulationAgent<ColonyEnvironment>
     //            Direction = State.Direction.Opposite()
     //        };
     //    }
-        
+
     //    if (State.IsCarryingFood && environment.IsNearHome(State.Coordinates))
     //    {
     //        return State with

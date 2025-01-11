@@ -9,7 +9,8 @@
     {
         private const int Scale = 10;
         private const int AntSize = 1 * Scale;
-        private const int AnthillScale = 2 * Scale;
+        private const int AnthillSize = 10 * Scale;
+        private const int FoodSize = 10 * Scale;
 
         private Bitmap _bmp;
 
@@ -45,19 +46,19 @@
             //    graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
             //}
 
-            //foreach (Ant ant in context.GetAgents<Ant>())
-            //{
-            //    graphic.FillEllipse(ant.State.IsCarryingFood ? Brushes.Green : Brushes.Black, Scale * ant.State.Coordinates.X, Scale * ant.State.Coordinates.Y, AntSize, AntSize);
-            //}
-
             foreach (var antHill in context.SimulationEnvironment.GetAntHills())
             {
-                graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), Scale * antHill.X, Scale * antHill.Y, AntSize, AntSize);
+                graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), Scale * antHill.X, Scale * antHill.Y, AnthillSize, AnthillSize);
             }
 
             foreach (var foodSource in context.SimulationEnvironment.GetFoodSources())
             {
-                graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 255, 255, 0)), Scale * foodSource.X, Scale * foodSource.Y, AntSize, AntSize);
+                graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 255, 255, 0)), Scale * foodSource.X, Scale * foodSource.Y, FoodSize, FoodSize);
+            }
+
+            foreach (Ant ant in context.GetAgents<Ant>())
+            {
+                graphic.FillEllipse(Brushes.Black, Scale * ant.X, Scale * ant.Y, AntSize, AntSize);
             }
 
             var bitmapSource = _bmp.ConvertToBitmapSource();
