@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 internal class DecreasePheromones : ISimulationStage<ColonyEnvironment>
 {
+    private double decreaseRate = 0.95;
+
+    public void SetDecreaseRate(double decreaseRate)
+    {
+        this.decreaseRate = decreaseRate;
+    }
+
     public async Task Execute(ISimulationContext<ColonyEnvironment> context)
     {
         for (var x = 0; x < context.SimulationEnvironment.Width; x++)
@@ -13,7 +20,7 @@ internal class DecreasePheromones : ISimulationStage<ColonyEnvironment>
             for (var y = 0; y < context.SimulationEnvironment.Height; y++)
             {
                 var pheromones = context.SimulationEnvironment.Pheromones[x, y];
-                pheromones.Decrease(0.91);
+                pheromones.Decrease(decreaseRate);
             }
         }
     }
