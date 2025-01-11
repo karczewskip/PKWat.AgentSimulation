@@ -2,6 +2,7 @@
 
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
+using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System.Threading.Tasks;
 
 internal class ChangeAfterVisitHill : ISimulationStage<ColonyEnvironment>

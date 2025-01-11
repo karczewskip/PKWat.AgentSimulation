@@ -2,6 +2,7 @@
 
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
+using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ internal class AddHomePheromones : ISimulationStage<ColonyEnvironment>
     {
         foreach (var agent in context.GetAgents<Ant>().Where(x => x.IsAfterHillVisit))
         {
-            var agentHomePheromones = Pheromones.MaxPheromoneValue * Math.Exp(-agent.PathLength / 10);
+            var agentHomePheromones = Pheromones.MaxPheromoneValue * Math.Exp(-agent.PathLength / 1000);
             context.SimulationEnvironment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddHome(agentHomePheromones);
         }
     }
