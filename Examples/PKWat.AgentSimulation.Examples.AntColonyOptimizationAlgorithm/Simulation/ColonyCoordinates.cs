@@ -18,14 +18,19 @@ public class ColonyCoordinates
         return new ColonyCoordinates { X = x, Y = y };
     }
 
-    public double DistanceFrom(ColonyCoordinates coordinates)
+    public double DistanceFrom(double x, double y)
     {
-        return Math.Sqrt(Math.Pow(X - coordinates.X, 2) + Math.Pow(Y - coordinates.Y, 2));
+        return Math.Sqrt(Math.Pow(X - x, 2) + Math.Pow(Y - y, 2));
     }
 
     public bool IsInRange(ColonyCoordinates coordinates, double size)
     {
-        return DistanceFrom(coordinates) <= size;
+        return DistanceFrom(coordinates.X, coordinates.Y) <= size;
+    }
+
+    public bool IsInRange(double x, double y, double size)
+    {
+        return DistanceFrom(x, y) <= size;
     }
 
     public void MoveBy(ColonyDirection direction, int maxX, int maxY)

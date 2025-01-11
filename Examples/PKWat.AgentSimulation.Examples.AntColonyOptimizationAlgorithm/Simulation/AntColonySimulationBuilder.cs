@@ -19,9 +19,10 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             })
             .AddInitializationStage<AddFoodSources>(s =>
             {
-                s.AddFoodSource(new FoodSource { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(50, 50) });
+                s.AddFoodSource(new FoodSource { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(50, 80) });
+                s.AddFoodSource(new FoodSource { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(80, 50) });
             })
-            .AddAgents<Ant>(100)
+            .AddAgents<Ant>(400)
             .AddInitializationStage<SetAntsInRandomPositions>()
             .AddStage<ChangeAfterVisitHill>()
             .AddStage<ChangeAfterVisitFood>()

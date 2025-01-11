@@ -16,5 +16,19 @@ internal class AddFoodPheromones : ISimulationStage<ColonyEnvironment>
             var agentFoodPheromones = Pheromones.MaxPheromoneValue*Math.Exp(-agent.PathLength/8);
             context.SimulationEnvironment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddFood(agentFoodPheromones);
         }
+
+        foreach(var food in context.SimulationEnvironment.FoodSource)
+        {
+            for(var x = food.Coordinates.X - food.SizeRadius; x <= food.Coordinates.X + food.SizeRadius; x++)
+            {
+                for (var y = food.Coordinates.Y - food.SizeRadius; y <= food.Coordinates.Y + food.SizeRadius; y++)
+                {
+                    if (food.Coordinates.IsInRange(x, y, food.SizeRadius))
+                    {
+                        context.SimulationEnvironment.Pheromones[(int)x, (int)y].AddFood(Pheromones.MaxPheromoneValue);
+                    }
+                }
+            }
+        }
     }
 }

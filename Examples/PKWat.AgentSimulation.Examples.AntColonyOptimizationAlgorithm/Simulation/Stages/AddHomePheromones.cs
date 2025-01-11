@@ -16,5 +16,19 @@ internal class AddHomePheromones : ISimulationStage<ColonyEnvironment>
             var agentHomePheromones = Pheromones.MaxPheromoneValue * Math.Exp(-agent.PathLength / 8);
             context.SimulationEnvironment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddHome(agentHomePheromones);
         }
+
+        foreach (var hill in context.SimulationEnvironment.AntHills)
+        {
+            for (var x = hill.Coordinates.X - hill.SizeRadius; x <= hill.Coordinates.X + hill.SizeRadius; x++)
+            {
+                for (var y = hill.Coordinates.Y - hill.SizeRadius; y <= hill.Coordinates.Y + hill.SizeRadius; y++)
+                {
+                    if (hill.Coordinates.IsInRange(x, y, hill.SizeRadius))
+                    {
+                        context.SimulationEnvironment.Pheromones[(int)x, (int)y].AddHome(Pheromones.MaxPheromoneValue);
+                    }
+                }
+            }
+        }
     }
 }
