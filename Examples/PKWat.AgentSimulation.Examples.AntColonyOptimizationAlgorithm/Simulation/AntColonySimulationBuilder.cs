@@ -21,6 +21,7 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             {
                 s.AddFoodSource(new FoodSource { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(50, 80) });
                 s.AddFoodSource(new FoodSource { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(80, 50) });
+                s.AddFoodSource(new FoodSource { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(80, 10) });
             })
             .AddAgents<Ant>(400)
             .AddInitializationStage<SetAntsInRandomPositions>()
@@ -29,7 +30,7 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             .AddStage<DecreasePheromones>()
             .AddStage<AddFoodPheromones>()
             .AddStage<AddHomePheromones>()
-            .AddStage<MoveAnts>()
+            .AddStage<MoveAnts>(s => s.SetTemperature(0.04))
             .AddCallback(c => drawing(colonyDrawer.Draw(c)))
             .SetRandomSeed(12557)
             .StopAgents()

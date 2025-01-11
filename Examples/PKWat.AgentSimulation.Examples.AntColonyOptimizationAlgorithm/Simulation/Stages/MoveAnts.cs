@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage<ColonyEnvironment>
 {
+    private double temperature = 0.01;
+
     private readonly Dictionary<ColonyDirection, ColonyDirection> verticalMirrorDirection = new Dictionary<ColonyDirection, ColonyDirection>
     {
         { ColonyDirection.Up, ColonyDirection.Down },
@@ -48,6 +50,11 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
         { ColonyDirection.Left, new[] { ColonyDirection.Left, ColonyDirection.Left, ColonyDirection.DownLeft, ColonyDirection.UpLeft } },
         { ColonyDirection.UpLeft, new[] { ColonyDirection.UpLeft, ColonyDirection.UpLeft, ColonyDirection.Left, ColonyDirection.Up } }
     };
+
+    public void SetTemperature(double temperature)
+    {
+        this.temperature = temperature;
+    }
 
     public async Task Execute(ISimulationContext<ColonyEnvironment> context)
     {
@@ -127,7 +134,7 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
             return false;
         }
 
-        if(randomNumbersGenerator.NextDouble() < 0.01)
+        if(randomNumbersGenerator.NextDouble() < temperature)
         {
             return false;
         }
