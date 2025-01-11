@@ -86,12 +86,15 @@
 
             foreach (Ant ant in context.GetAgents<Ant>())
             {
-                var brush = ant switch 
-                { 
-                    { IsCarryingFood: true } => Brushes.Yellow,
-                    { IsAfterHillVisit: true } => Brushes.Brown,
-                    _ => Brushes.Black 
-                };
+                //var brush = ant switch 
+                //{ 
+                //    { IsCarryingFood: true } => Brushes.Yellow,
+                //    { IsAfterHillVisit: true } => Brushes.Brown,
+                //    _ => Brushes.Black 
+                //};
+
+                var brush = Brushes.Black;
+
                 graphic.FillEllipse(brush, Scale * ant.Coordinates.X, Scale * ant.Coordinates.Y, AntSize, AntSize);
             }
 

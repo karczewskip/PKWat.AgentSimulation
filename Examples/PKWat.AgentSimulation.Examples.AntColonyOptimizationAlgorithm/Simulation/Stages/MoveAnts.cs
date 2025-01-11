@@ -5,6 +5,7 @@ using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage<ColonyEnvironment>
 {
@@ -33,7 +34,7 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
     {
         var possibleDirections = this.possibleDirections[ant.Direction];
 
-        if (SetUsingPheromones(ant, colonyEnvironment, colonyEnvironment))
+        if (SetUsingPheromones(ant, colonyEnvironment, possibleDirections))
         {
             return;
         }
@@ -44,13 +45,86 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
     private void SetNewRandomPostion(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection[] possibleDirections)
     {
         var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
+        SetUsingDirection(ant, colonyEnvironment, newDirection);
+    }
+
+    private void SetUsingDirection(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection newDirection)
+    {
         ant.Coordinates.MoveBy(newDirection, colonyEnvironment.Width - 1, colonyEnvironment.Height - 1);
         ant.Direction = newDirection;
         ant.PathLength++;
     }
 
-    private bool SetUsingPheromones(Ant ant, ColonyEnvironment environment, ColonyEnvironment colonyEnvironment)
+    private bool SetUsingPheromones(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection[] possibleDirections)
     {
-        return false;
+        var antCoordinates = ant.Coordinates;
+
+        if(antCoordinates.X <= 0 || antCoordinates.Y <= 0 || antCoordinates.X >= colonyEnvironment.Width - 1 || antCoordinates.Y >= colonyEnvironment.Height - 1)
+        {
+            return false;
+        }
+
+        if(randomNumbersGenerator.NextDouble() < 0.01)
+        {
+            return false;
+        }
+
+        var possiblePheromones = possibleDirections.Distinct().Select(possibleDirection =>
+        {
+            var xForNewDirection = possibleDirection switch
+            {
+                ColonyDirection.Up => antCoordinates.X,
+                ColonyDirection.Down => antCoordinates.X,
+                ColonyDirection.Left => antCoordinates.X - 1,
+                ColonyDirection.Right => antCoordinates.X + 1,
+                ColonyDirection.UpLeft => antCoordinates.X - 1,
+                ColonyDirection.UpRight => antCoordinates.X + 1,
+                ColonyDirection.DownLeft => antCoordinates.X - 1,
+                ColonyDirection.DownRight => antCoordinates.X + 1,
+                _ => antCoordinates.X
+            };
+
+            var yForNewDirection = possibleDirection switch
+            {
+                ColonyDirection.Up => antCoordinates.Y + 1,
+                ColonyDirection.Down => antCoordinates.Y - 1,
+                ColonyDirection.Left => antCoordinates.Y,
+                ColonyDirection.Right => antCoordinates.Y,
+                ColonyDirection.UpLeft => antCoordinates.Y + 1,
+                ColonyDirection.UpRight => antCoordinates.Y + 1,
+                ColonyDirection.DownLeft => antCoordinates.Y - 1,
+                ColonyDirection.DownRight => antCoordinates.Y - 1,
+                _ => antCoordinates.Y
+            };
+
+            var pheromonesForNewDirection = colonyEnvironment.Pheromones[xForNewDirection, yForNewDirection];
+
+            return (Direction: possibleDirection, Pheromones: pheromonesForNewDirection);
+        });
+
+        if (ant.IsCarryingFood)
+        {
+            var bestPossibility = possiblePheromones.Where(x => x.Pheromones.Home > 0.1).OrderByDescending(x => x.Pheromones.Home).FirstOrDefault();
+            if(bestPossibility == default)
+            {
+                return false;
+            }
+
+            SetUsingDirection(ant, colonyEnvironment, bestPossibility.Direction);
+
+            return true;
+        }
+        else
+        {
+            var bestPossibility = possiblePheromones.Where(x => x.Pheromones.Food > 0.1).OrderByDescending(x => x.Pheromones.Food).FirstOrDefault();
+            if (bestPossibility == default)
+            {
+                return false;
+            }
+
+            SetUsingDirection(ant, colonyEnvironment, bestPossibility.Direction);
+
+            return true;
+        }
     }
 }

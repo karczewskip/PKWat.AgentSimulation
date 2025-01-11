@@ -13,7 +13,7 @@ internal class AddFoodPheromones : ISimulationStage<ColonyEnvironment>
     {
         foreach(var agent in context.GetAgents<Ant>().Where(x => x.IsCarryingFood))
         {
-            var agentFoodPheromones = Pheromones.MaxPheromoneValue*Math.Exp(-agent.PathLength/1000);
+            var agentFoodPheromones = Pheromones.MaxPheromoneValue*Math.Exp(-agent.PathLength/8);
             context.SimulationEnvironment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddFood(agentFoodPheromones);
         }
     }
