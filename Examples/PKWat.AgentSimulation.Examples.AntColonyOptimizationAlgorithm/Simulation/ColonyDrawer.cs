@@ -66,22 +66,30 @@
 
             foreach (var antHill in context.SimulationEnvironment.AntHills)
             {
+                var antHillSize = (float)(AntSize * antHill.SizeRadius*2);
+                var antHillX = Scale * antHill.Coordinates.X - antHillSize/2;
+                var antHillY = Scale * antHill.Coordinates.Y - antHillSize/2;
+
                 graphic.FillEllipse(
-                    new SolidBrush(Color.FromArgb(125, 102, 51, 0)), 
-                    Scale * antHill.Coordinates.X, 
-                    Scale * antHill.Coordinates.Y, 
-                    (float)(AntSize * antHill.Size),
-                    (float)(AntSize * antHill.Size));
+                    new SolidBrush(Color.FromArgb(125, 102, 51, 0)),
+                    antHillX,
+                    antHillY,
+                    antHillSize,
+                    antHillSize);
             }
 
             foreach (var foodSource in context.SimulationEnvironment.FoodSource)
             {
+                var foodSourceSize = (float)(AntSize * foodSource.SizeRadius*2);
+                var foodSourceX = Scale * foodSource.Coordinates.X - foodSourceSize / 2;
+                var foodSourceY = Scale * foodSource.Coordinates.Y - foodSourceSize / 2;
+
                 graphic.FillEllipse(
                     new SolidBrush(Color.FromArgb(125, 0, 51, 102)), 
-                    Scale * foodSource.Coordinates.X, 
-                    Scale * foodSource.Coordinates.Y,
-                    (float)(AntSize * foodSource.Size),
-                    (float)(AntSize * foodSource.Size));
+                    foodSourceX,
+                    foodSourceY,
+                    foodSourceSize,
+                    foodSourceSize);
             }
 
             foreach (Ant ant in context.GetAgents<Ant>())

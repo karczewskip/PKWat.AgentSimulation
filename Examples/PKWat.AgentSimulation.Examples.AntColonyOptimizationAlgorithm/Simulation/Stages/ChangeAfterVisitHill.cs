@@ -15,7 +15,7 @@ internal class ChangeAfterVisitHill : ISimulationStage<ColonyEnvironment>
         {
             foreach (var hill in hills)
             {
-                if(ant.Coordinates.IsInRange(hill.Coordinates, hill.Size))
+                if(ant.Coordinates.IsInRange(hill.Coordinates, hill.SizeRadius))
                 {
                     ant.VisitHill();
                 }

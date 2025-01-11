@@ -14,7 +14,7 @@ internal class ChangeAfterVisitFood : ISimulationStage<ColonyEnvironment>
         {
             foreach (var foodItem in food)
             {
-                if (ant.Coordinates.IsInRange(foodItem.Coordinates, foodItem.Size))
+                if (ant.Coordinates.IsInRange(foodItem.Coordinates, foodItem.SizeRadius))
                 {
                     ant.GetFood();
                 }

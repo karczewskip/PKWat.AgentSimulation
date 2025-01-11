@@ -2,5 +2,5 @@
 public class AntHill
 {
     public required ColonyCoordinates Coordinates { get; set; }
-    public required double Size { get; set; }
+    public required double SizeRadius { get; set; }
 }

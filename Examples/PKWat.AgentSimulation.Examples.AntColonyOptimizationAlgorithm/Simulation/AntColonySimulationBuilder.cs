@@ -15,11 +15,11 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             .AddInitializationStage<SetColonySize>(s => s.SetSize(100, 100))
             .AddInitializationStage<AddAntHills>(s =>
             {
-                s.AddAntHill(new AntHill { Size = 10, Coordinates = ColonyCoordinates.CreateAt(10, 10)});
+                s.AddAntHill(new AntHill { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(10, 10)});
             })
             .AddInitializationStage<AddFoodSources>(s =>
             {
-                s.AddFoodSource(new FoodSource { Size = 10, Coordinates = ColonyCoordinates.CreateAt(50, 50) });
+                s.AddFoodSource(new FoodSource { SizeRadius = 5, Coordinates = ColonyCoordinates.CreateAt(50, 50) });
             })
             .AddAgents<Ant>(1000)
             .AddInitializationStage<SetAntsInRandomPositions>()
