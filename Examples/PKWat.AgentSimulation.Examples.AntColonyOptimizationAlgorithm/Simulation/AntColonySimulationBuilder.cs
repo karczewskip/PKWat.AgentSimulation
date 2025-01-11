@@ -12,7 +12,7 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
     {
         var simulation = simulationBuilder
             .CreateNewSimulation<ColonyEnvironment>()
-            .AddInitializationStage<SetColonySize>(s => s.SetSize(100, 100))
+            .AddInitializationStage<SetColonySize>(s => s.SetSize(200, 200))
             .AddInitializationStage<AddAntHills>(s =>
             {
                 s.AddAntHill(new AntHill { Size = 10, Coordinates = ColonyCoordinates.CreateAt(10, 10)});
@@ -26,12 +26,14 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             .AddStage<MoveAnts>()
             .AddStage<ChangeAfterVisitHill>()
             .AddStage<ChangeAfterVisitFood>()
+            .AddStage<DecreasePheromones>()
+            .AddStage<AddFoodPheromones>()
+            .AddStage<AddHomePheromones>()
             //.AddEnvironmentUpdates(DecreasePheromones)
             //.AddEnvironmentUpdates(AddPheromones)
             .AddCallback(c => drawing(colonyDrawer.Draw(c)))
             .SetRandomSeed(12557)
             .StopAgents()
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(100))
             .Build();
 
         return simulation;

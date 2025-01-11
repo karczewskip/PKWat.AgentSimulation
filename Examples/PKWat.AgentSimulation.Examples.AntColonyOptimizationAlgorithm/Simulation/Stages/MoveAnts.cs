@@ -27,6 +27,7 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
             }
 
             coordinates.SetCoordinates(x, y);
+            ant.PathLength++;
         }
     }
 }

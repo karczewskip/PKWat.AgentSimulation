@@ -8,7 +8,7 @@ internal class ChangeAfterVisitHill : ISimulationStage<ColonyEnvironment>
 {
     public async Task Execute(ISimulationContext<ColonyEnvironment> context)
     {
-        var hills = context.SimulationEnvironment.GetAntHills();
+        var hills = context.SimulationEnvironment.AntHills;
 
         foreach (var ant in context.GetAgents<Ant>())
         {

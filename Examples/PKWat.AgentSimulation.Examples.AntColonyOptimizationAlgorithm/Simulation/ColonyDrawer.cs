@@ -44,7 +44,27 @@
             //    graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
             //}
 
-            foreach (var antHill in context.SimulationEnvironment.GetAntHills())
+            for(int x = 0; x < context.SimulationEnvironment.Width; x++)
+            {
+                for (int y = 0; y < context.SimulationEnvironment.Height; y++)
+                {
+                    var pheromone = context.SimulationEnvironment.Pheromones[x, y];
+                    var foodValue = 255 * pheromone.Food / Pheromones.MaxPheromoneValue;
+                    var homeValue = 255 * pheromone.Home / Pheromones.MaxPheromoneValue;
+                    Color color;
+                    if(foodValue > homeValue)
+                    {
+                        color = Color.FromArgb((int)foodValue, 255, 255, 0);
+                    }
+                    else
+                    {
+                        color = Color.FromArgb((int)homeValue, 255, 0, 255);
+                    }
+                    graphic.FillRectangle(new SolidBrush(color), Scale * x, Scale * y, AntSize, AntSize);
+                }
+            }
+
+            foreach (var antHill in context.SimulationEnvironment.AntHills)
             {
                 graphic.FillEllipse(
                     new SolidBrush(Color.FromArgb(125, 102, 51, 0)), 
@@ -54,10 +74,10 @@
                     (float)(AntSize * antHill.Size));
             }
 
-            foreach (var foodSource in context.SimulationEnvironment.GetFoodSources())
+            foreach (var foodSource in context.SimulationEnvironment.FoodSource)
             {
                 graphic.FillEllipse(
-                    new SolidBrush(Color.FromArgb(125, 255, 255, 0)), 
+                    new SolidBrush(Color.FromArgb(125, 0, 51, 102)), 
                     Scale * foodSource.Coordinates.X, 
                     Scale * foodSource.Coordinates.Y,
                     (float)(AntSize * foodSource.Size),

@@ -8,17 +8,20 @@ public class Ant : SimpleSimulationAgent<ColonyEnvironment>
     public ColonyCoordinates Coordinates { get; private set; } = ColonyCoordinates.CreateAtOrigin();
     public bool IsCarryingFood { get; private set; } = false;
     public bool IsAfterHillVisit { get; private set; } = false;
+    public int PathLength { get; set; } = 1;
 
     public void GetFood()
     {
         IsCarryingFood = true;
         IsAfterHillVisit = false;
+        PathLength = 1;
     }
 
     public void VisitHill()
     {
         IsCarryingFood = false;
         IsAfterHillVisit = true;
+        PathLength = 1;
     }
 
 

@@ -8,7 +8,7 @@ internal class ChangeAfterVisitFood : ISimulationStage<ColonyEnvironment>
 {
     public async Task Execute(ISimulationContext<ColonyEnvironment> context)
     {
-        var food = context.SimulationEnvironment.GetFoodSources();
+        var food = context.SimulationEnvironment.FoodSource;
         foreach (var ant in context.GetAgents<Ant>())
         {
             foreach (var foodItem in food)

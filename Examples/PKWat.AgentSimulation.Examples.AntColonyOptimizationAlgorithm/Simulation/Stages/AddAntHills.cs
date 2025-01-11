@@ -19,7 +19,7 @@ internal class AddAntHills : ISimulationStage<ColonyEnvironment>
     {
         foreach (var antHill in antHills)
         {
-            context.SimulationEnvironment.AddAntHill(antHill);
+            context.SimulationEnvironment.AntHills.Add(antHill);
         }
     }
 }

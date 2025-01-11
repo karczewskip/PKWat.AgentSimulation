@@ -17,7 +17,7 @@ internal class AddFoodSources : ISimulationStage<ColonyEnvironment>
     {
         foreach (var foodSource in foodSources)
         {
-            context.SimulationEnvironment.AddFoodSource(foodSource);
+            context.SimulationEnvironment.FoodSource.Add(foodSource);
         }
     }
 }
