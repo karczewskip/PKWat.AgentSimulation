@@ -12,20 +12,21 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
     {
         foreach (var ant in context.GetAgents<Ant>())
         {
-            var x = ant.X + randomNumbersGenerator.Next(3) - 1;
-            var y = ant.Y + randomNumbersGenerator.Next(3) - 1;
+            var coordinates = ant.Coordinates;
+            var x = coordinates.X + randomNumbersGenerator.Next(3) - 1;
+            var y = coordinates.Y + randomNumbersGenerator.Next(3) - 1;
 
             if (x < 0 || x >= context.SimulationEnvironment.Width)
             {
-                x = ant.X;
+                x = coordinates.X;
             }
 
             if (y < 0 || y >= context.SimulationEnvironment.Height)
             {
-                y = ant.Y;
+                y = coordinates.Y;
             }
 
-            ant.SetCoordinates(x, y);
+            coordinates.SetCoordinates(x, y);
         }
     }
 }

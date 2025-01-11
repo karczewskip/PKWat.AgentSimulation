@@ -12,7 +12,7 @@ internal class SetAntsInRandomPositions(IRandomNumbersGenerator randomNumbersGen
     {
         foreach(var ant in context.GetAgents<Ant>())
         {
-            ant.SetCoordinates(
+            ant.Coordinates.SetCoordinates(
                 randomNumbersGenerator.Next(context.SimulationEnvironment.Width), 
                 randomNumbersGenerator.Next(context.SimulationEnvironment.Height));
         }

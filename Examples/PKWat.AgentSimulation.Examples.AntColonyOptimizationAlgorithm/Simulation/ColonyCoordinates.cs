@@ -23,6 +23,11 @@ public class ColonyCoordinates
         return Math.Sqrt(Math.Pow(X - coordinates.X, 2) + Math.Pow(Y - coordinates.Y, 2));
     }
 
+    public bool IsInRange(ColonyCoordinates coordinates, double size)
+    {
+        return DistanceFrom(coordinates) <= size;
+    }
+
     public void MoveBy(ColonyDirection direction)
     {
         X += direction.X;

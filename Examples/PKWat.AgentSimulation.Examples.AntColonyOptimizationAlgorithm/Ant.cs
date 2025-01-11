@@ -1,20 +1,24 @@
 ﻿namespace PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm;
 
 using PKWat.AgentSimulation.Core.Agent;
-using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
-using System;
 
 public class Ant : SimpleSimulationAgent<ColonyEnvironment>
 {
-    private readonly ColonyCoordinates coordinates = ColonyCoordinates.CreateAtOrigin();
+    public ColonyCoordinates Coordinates { get; private set; } = ColonyCoordinates.CreateAtOrigin();
+    public bool IsCarryingFood { get; private set; } = false;
+    public bool IsAfterHillVisit { get; private set; } = false;
 
-    public int X => coordinates.X;
-    public int Y => coordinates.Y;
-
-    public void SetCoordinates(int x, int y)
+    public void GetFood()
     {
-        coordinates.SetCoordinates(x, y);
+        IsCarryingFood = true;
+        IsAfterHillVisit = false;
+    }
+
+    public void VisitHill()
+    {
+        IsCarryingFood = false;
+        IsAfterHillVisit = true;
     }
 
 

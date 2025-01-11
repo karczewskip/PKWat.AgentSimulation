@@ -9,8 +9,6 @@
     {
         private const int Scale = 10;
         private const int AntSize = 1 * Scale;
-        private const int AnthillSize = 10 * Scale;
-        private const int FoodSize = 10 * Scale;
 
         private Bitmap _bmp;
 
@@ -48,17 +46,33 @@
 
             foreach (var antHill in context.SimulationEnvironment.GetAntHills())
             {
-                graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 102, 51, 0)), Scale * antHill.X, Scale * antHill.Y, AnthillSize, AnthillSize);
+                graphic.FillEllipse(
+                    new SolidBrush(Color.FromArgb(125, 102, 51, 0)), 
+                    Scale * antHill.Coordinates.X, 
+                    Scale * antHill.Coordinates.Y, 
+                    (float)(AntSize * antHill.Size),
+                    (float)(AntSize * antHill.Size));
             }
 
             foreach (var foodSource in context.SimulationEnvironment.GetFoodSources())
             {
-                graphic.FillEllipse(new SolidBrush(Color.FromArgb(125, 255, 255, 0)), Scale * foodSource.X, Scale * foodSource.Y, FoodSize, FoodSize);
+                graphic.FillEllipse(
+                    new SolidBrush(Color.FromArgb(125, 255, 255, 0)), 
+                    Scale * foodSource.Coordinates.X, 
+                    Scale * foodSource.Coordinates.Y,
+                    (float)(AntSize * foodSource.Size),
+                    (float)(AntSize * foodSource.Size));
             }
 
             foreach (Ant ant in context.GetAgents<Ant>())
             {
-                graphic.FillEllipse(Brushes.Black, Scale * ant.X, Scale * ant.Y, AntSize, AntSize);
+                var brush = ant switch 
+                { 
+                    { IsCarryingFood: true } => Brushes.Yellow,
+                    { IsAfterHillVisit: true } => Brushes.Brown,
+                    _ => Brushes.Black 
+                };
+                graphic.FillEllipse(brush, Scale * ant.Coordinates.X, Scale * ant.Coordinates.Y, AntSize, AntSize);
             }
 
             var bitmapSource = _bmp.ConvertToBitmapSource();
