@@ -5,10 +5,37 @@ using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage<ColonyEnvironment>
 {
+    private readonly Dictionary<ColonyDirection, ColonyDirection> verticalMirrorDirection = new Dictionary<ColonyDirection, ColonyDirection>
+    {
+        { ColonyDirection.Up, ColonyDirection.Down },
+        { ColonyDirection.Down, ColonyDirection.Up },
+        { ColonyDirection.UpRight, ColonyDirection.DownRight },
+        { ColonyDirection.DownRight, ColonyDirection.UpRight },
+        { ColonyDirection.DownLeft, ColonyDirection.UpLeft },
+        { ColonyDirection.UpLeft, ColonyDirection.DownLeft }
+    };
+
+    private readonly Dictionary<ColonyDirection, ColonyDirection> horizontalMirrorDirection = new Dictionary<ColonyDirection, ColonyDirection>
+    {
+        { ColonyDirection.Left, ColonyDirection.Right },
+        { ColonyDirection.Right, ColonyDirection.Left },
+        { ColonyDirection.UpLeft, ColonyDirection.UpRight },
+        { ColonyDirection.UpRight, ColonyDirection.UpLeft },
+        { ColonyDirection.DownRight, ColonyDirection.DownLeft },
+        { ColonyDirection.DownLeft, ColonyDirection.DownRight }
+    };
+
+    private readonly Dictionary<ColonyDirection, ColonyDirection> cornerMirrorDirection = new Dictionary<ColonyDirection, ColonyDirection>
+    {
+        { ColonyDirection.UpRight, ColonyDirection.DownLeft },
+        { ColonyDirection.DownRight, ColonyDirection.UpLeft },
+        { ColonyDirection.DownLeft, ColonyDirection.UpRight },
+        { ColonyDirection.UpLeft, ColonyDirection.DownRight }
+    };
+
     private readonly Dictionary<ColonyDirection, ColonyDirection[]> possibleDirections = new Dictionary<ColonyDirection, ColonyDirection[]>
     {
         { ColonyDirection.None, new[] { ColonyDirection.Up, ColonyDirection.Down, ColonyDirection.Left, ColonyDirection.Right } },
@@ -34,6 +61,11 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
     {
         var possibleDirections = this.possibleDirections[ant.Direction];
 
+        if(SetForEdges(ant, colonyEnvironment))
+        {
+            return;
+        }
+
         if (SetUsingPheromones(ant, colonyEnvironment, possibleDirections))
         {
             return;
@@ -42,17 +74,48 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
         SetNewRandomPostion(ant, colonyEnvironment, possibleDirections);
     }
 
-    private void SetNewRandomPostion(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection[] possibleDirections)
+    private bool SetForEdges(Ant ant, ColonyEnvironment colonyEnvironment)
     {
-        var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
-        SetUsingDirection(ant, colonyEnvironment, newDirection);
-    }
+        var antCoordinates = ant.Coordinates;
 
-    private void SetUsingDirection(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection newDirection)
-    {
-        ant.Coordinates.MoveBy(newDirection, colonyEnvironment.Width - 1, colonyEnvironment.Height - 1);
-        ant.Direction = newDirection;
-        ant.PathLength++;
+        var leftEdge = antCoordinates.X == 0;
+        var rightEdge = antCoordinates.X == colonyEnvironment.Width - 1;
+        var topEdge = antCoordinates.Y == colonyEnvironment.Height - 1;
+        var bottomEdge = antCoordinates.Y == 0;
+
+        if (
+            !leftEdge 
+            && !rightEdge 
+            && !topEdge
+            && !bottomEdge)
+        {
+            return false;
+        }
+
+        // Corner Mirror
+        if(
+            (leftEdge || rightEdge) && 
+            (topEdge || bottomEdge))
+        {
+            SetUsingDirection(ant, colonyEnvironment, cornerMirrorDirection[ant.Direction]);
+            return true;
+        }
+
+        // Horizontal Mirror
+        if (leftEdge || rightEdge)
+        {
+            SetUsingDirection(ant, colonyEnvironment, horizontalMirrorDirection[ant.Direction]);
+            return true;
+        }
+
+        // Vertical Mirror
+        if (topEdge || bottomEdge)
+        {
+            SetUsingDirection(ant, colonyEnvironment, verticalMirrorDirection[ant.Direction]);
+            return true;
+        }
+
+        return true;
     }
 
     private bool SetUsingPheromones(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection[] possibleDirections)
@@ -126,5 +189,18 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
 
             return true;
         }
+    }
+
+    private void SetNewRandomPostion(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection[] possibleDirections)
+    {
+        var newDirection = possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)];
+        SetUsingDirection(ant, colonyEnvironment, newDirection);
+    }
+
+    private void SetUsingDirection(Ant ant, ColonyEnvironment colonyEnvironment, ColonyDirection newDirection)
+    {
+        ant.Coordinates.MoveBy(newDirection, colonyEnvironment.Width - 1, colonyEnvironment.Height - 1);
+        ant.Direction = newDirection;
+        ant.PathLength++;
     }
 }
