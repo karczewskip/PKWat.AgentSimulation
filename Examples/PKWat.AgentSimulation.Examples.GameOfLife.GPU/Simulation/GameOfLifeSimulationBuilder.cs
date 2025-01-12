@@ -11,7 +11,7 @@ public class GameOfLifeSimulationBuilder(ISimulationBuilder simulationBuilder, G
     {
         var simulation = simulationBuilder
             .CreateNewSimulation<LifeMatrixEnvironment>()
-            .AddInitializationStage<InitializeSize>(s => s.UseSize(2000, 2000))
+            .AddInitializationStage<InitializeSize>(s => s.UseSize(1000, 1000))
             .AddStage<UpdateMatrix>(s => s.UseNumberOfThreads(32))
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)

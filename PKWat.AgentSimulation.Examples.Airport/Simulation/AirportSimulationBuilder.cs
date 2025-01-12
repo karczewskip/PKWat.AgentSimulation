@@ -39,7 +39,6 @@
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
                 .SetRandomSeed(100)
                 .WithSnapshots()
-                .StopAgents()
                 .Build();
 
             return simulation;

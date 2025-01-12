@@ -2,7 +2,7 @@
 
 using PKWat.AgentSimulation.Core.Agent;
 
-public class Airplane : SimpleSimulationAgent<AirportEnvironment>
+public class Airplane : SimpleSimulationAgent
 {
     public int? AssignedLine { get; set; }
     public TimeSpan? StartedLandingTime { get; private set; }

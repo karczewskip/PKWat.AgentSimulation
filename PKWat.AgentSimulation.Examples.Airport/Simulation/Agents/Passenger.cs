@@ -3,7 +3,7 @@
 using PKWat.AgentSimulation.Core.Agent;
 using System;
 
-public class Passenger : SimpleSimulationAgent<AirportEnvironment>
+public class Passenger : SimpleSimulationAgent
 {
     public AgentId AirplaneId { get; private set; }
     public TimeSpan? StartedCheckoutTime { get; private set; }

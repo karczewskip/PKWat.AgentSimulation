@@ -11,8 +11,8 @@ using System.Reflection;
 
 public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
 {
-    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
+    ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT>() where AGENT : ISimulationAgent;
+    ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent;
     ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
     ISimulationBuilderContext<ENVIRONMENT> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback);
     ISimulationBuilderContext<ENVIRONMENT> SetSimulationStep(TimeSpan simulationStep);
@@ -23,7 +23,6 @@ public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISim
     ISimulationBuilderContext<ENVIRONMENT> AddStage<U>() where U : ISimulationStage<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> WithSnapshots();
-    ISimulationBuilderContext<ENVIRONMENT> StopAgents();
 
     ISimulation Build();
 }
@@ -32,7 +31,7 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
 {
     private readonly IServiceProvider _serviceProvider;
 
-    private List<Func<ISimulationAgent<ENVIRONMENT>>> _agentsToGenerate = new();
+    private List<Func<ISimulationAgent>> _agentsToGenerate = new();
     private List<Func<ISimulationStage<ENVIRONMENT>>> _initializationStagesToGenerate = new();
     private List<Func<ISimulationStage<ENVIRONMENT>>> _stagesToGenerate = new();
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _callbacks = new();
@@ -40,23 +39,22 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
     private bool _doSnapshot = false;
-    private bool _runAgentsInParallel = true;
 
     public SimulationBuilderContext(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT> AddAgent<U>() where U : ISimulationAgent<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddAgent<U>() where U : ISimulationAgent
     {
         return AddAgents<U>(1);
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT> AddAgents<U>(int number) where U : ISimulationAgent<ENVIRONMENT>
+    public ISimulationBuilderContext<ENVIRONMENT> AddAgents<U>(int number) where U : ISimulationAgent
     {
         _agentsToGenerate.AddRange(Enumerable
             .Range(0, number)
-            .Select(x => new Func<ISimulationAgent<ENVIRONMENT>>(
+            .Select(x => new Func<ISimulationAgent>(
                 () => _serviceProvider.GetRequiredService<U>())));
 
         return this;
@@ -121,8 +119,7 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
             CreateSimulationSnapshotStore(),
             _callbacks,
             initializationStages,
-            stages,
-            _runAgentsInParallel);
+            stages);
     }
 
     private ISimulationSnapshotStore CreateSimulationSnapshotStore()
@@ -166,12 +163,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
             return stage;
         });
 
-        return this;
-    }
-
-    public ISimulationBuilderContext<ENVIRONMENT> StopAgents()
-    {
-        _runAgentsInParallel = false;
         return this;
     }
 }

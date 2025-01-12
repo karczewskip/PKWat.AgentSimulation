@@ -21,7 +21,6 @@
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly ISimulationStage<T>[] _initializationStages;
         private readonly ISimulationStage<T>[] _stages;
-        private readonly bool _runAgentsInParallel;
 
         private RunningSimulationState _runningState = RunningSimulationState.CreateNotRunningState();
 
@@ -33,15 +32,13 @@
             ISimulationSnapshotStore simulationSnapshotStore,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
             ISimulationStage<T>[] initializationStages,
-            ISimulationStage<T>[] stages,
-            bool runAgentsInParallel)
+            ISimulationStage<T>[] stages)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
             _callbacks = callbacks;
             _initializationStages = initializationStages;
             _stages = stages;
-            _runAgentsInParallel = runAgentsInParallel;
         }
 
         public async Task StartAsync()
@@ -52,11 +49,6 @@
             {
                 await stage.Execute(_context);
             }
-
-            await Parallel.ForEachAsync(
-                    _context.Agents,
-                    new ParallelOptions() { MaxDegreeOfParallelism = 10 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context.SimulationEnvironment))));
 
             _snapshotStore.CleanExistingSnapshots();
 
@@ -72,39 +64,9 @@
 
                 _context.StartNewCycle();
 
-                foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context.SimulationTime)))
-                {
-                    _context.Agents.Remove(agentToRemove.Id);
-                }
-
                 foreach (var stage in _stages)
                 {
                     await stage.Execute(_context);
-                }
-
-                //using (_context.PerformanceInfo.AddStep("Agents update"))
-                if (_runAgentsInParallel)
-                {
-                    var agentsCount = _context.Agents.Count;
-
-                    if(agentsCount > 0)
-                    {
-                        var numberOfThreads = 8;
-                        var chunkSize = 1 + (agentsCount - 1) / numberOfThreads;
-                        var chunkedAgents = _context.Agents.Values.Chunk(chunkSize).ToArray();
-
-                        await Parallel.ForEachAsync(
-                            chunkedAgents,
-                            new ParallelOptions() { MaxDegreeOfParallelism = numberOfThreads },
-                            (chunk, c) => new ValueTask(Task.Run(() =>
-                            {
-                                using var step = _context.PerformanceInfo.AddStep("Chunk");
-                                foreach (var agent in chunk)
-                                {
-                                    agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
-                                }
-                            })));
-                    }
                 }
 
                 foreach (var callback in _callbacks)

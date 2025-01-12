@@ -33,7 +33,6 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             .AddStage<MoveAnts>(s => s.SetTemperature(0.04))
             .AddCallback(c => drawing(colonyDrawer.Draw(c)))
             .SetRandomSeed(12557)
-            .StopAgents()
             .Build();
 
         return simulation;

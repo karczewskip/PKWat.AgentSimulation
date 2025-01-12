@@ -11,11 +11,11 @@ public interface ISimulationContext<ENVIRONMENT> : ISimulationTimeProvider, ISim
 {
     ENVIRONMENT SimulationEnvironment { get; }
 
-    AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
+    AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent;
     void RemoveAgent(AgentId agentId);
-    IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
-    AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
-    AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>;
+    IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent;
+    AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent;
+    AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent;
 }
 
 internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> where ENVIRONMENT : ISimulationEnvironment
@@ -29,7 +29,7 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
     public SimulationContext(
         IServiceProvider serviceProvider,
         ENVIRONMENT simulationEnvironment,
-        ISimulationAgent<ENVIRONMENT>[] agents,
+        ISimulationAgent[] agents,
         TimeSpan simulationStep,
         TimeSpan waitingTimeBetweenSteps)
     {
@@ -45,16 +45,16 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
     public IReadOnlySimulationTime SimulationTime => _simulationTime;
     public ISimulationCyclePerformanceInfo PerformanceInfo => _performanceInfo;
 
-    public Dictionary<AgentId, ISimulationAgent<ENVIRONMENT>> Agents { get; }
+    public Dictionary<AgentId, ISimulationAgent> Agents { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
 
-    public IEnumerable<T> GetAgents<T>() where T : ISimulationAgent<ENVIRONMENT> 
+    public IEnumerable<T> GetAgents<T>() where T : ISimulationAgent 
         => Agents.Values.OfType<T>();
 
-    public AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
+    public AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent
         => Agents.Values.OfType<AGENT>().Single();
 
-    public AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent<ENVIRONMENT>
+    public AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent
         => (AGENT)Agents[agentId];
 
     internal void StartCycleZero()
@@ -70,10 +70,9 @@ internal class SimulationContext<ENVIRONMENT> : ISimulationContext<ENVIRONMENT> 
         _performanceInfo.StartNewCycle();
     }
 
-    public AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>
+    public AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent
     {
         var agent = _serviceProvider.GetRequiredService<AGENT>();
-        agent.Initialize(SimulationEnvironment);
         Agents.Add(agent.Id, agent);
 
         return agent;

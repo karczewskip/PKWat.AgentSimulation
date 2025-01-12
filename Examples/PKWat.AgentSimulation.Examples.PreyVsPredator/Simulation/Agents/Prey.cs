@@ -38,7 +38,7 @@ public class PregnancyStatus
 }
 
 internal class Prey(IRandomNumbersGenerator randomNumbersGenerator) :
-    SimpleSimulationAgent<PreyVsPredatorEnvironment>
+    SimpleSimulationAgent
 {
     private PregnancyStatus _pregnancy = PregnancyStatus.StartPregnancy();
 

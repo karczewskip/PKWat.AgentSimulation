@@ -24,7 +24,6 @@ public class PreyVsPredatorSimulationBuilder(
             .AddStage<PreyersEaten>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)
-            .StopAgents()
             .Build();
 
         return simulation;
