@@ -2,7 +2,6 @@
 {
     using PKWat.AgentSimulation.Core.Crash;
     using PKWat.AgentSimulation.Core.Environment;
-    using PKWat.AgentSimulation.Core.Event;
     using PKWat.AgentSimulation.Core.Snapshots;
     using PKWat.AgentSimulation.Core.Stage;
 
@@ -22,7 +21,6 @@
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
         private readonly Func<SimulationContext<T>, Task> _environmentInitialization;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
-        private readonly IReadOnlyList<ISimulationEvent<T>> _events;
         private readonly ISimulationStage<T>[] _initializationStages;
         private readonly ISimulationStage<T>[] _stages;
         private readonly bool _runAgentsInParallel;
@@ -38,7 +36,6 @@
             IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
             Func<SimulationContext<T>, Task> environmentInitialization,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
-            IReadOnlyList<ISimulationEvent<T>> events,
             ISimulationStage<T>[] initializationStages,
             ISimulationStage<T>[] stages,
             bool runAgentsInParallel)
@@ -48,7 +45,6 @@
             _environmentUpdates = environmentUpdates;
             _environmentInitialization = environmentInitialization;
             _callbacks = callbacks;
-            _events = events;
             _initializationStages = initializationStages;
             _stages = stages;
             _runAgentsInParallel = runAgentsInParallel;
@@ -94,14 +90,6 @@
                     foreach (var environmentUpdate in _environmentUpdates)
                     {
                         await environmentUpdate(_context);
-                    }
-                }
-
-                foreach (var simulationEvent in _events)
-                {
-                    if(await simulationEvent.ShouldBeExecuted(_context))
-                    {
-                        await simulationEvent.Execute(_context);
                     }
                 }
 

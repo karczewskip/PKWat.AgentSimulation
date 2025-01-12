@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Environment;
-using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Snapshots;
 using PKWat.AgentSimulation.Core.Stage;
@@ -25,8 +24,6 @@ public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISim
     ISimulationBuilderContext<ENVIRONMENT> AddInitializationStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddStage<U>() where U : ISimulationStage<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddStage<U>(Action<U> initialization) where U : ISimulationStage<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> WithSnapshots();
     ISimulationBuilderContext<ENVIRONMENT> StopAgents();
 
@@ -38,7 +35,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
     private readonly IServiceProvider _serviceProvider;
 
     private List<Func<ISimulationAgent<ENVIRONMENT>>> _agentsToGenerate = new();
-    private List<Func<ISimulationEvent<ENVIRONMENT>>> _eventsToGenerate = new();
     private List<Func<ISimulationStage<ENVIRONMENT>>> _initializationStagesToGenerate = new();
     private List<Func<ISimulationStage<ENVIRONMENT>>> _stagesToGenerate = new();
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _environmentUpdates = new();
@@ -119,22 +115,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
         return this;
     }
 
-    public ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>() where U : ISimulationEvent<ENVIRONMENT>
-        => AddEvent<U>(_ => { });
-
-    public ISimulationBuilderContext<ENVIRONMENT> AddEvent<U>(Action<U> initialization) where U : ISimulationEvent<ENVIRONMENT>
-    {
-        _eventsToGenerate.Add(() =>
-            {
-                var newEvent = _serviceProvider.GetRequiredService<U>();
-                initialization(newEvent);
-
-                return newEvent;
-            });
-
-        return this;
-    }
-
     public ISimulationBuilderContext<ENVIRONMENT> WithSnapshots()
     {
         _doSnapshot = true;
@@ -146,7 +126,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
         _serviceProvider.GetRequiredService<RandomNumbersGeneratorFactory>().Initialize(_randomSeed);
         var simulationEnvironment = _serviceProvider.GetRequiredService<ENVIRONMENT>();
         var agents = _agentsToGenerate.Select(x => x()).ToArray();
-        var events = _eventsToGenerate.Select(x => x()).ToArray();
         var initializationStages = _initializationStagesToGenerate.Select(x => x()).ToArray();
         var stages = _stagesToGenerate.Select(x => x()).ToArray();
 
@@ -161,7 +140,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
             _environmentUpdates,
             _environmentInitilization,
             _callbacks,
-            events,
             initializationStages,
             stages,
             _runAgentsInParallel);
