@@ -5,7 +5,7 @@ using PKWat.AgentSimulation.Core.Stage;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class SetLindingLines : ISimulationStage<AirportEnvironment>
+internal class SetLindingLines : ISimulationStage
 {
     private int maxLandingLines = 8;
 
@@ -14,8 +14,10 @@ internal class SetLindingLines : ISimulationStage<AirportEnvironment>
         this.maxLandingLines = maxLandingLines;
     }
 
-    public async Task Execute(ISimulationContext<AirportEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        context.SimulationEnvironment.SetLandingLines(Enumerable.Range(1, maxLandingLines).ToArray());
+        var environment = context.GetSimulationEnvironment<AirportEnvironment>();
+
+        environment.SetLandingLines(Enumerable.Range(1, maxLandingLines).ToArray());
     }
 }

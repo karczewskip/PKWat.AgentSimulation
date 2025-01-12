@@ -44,7 +44,7 @@
             return simulation;
         }
 
-        private async Task RenderAsync(ISimulationContext<AirportEnvironment> context, Action<BitmapSource> drawing)
+        private async Task RenderAsync(ISimulationContext context, Action<BitmapSource> drawing)
             => drawing(_airportDrawer.Draw(context));
     }
 }

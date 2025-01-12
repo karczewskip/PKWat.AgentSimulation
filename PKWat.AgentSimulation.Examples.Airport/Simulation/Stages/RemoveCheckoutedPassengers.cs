@@ -6,9 +6,9 @@ using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class RemoveCheckoutedPassengers : ISimulationStage<AirportEnvironment>
+internal class RemoveCheckoutedPassengers : ISimulationStage
 {
-    public async Task Execute(ISimulationContext<AirportEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
         var checkoutedPassengers = context.GetAgents<Passenger>()
             .Where(p => p.IsCheckouted(context.SimulationTime.Time));

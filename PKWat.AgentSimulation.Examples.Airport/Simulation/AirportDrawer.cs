@@ -25,8 +25,10 @@ public class AirportDrawer
         _bmp.SetResolution(96, 96);
     }
 
-    public BitmapSource Draw(ISimulationContext<AirportEnvironment> context)
+    public BitmapSource Draw(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<AirportEnvironment>();
+
         var waitingCordinates = new DrawingCoordinates(_bmp.Width / 2, 100);
         var departureCoordinates = new DrawingCoordinates(_bmp.Width - 100, _bmp.Height / 2);
 
@@ -35,7 +37,7 @@ public class AirportDrawer
 
         var now = context.SimulationTime.Time;
 
-        foreach(var landingLine in context.SimulationEnvironment.AllLandingLines)
+        foreach(var landingLine in environment.AllLandingLines)
         {
             var landingPlace = GetLandingPlaceForLandingLine(landingLine);
             graphic.DrawLine(Pens.Black, 0, landingPlace.Y, _bmp.Width, landingPlace.Y);

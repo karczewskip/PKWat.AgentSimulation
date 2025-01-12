@@ -6,15 +6,17 @@ using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class ReleaseLines : ISimulationStage<AirportEnvironment>
+internal class ReleaseLines : ISimulationStage
 {
-    public async Task Execute(ISimulationContext<AirportEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
         foreach(var airplane in context.GetAgents<Airplane>().Where(
             x => x.IsDepartured(context.SimulationTime.Time) 
             && x.AssignedLine.HasValue).ToArray())
         {
-            context.SimulationEnvironment.AvailableLines.Enqueue(airplane.AssignedLine!.Value);
+            var environment = context.GetSimulationEnvironment<AirportEnvironment>();
+
+            environment.AvailableLines.Enqueue(airplane.AssignedLine!.Value);
             airplane.AssignedLine = null;
         }
     }

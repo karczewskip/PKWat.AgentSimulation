@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class StartLandingAirplane : ISimulationStage<AirportEnvironment>
+internal class StartLandingAirplane : ISimulationStage
 {
     private TimeSpan landingTime = TimeSpan.FromMinutes(10);
 
@@ -16,7 +16,7 @@ internal class StartLandingAirplane : ISimulationStage<AirportEnvironment>
         this.landingTime = landingTime;
     }
 
-    public async Task Execute(ISimulationContext<AirportEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
         var airplanes = context.GetAgents<Airplane>().Where(x => x.WaitsForLanding && x.AssignedLine.HasValue);
         foreach (var airplane in airplanes)

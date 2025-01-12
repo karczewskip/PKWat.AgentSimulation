@@ -6,7 +6,7 @@ using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class StartCheckoutingPassengers : ISimulationStage<AirportEnvironment>
+internal class StartCheckoutingPassengers : ISimulationStage
 {
     private TimeSpan checkoutTime = TimeSpan.FromMinutes(5);
 
@@ -15,7 +15,7 @@ internal class StartCheckoutingPassengers : ISimulationStage<AirportEnvironment>
         this.checkoutTime = checkoutTime;
     }
 
-    public async Task Execute(ISimulationContext<AirportEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
         var simulationTime = context.SimulationTime;
 

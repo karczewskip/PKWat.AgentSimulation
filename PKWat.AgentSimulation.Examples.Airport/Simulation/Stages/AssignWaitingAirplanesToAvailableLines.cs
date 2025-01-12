@@ -6,14 +6,16 @@ using PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class AssignWaitingAirplanesToAvailableLines : ISimulationStage<AirportEnvironment>
+internal class AssignWaitingAirplanesToAvailableLines : ISimulationStage
 {
-    public async Task Execute(ISimulationContext<AirportEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        while(context.SimulationEnvironment.WaitingAirplanes.Any() && context.SimulationEnvironment.AvailableLines.Any())
+        var environment = context.GetSimulationEnvironment<AirportEnvironment>();
+
+        while (environment.WaitingAirplanes.Any() && environment.AvailableLines.Any())
         {
-            var airplaneId = context.SimulationEnvironment.WaitingAirplanes.Dequeue();
-            var line = context.SimulationEnvironment.AvailableLines.Dequeue();
+            var airplaneId = environment.WaitingAirplanes.Dequeue();
+            var line = environment.AvailableLines.Dequeue();
             var airplane = context.GetRequiredAgent<Airplane>(airplaneId);
             airplane.AssignedLine = line;
         }
