@@ -7,17 +7,19 @@ using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using System.Threading.Tasks;
 
-internal class PreyersEaten(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage<PreyVsPredatorEnvironment>
+internal class PreyersEaten(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage
 {
-    public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
+
         using var step = simulationCyclePerformanceInfo.AddStep("PreyersEaten");
         var newBornPredators = new List<(AgentId NewBorn, AgentId Parent)>();
         var predators = context.GetAgents<Predator>().ToArray();
 
         foreach (var predator in predators)
         {
-            var eatenPrey = context.SimulationEnvironment.EatPreyByPredator(predator.Id);
+            var eatenPrey = environment.EatPreyByPredator(predator.Id);
             if (eatenPrey != null)
             {
                 context.RemoveAgent(eatenPrey);
@@ -29,6 +31,6 @@ internal class PreyersEaten(ISimulationCyclePerformanceInfo simulationCyclePerfo
             }
         }
 
-        context.SimulationEnvironment.PlaceNewBornPredators(newBornPredators);
+        environment.PlaceNewBornPredators(newBornPredators);
     }
 }

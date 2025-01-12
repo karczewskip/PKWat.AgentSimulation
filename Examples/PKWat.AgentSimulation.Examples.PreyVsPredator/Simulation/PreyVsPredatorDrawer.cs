@@ -7,10 +7,12 @@ using System.Windows.Media.Imaging;
 
 public class PreyVsPredatorDrawer(ISimulationCyclePerformanceInfo performanceInfoProvider)
 {
-    public BitmapSource Draw(ISimulationContext<PreyVsPredatorEnvironment> context)
+    public BitmapSource Draw(ISimulationContext context)
     {
-        var width = context.SimulationEnvironment.GetWidth();
-        var height = context.SimulationEnvironment.GetHeight();
+        var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
+
+        var width = environment.GetWidth();
+        var height = environment.GetHeight();
         var wholeImageSize = (int)(height * 1.5);
         var stride = width * 4;
 
@@ -22,14 +24,14 @@ public class PreyVsPredatorDrawer(ISimulationCyclePerformanceInfo performanceInf
             for (int j = 0; j < height; j++)
             {
                 var index = (i * height + j) * 4;
-                if (context.SimulationEnvironment.IsPredatorAt(i, j))
+                if (environment.IsPredatorAt(i, j))
                 {
                     pixels[index] = 255;
                     pixels[index + 1] = 0;
                     pixels[index + 2] = 0;
                     pixels[index + 3] = 255;
                 }
-                else if(context.SimulationEnvironment.IsPreyAt(i, j))
+                else if(environment.IsPreyAt(i, j))
                 {
                     pixels[index] = 0;
                     pixels[index + 1] += 255;

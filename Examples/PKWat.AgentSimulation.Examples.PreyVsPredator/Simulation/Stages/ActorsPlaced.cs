@@ -6,7 +6,7 @@ using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class ActorsPlaced : ISimulationStage<PreyVsPredatorEnvironment>
+internal class ActorsPlaced : ISimulationStage
 {
     private int width;
     private int height;
@@ -17,11 +17,13 @@ internal class ActorsPlaced : ISimulationStage<PreyVsPredatorEnvironment>
         this.height = height;
     }
 
-    public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        context.SimulationEnvironment.SetSize(width, height);
+        var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
 
-        context.SimulationEnvironment.PlaceInitialPreys(context.GetAgents<Prey>().Select(x => x.Id).ToArray());
-        context.SimulationEnvironment.PlaceInitialPredators(context.GetAgents<Predator>().Select(x => x.Id).ToArray());
+        environment.SetSize(width, height);
+
+        environment.PlaceInitialPreys(context.GetAgents<Prey>().Select(x => x.Id).ToArray());
+        environment.PlaceInitialPredators(context.GetAgents<Predator>().Select(x => x.Id).ToArray());
     }
 }
