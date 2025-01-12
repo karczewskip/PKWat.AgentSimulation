@@ -1,0 +1,57 @@
+﻿<Window x:Class="PKWat.AgentSimulation.ExamplesVisualizer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PKWat.AgentSimulation.ExamplesVisualizer"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <DockPanel>
+
+        <!-- Górny panel (umieszczony w DockPanel.Dock="Top") -->
+        <StackPanel DockPanel.Dock="Top" 
+                    Orientation="Horizontal" 
+                    Background="LightGray"
+                    Margin="5">
+            <Button Name="startSimulationButton" 
+                    Content="Start" 
+                    Click="startSimulationButton_Click"
+                    Margin="5,0,5,0" 
+                    Width="80" />
+            <Button Name="stopSimulationButton" 
+                    Content="Stop" 
+                    Click="stopSimulationButton_Click" 
+                    Margin="5,0,5,0" 
+                    Width="80" />
+            <ComboBox 
+                      Name="simulationBuildersComboBox"
+                      Width="250" 
+                      Margin="5,0,5,0">
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Główny panel z podziałem na dwie kolumny (Image i TextBox) -->
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <!-- Kolumna na obrazek -->
+                <ColumnDefinition Width="2*" />
+                <!-- Kolumna na tekst -->
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Kontrolka Image po lewej -->
+            <Image Grid.Column="0" 
+                   Name="simulationImage"
+                   Stretch="Uniform" 
+                   Margin="5" />
+
+            <!-- Read-only TextBox po prawej -->
+            <TextBox 
+                     Name="LogsTextBox"
+                     Grid.Column="1" 
+                     Margin="5" 
+                     IsReadOnly="True"
+                     VerticalScrollBarVisibility="Auto" />
+        </Grid>
+    </DockPanel>
+</Window>

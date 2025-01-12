@@ -81,6 +81,8 @@
                     _runningState.Crash(crashResult);
                 }
 
+                _context.OnCycleFinish();
+
                 await Task.Delay(_context.WaitingTimeBetweenSteps);
             }
         }

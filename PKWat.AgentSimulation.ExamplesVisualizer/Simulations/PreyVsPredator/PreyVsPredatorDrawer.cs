@@ -1,0 +1,46 @@
+﻿namespace PKWat.AgentSimulation.ExamplesVisualizer.Simulations.PreyVsPredator;
+
+using PKWat.AgentSimulation.Core;
+using System.Windows.Media.Imaging;
+
+public class PreyVsPredatorDrawer : IVisualizationDrawer
+{
+    public BitmapSource Draw(ISimulationContext context)
+    {
+        var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
+
+        var width = environment.GetWidth();
+        var height = environment.GetHeight();
+        var stride = width * 4;
+
+        var writableBitmap = new WriteableBitmap(width, height, 96, 96, System.Windows.Media.PixelFormats.Bgr32, null);
+
+        var pixels = new byte[width * height * 4];
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                var index = (i * height + j) * 4;
+                if (environment.IsPredatorAt(i, j))
+                {
+                    pixels[index] = 255;
+                    pixels[index + 1] = 0;
+                    pixels[index + 2] = 0;
+                    pixels[index + 3] = 255;
+                }
+                else if (environment.IsPreyAt(i, j))
+                {
+                    pixels[index] = 0;
+                    pixels[index + 1] += 255;
+                    pixels[index + 2] += 0;
+                    pixels[index + 3] += 255;
+                }
+            }
+        }
+        writableBitmap.WritePixels(new System.Windows.Int32Rect(0, 0, width, height), pixels, width * 4, 0);
+
+        writableBitmap.Freeze();
+
+        return writableBitmap;
+    }
+}
