@@ -59,9 +59,9 @@ public static class RegisterExtensions
             var interfaces = type.GetInterfaces();
             if (interfaces.Any(i => registeringGenericTypes.Contains(i)))
             {
-                services.AddTransient(type);
+                services.AddScoped(type);
                 var registeringInterface = interfaces.First(i => registeringGenericTypes.Contains(i));
-                services.AddTransient(registeringInterface, type);
+                services.AddScoped(registeringInterface, type);
             }
         }
     }
