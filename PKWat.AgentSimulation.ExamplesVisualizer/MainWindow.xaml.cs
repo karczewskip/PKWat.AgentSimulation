@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.ExamplesVisualizer;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,7 +14,9 @@ public partial class MainWindow : Window
     private ISimulation simulation;
     private readonly Dictionary<string, IExampleSimulationBuilder> exampleSimulationBuilders;
 
-    public MainWindow(IEnumerable<IExampleSimulationBuilder> exampleSimulationBuilders)
+    public MainWindow(
+        IEnumerable<IExampleSimulationBuilder> exampleSimulationBuilders,
+        ISimulationCyclePerformanceInfo performanceInfo)
     {
         this.exampleSimulationBuilders = exampleSimulationBuilders.ToDictionary(b => b.GetType().Name);
 
@@ -24,6 +27,8 @@ public partial class MainWindow : Window
             simulationBuildersComboBox.Items.Add(builderName);
         }
         simulationBuildersComboBox.SelectedIndex = 0;
+
+        performanceInfo.Subscribe(s => Dispatcher.Invoke(() => LogsTextBox.Text = s));
     }
 
     private async void startSimulationButton_Click(object sender, RoutedEventArgs e)

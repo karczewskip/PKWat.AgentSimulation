@@ -7,7 +7,7 @@ using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.Time;
 using System.Collections.Generic;
 
-public interface ISimulationContext : ISimulationTimeProvider, ISimulationPerformanceInfoProvider
+public interface ISimulationContext : ISimulationTimeProvider
 {
     ENVIRONMENT GetSimulationEnvironment<ENVIRONMENT>() where ENVIRONMENT : ISimulationEnvironment;
     AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent;
@@ -83,5 +83,10 @@ internal class SimulationContext : ISimulationContext
     public void RemoveAgent(AgentId agentId)
     {
         Agents.Remove(agentId);
+    }
+
+    internal void OnCycleFinish()
+    {
+        _performanceInfo.NotifySubscribers();
     }
 }

@@ -6,6 +6,7 @@ public interface ISimulationCyclePerformanceInfo
 {
     IDisposable AddStep(string name);
     string GetPerformanceInfo();
+    void Subscribe(Action<string> notify);
 }
 
 internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
@@ -14,6 +15,7 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
 
     private List<SimulationPerformanceInfoStep> _cycles = new();
     private ConcurrentBag<SimulationPerformanceInfoStep> _currentCycleSteps = new();
+    private List<Action<string>> _subscribers = new();
 
     private SimulationPerformanceInfoStep? CurrentCycle => _cycles.LastOrDefault();
 
@@ -76,6 +78,20 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
     private static string GetCycleName(int cycleNumber)
     {
         return $"Cycle {cycleNumber}";
+    }
+
+    public void Subscribe(Action<string> notify)
+    {
+        _subscribers.Add(notify);
+    }
+
+    public void NotifySubscribers()
+    {
+        var performanceInfo = GetPerformanceInfo();
+        foreach (var subscriber in _subscribers)
+        {
+            subscriber(performanceInfo);
+        }
     }
 
     private class DisposeAfterFinish : IDisposable
