@@ -6,21 +6,50 @@
         xmlns:local="clr-namespace:PKWat.AgentSimulation.ExamplesVisualizer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Button Grid.Row="0" Name="startSimulationButton" Content="Start Simulation" Click="startSimulationButton_Click" />
-        <Button Grid.Row="0" Grid.Column="1" Name="stopSimulationButton" Content="Stop Simulation" Click="stopSimulationButton_Click" />
-        <Grid Grid.Row="1" Grid.ColumnSpan="2"  Background="Black">
-            <Border  Grid.Row="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Top"  BorderBrush="White" BorderThickness="2" >
-                <Image Name="simulationImage" Stretch="Uniform" />
-            </Border>
+    <DockPanel>
+
+        <!-- Górny panel (umieszczony w DockPanel.Dock="Top") -->
+        <StackPanel DockPanel.Dock="Top" 
+                    Orientation="Horizontal" 
+                    Background="LightGray"
+                    Margin="5">
+            <Button Name="startSimulationButton" 
+                    Content="Start" 
+                    Click="startSimulationButton_Click"
+                    Margin="5,0,5,0" 
+                    Width="80" />
+            <Button Name="stopSimulationButton" 
+                    Content="Stop" 
+                    Click="stopSimulationButton_Click" 
+                    Margin="5,0,5,0" 
+                    Width="80" />
+            <ComboBox 
+                      Name="simulationBuildersComboBox"
+                      Width="150" 
+                      Margin="5,0,5,0">
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Główny panel z podziałem na dwie kolumny (Image i TextBox) -->
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <!-- Kolumna na obrazek -->
+                <ColumnDefinition Width="2*" />
+                <!-- Kolumna na tekst -->
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Kontrolka Image po lewej -->
+            <Image Grid.Column="0" 
+                   Name="simulationImage"
+                   Stretch="Uniform" 
+                   Margin="5" />
+
+            <!-- Read-only TextBox po prawej -->
+            <TextBox Grid.Column="1" 
+                     Margin="5" 
+                     IsReadOnly="True"
+                     VerticalScrollBarVisibility="Auto" />
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>

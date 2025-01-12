@@ -3,6 +3,7 @@
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations;
 using System.Windows;
+using System.Windows.Controls;
 
 /// <summary>
 /// Interaction logic for MainWindow.xaml
@@ -10,13 +11,19 @@ using System.Windows;
 public partial class MainWindow : Window
 {
     private ISimulation simulation;
-    private readonly SimulationsBuilder simulationsBuilder;
+    private readonly Dictionary<string, IExampleSimulationBuilder> exampleSimulationBuilders;
 
-    public MainWindow(SimulationsBuilder simulationsBuilder)
+    public MainWindow(IEnumerable<IExampleSimulationBuilder> exampleSimulationBuilders)
     {
-        this.simulationsBuilder = simulationsBuilder;
+        this.exampleSimulationBuilders = exampleSimulationBuilders.ToDictionary(b => b.GetType().Name);
 
         InitializeComponent();
+
+        foreach (var builderName in this.exampleSimulationBuilders.Keys)
+        {
+            simulationBuildersComboBox.Items.Add(builderName);
+        }
+        simulationBuildersComboBox.SelectedIndex = 0;
     }
 
     private async void startSimulationButton_Click(object sender, RoutedEventArgs e)
@@ -25,7 +32,8 @@ public partial class MainWindow : Window
         {
             await simulation.StopAsync();
         }
-        simulation = simulationsBuilder.BuildPreyVsPredatorSimulation(bitmapSource =>
+        var selectedBuilder = simulationBuildersComboBox.SelectedValue.ToString();
+        simulation = exampleSimulationBuilders[selectedBuilder].Build(bitmapSource =>
         {
             Dispatcher.Invoke(() => simulationImage.Source = bitmapSource);
         });
