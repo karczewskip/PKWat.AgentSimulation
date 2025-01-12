@@ -5,11 +5,13 @@ using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System.Threading.Tasks;
 
-internal class ChangeAfterVisitHill : ISimulationStage<ColonyEnvironment>
+internal class ChangeAfterVisitHill : ISimulationStage
 {
-    public async Task Execute(ISimulationContext<ColonyEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        var hills = context.SimulationEnvironment.AntHills;
+        var environment = context.GetSimulationEnvironment<ColonyEnvironment>();
+
+        var hills = environment.AntHills;
 
         foreach (var ant in context.GetAgents<Ant>())
         {

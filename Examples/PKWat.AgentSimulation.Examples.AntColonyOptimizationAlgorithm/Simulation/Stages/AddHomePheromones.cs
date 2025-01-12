@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class AddHomePheromones : ISimulationStage<ColonyEnvironment>
+internal class AddHomePheromones : ISimulationStage
 {
     private double pheromonesPersistence = 8;
 
@@ -16,15 +16,17 @@ internal class AddHomePheromones : ISimulationStage<ColonyEnvironment>
         this.pheromonesPersistence = pheromonesPersistence;
     }
 
-    public async Task Execute(ISimulationContext<ColonyEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<ColonyEnvironment>();
+
         foreach (var agent in context.GetAgents<Ant>().Where(x => x.IsAfterHillVisit))
         {
             var agentHomePheromones = Pheromones.MaxPheromoneValue * Math.Exp(-agent.PathLength / pheromonesPersistence);
-            context.SimulationEnvironment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddHome(agentHomePheromones);
+            environment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddHome(agentHomePheromones);
         }
 
-        foreach (var hill in context.SimulationEnvironment.AntHills)
+        foreach (var hill in environment.AntHills)
         {
             for (var x = hill.Coordinates.X - hill.SizeRadius; x <= hill.Coordinates.X + hill.SizeRadius; x++)
             {
@@ -32,7 +34,7 @@ internal class AddHomePheromones : ISimulationStage<ColonyEnvironment>
                 {
                     if (hill.Coordinates.IsInRange(x, y, hill.SizeRadius))
                     {
-                        context.SimulationEnvironment.Pheromones[(int)x, (int)y].AddHome(Pheromones.MaxPheromoneValue);
+                        environment.Pheromones[(int)x, (int)y].AddHome(Pheromones.MaxPheromoneValue);
                     }
                 }
             }

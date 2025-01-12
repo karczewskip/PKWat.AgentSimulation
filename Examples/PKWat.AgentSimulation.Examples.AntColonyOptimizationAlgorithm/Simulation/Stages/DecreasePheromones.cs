@@ -4,7 +4,7 @@ using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
 using System.Threading.Tasks;
 
-internal class DecreasePheromones : ISimulationStage<ColonyEnvironment>
+internal class DecreasePheromones : ISimulationStage
 {
     private double decreaseRate = 0.95;
 
@@ -13,13 +13,15 @@ internal class DecreasePheromones : ISimulationStage<ColonyEnvironment>
         this.decreaseRate = decreaseRate;
     }
 
-    public async Task Execute(ISimulationContext<ColonyEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        for (var x = 0; x < context.SimulationEnvironment.Width; x++)
+        var environment = context.GetSimulationEnvironment<ColonyEnvironment>();
+
+        for (var x = 0; x < environment.Width; x++)
         {
-            for (var y = 0; y < context.SimulationEnvironment.Height; y++)
+            for (var y = 0; y < environment.Height; y++)
             {
-                var pheromones = context.SimulationEnvironment.Pheromones[x, y];
+                var pheromones = environment.Pheromones[x, y];
                 pheromones.Decrease(decreaseRate);
             }
         }

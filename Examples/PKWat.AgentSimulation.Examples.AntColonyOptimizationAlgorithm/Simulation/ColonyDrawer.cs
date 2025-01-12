@@ -18,8 +18,10 @@
             _bmp.SetResolution(96, 96);
         }
 
-        public BitmapSource Draw(ISimulationContext<ColonyEnvironment> context)
+        public BitmapSource Draw(ISimulationContext context)
         {
+            var environment = context.GetSimulationEnvironment<ColonyEnvironment>();
+
             using var graphic = Graphics.FromImage(_bmp);
             graphic.Clear(Color.White);
 
@@ -44,11 +46,11 @@
             //    graphic.FillRectangle(new SolidBrush(color), Scale * coordinates.X, Scale * coordinates.Y, 5, 5);
             //}
 
-            for(int x = 0; x < context.SimulationEnvironment.Width; x++)
+            for(int x = 0; x < environment.Width; x++)
             {
-                for (int y = 0; y < context.SimulationEnvironment.Height; y++)
+                for (int y = 0; y < environment.Height; y++)
                 {
-                    var pheromone = context.SimulationEnvironment.Pheromones[x, y];
+                    var pheromone = environment.Pheromones[x, y];
                     var foodValue = 255 * pheromone.Food / Pheromones.MaxPheromoneValue;
                     var homeValue = 255 * pheromone.Home / Pheromones.MaxPheromoneValue;
                     Color color;

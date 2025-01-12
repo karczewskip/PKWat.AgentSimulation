@@ -5,7 +5,7 @@ using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System.Threading.Tasks;
 
-internal class SetColonySize(ColonyDrawer colonyDrawer) : ISimulationStage<ColonyEnvironment>
+internal class SetColonySize(ColonyDrawer colonyDrawer) : ISimulationStage
 {
     private int width = 100;
     private int height = 100;
@@ -18,8 +18,10 @@ internal class SetColonySize(ColonyDrawer colonyDrawer) : ISimulationStage<Colon
         colonyDrawer.Initialize(width, height);
     }
 
-    public async Task Execute(ISimulationContext<ColonyEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        context.SimulationEnvironment.SetSize(width, height);
+        var environment = context.GetSimulationEnvironment<ColonyEnvironment>();
+
+        environment.SetSize(width, height);
     }
 }

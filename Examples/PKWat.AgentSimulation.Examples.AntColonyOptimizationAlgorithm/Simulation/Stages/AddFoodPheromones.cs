@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class AddFoodPheromones : ISimulationStage<ColonyEnvironment>
+internal class AddFoodPheromones : ISimulationStage
 {
     private double pheromonesPersistence = 8;
 
@@ -16,15 +16,17 @@ internal class AddFoodPheromones : ISimulationStage<ColonyEnvironment>
         this.pheromonesPersistence = pheromonesPersistence;
     }
 
-    public async Task Execute(ISimulationContext<ColonyEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        foreach(var agent in context.GetAgents<Ant>().Where(x => x.IsCarryingFood))
+        var environment = context.GetSimulationEnvironment<ColonyEnvironment>();
+
+        foreach (var agent in context.GetAgents<Ant>().Where(x => x.IsCarryingFood))
         {
             var agentFoodPheromones = Pheromones.MaxPheromoneValue*Math.Exp(-agent.PathLength/pheromonesPersistence);
-            context.SimulationEnvironment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddFood(agentFoodPheromones);
+            environment.Pheromones[agent.Coordinates.X, agent.Coordinates.Y].AddFood(agentFoodPheromones);
         }
 
-        foreach(var food in context.SimulationEnvironment.FoodSource)
+        foreach(var food in environment.FoodSource)
         {
             for(var x = food.Coordinates.X - food.SizeRadius; x <= food.Coordinates.X + food.SizeRadius; x++)
             {
@@ -32,7 +34,7 @@ internal class AddFoodPheromones : ISimulationStage<ColonyEnvironment>
                 {
                     if (food.Coordinates.IsInRange(x, y, food.SizeRadius))
                     {
-                        context.SimulationEnvironment.Pheromones[(int)x, (int)y].AddFood(Pheromones.MaxPheromoneValue);
+                        environment.Pheromones[(int)x, (int)y].AddFood(Pheromones.MaxPheromoneValue);
                     }
                 }
             }

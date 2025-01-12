@@ -6,7 +6,7 @@ using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
 using System.Threading.Tasks;
 
-internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage<ColonyEnvironment>
+internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage
 {
     private double temperature = 0.01;
 
@@ -56,11 +56,13 @@ internal class MoveAnts(IRandomNumbersGenerator randomNumbersGenerator) : ISimul
         this.temperature = temperature;
     }
 
-    public async Task Execute(ISimulationContext<ColonyEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<ColonyEnvironment>();
+
         foreach (var ant in context.GetAgents<Ant>())
         {
-            SetNewPosition(ant, context.SimulationEnvironment);
+            SetNewPosition(ant, environment);
         }
     }
 
