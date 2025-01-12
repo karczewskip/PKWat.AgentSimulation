@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.PreyVsPredator", "Examples\PKWat.AgentSimulation.Examples.PreyVsPredator\PKWat.AgentSimulation.Examples.PreyVsPredator.csproj", "{331DC0F9-D151-457C-906E-36031448A7D9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.ExamplesVisualizer", "PKWat.AgentSimulation.ExamplesVisualizer\PKWat.AgentSimulation.ExamplesVisualizer.csproj", "{96367B18-6C6A-4AB5-BC8E-40C3BF3EE051}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{331DC0F9-D151-457C-906E-36031448A7D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{331DC0F9-D151-457C-906E-36031448A7D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{331DC0F9-D151-457C-906E-36031448A7D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96367B18-6C6A-4AB5-BC8E-40C3BF3EE051}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96367B18-6C6A-4AB5-BC8E-40C3BF3EE051}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96367B18-6C6A-4AB5-BC8E-40C3BF3EE051}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96367B18-6C6A-4AB5-BC8E-40C3BF3EE051}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
