@@ -31,7 +31,7 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU
             {
                 if(counter++ % 1 == 0)
                     Dispatcher.Invoke(() => simulationImage.Source = bitmapSource);
-            }, 400, 400);
+            });
 
             await Task.Run(async () => await _simulation.StartAsync());
         }

@@ -25,8 +25,10 @@ public class AirportDrawer
         _bmp.SetResolution(96, 96);
     }
 
-    public BitmapSource Draw(ISimulationContext<AirportEnvironment> context)
+    public BitmapSource Draw(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<AirportEnvironment>();
+
         var waitingCordinates = new DrawingCoordinates(_bmp.Width / 2, 100);
         var departureCoordinates = new DrawingCoordinates(_bmp.Width - 100, _bmp.Height / 2);
 
@@ -35,7 +37,7 @@ public class AirportDrawer
 
         var now = context.SimulationTime.Time;
 
-        foreach(var landingLine in context.SimulationEnvironment.AllLandingLines)
+        foreach(var landingLine in environment.AllLandingLines)
         {
             var landingPlace = GetLandingPlaceForLandingLine(landingLine);
             graphic.DrawLine(Pens.Black, 0, landingPlace.Y, _bmp.Width, landingPlace.Y);
@@ -46,58 +48,57 @@ public class AirportDrawer
 
             graphic.DrawString(landingLine.ToString(), landingLineFont, Brushes.Black, 0, landingLineStringPosition);
 
-            if(context.SimulationEnvironment.LandingAirplanes.Any(x => x.Value == landingLine))
-            {
-                graphic.DrawString("Landing", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
-            }
+            //if(context.SimulationEnvironment.LandingAirplanes.Any(x => x.Value == landingLine))
+            //{
+            //    graphic.DrawString("Landing", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
+            //}
 
-            if (context.SimulationEnvironment.AllowedForLand.Any(x => x.Value == landingLine))
-            {
-                graphic.DrawString("Allowed", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
-            }
+            //if (context.SimulationEnvironment.AllowedForLand.Any(x => x.Value == landingLine))
+            //{
+            //    graphic.DrawString("Allowed", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
+            //}
 
-            if (context.SimulationEnvironment.LandedAirplanes.Any(x => x.Value == landingLine))
-            {
-                graphic.DrawString("Landed", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
-            }
+            //if (context.SimulationEnvironment.LandedAirplanes.Any(x => x.Value == landingLine))
+            //{
+            //    graphic.DrawString("Landed", landingLineFont, Brushes.Black, 0 + 10, landingLineStringPosition);
+            //}
         }
 
-        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsLanding(now)))
+        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.IsLanding(now)))
         {
             var coordinates = GetCoordinatesForLandingAirplane(airplane, waitingCordinates, now);
 
             graphic.FillEllipse(Brushes.Blue, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
-
-            if(context.SimulationEnvironment.LandingAirplanes.ContainsKey(airplane.Id))
-            {
-                graphic.DrawString(context.SimulationEnvironment.LandingAirplanes[airplane.Id].ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);
-            }
+            graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
-        foreach(var passenger in context.GetAgents<Passenger>().Where(x => x.State.IsCheckouting))
+        foreach(var passenger in context.GetAgents<Passenger>().Where(x => x.IsCheckouted(now)))
         {
-            var airplane = context.GetRequiredAgent<Airplane>(passenger.State.AirplaneId);
+            var airplane = context.GetRequiredAgent<Airplane>(passenger.AirplaneId);
             var coordinates = GetCoordinatesForPassengerAirplane(passenger, airplane, now);
 
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, 5, 5);
         }
 
-        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsDeparting(now) || x.State.WaitsForDeparture(now)))
+        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.IsDeparting(now) || x.WaitsForPassangersCheckout(now)))
         {
             var coordinates = GetCoordinatesForDepartingAirplane(airplane, departureCoordinates, now);
 
             graphic.FillEllipse(Brushes.Green, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
         int i = 0;
-        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.State.IsBeforeLanding(now)))
+        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.WaitsForLanding))
         {
             var coordinates = GetCoordinatesForWaitingAirplane(i, waitingCordinates);
 
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(context.SimulationEnvironment.PassengersInEachAirplane.GetValueOrDefault(airplane.Id)?.Length.ToString() ?? "0", new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            if (airplane.AssignedLine.HasValue)
+            {
+                graphic.DrawString(airplane.AssignedLine.Value.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);
+            }
             i++;
         }
 
@@ -112,7 +113,7 @@ public class AirportDrawer
     private DrawingCoordinates GetCoordinatesForLandingAirplane(Airplane airplane, DrawingCoordinates waitingCordinates, TimeSpan now)
     {
         var landingPlace = GetLandingPlace(airplane);
-        var lerp = waitingCordinates.Lerp(landingPlace, airplane.State.LandingProgress(now));
+        var lerp = waitingCordinates.Lerp(landingPlace, CalculateProgress(now, airplane.StartedLandingTime, airplane.PlannedFinishedLandingTime));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
@@ -120,25 +121,47 @@ public class AirportDrawer
     {
         var landingPlace = GetLandingPlace(airplane);
         var checkoutPlace = new DrawingCoordinates(0, landingPlace.Y);
-        var lerp = landingPlace.Lerp(checkoutPlace, passenger.State.CheckoutProgress(now));
+        var lerp = landingPlace.Lerp(checkoutPlace, CalculateProgress(now, passenger.StartedCheckoutTime, passenger.EndPlannedCheckoutTime));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
     private DrawingCoordinates GetCoordinatesForDepartingAirplane(Airplane airplane, DrawingCoordinates departureCoordinates, TimeSpan now)
     {
         var landingPlace = GetLandingPlace(airplane);
-        var lerp = landingPlace.Lerp(departureCoordinates, airplane.State.DepartureProgress(now), convertY: x => 1 - Math.Cos(Math.PI * x/2));
+        var lerp = landingPlace.Lerp(departureCoordinates, CalculateProgress(now, airplane.StartedDepartureTime, airplane.PlannedFinishedDepartureTime), convertY: x => 1 - Math.Cos(Math.PI * x/2));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
     private DrawingCoordinates GetLandingPlace(Airplane airplane)
     {
-        var landingLine = airplane.State.LandingLine.Value;
+        var landingLine = airplane.AssignedLine!.Value;
         return new DrawingCoordinates(100, _bmp.Height - landingLine * 30);
     }
 
     private DrawingCoordinates GetLandingPlaceForLandingLine(int landingLine)
         => new DrawingCoordinates(100, _bmp.Height - landingLine * 30);
+
+    private double CalculateProgress(TimeSpan now, TimeSpan? start, TimeSpan? end)
+    {
+        if(start == null || end == null)
+        {
+            return 0;
+        }
+
+        if (now < start)
+        {
+            return 0;
+        }
+
+        if (now > end)
+        {
+            return 1;
+        }
+
+        var total = end - start;
+        var current = now - start;
+        return current.Value.TotalMilliseconds / total.Value.TotalMilliseconds;
+    }
 
     private record DrawingCoordinates(int X, int Y)
     {

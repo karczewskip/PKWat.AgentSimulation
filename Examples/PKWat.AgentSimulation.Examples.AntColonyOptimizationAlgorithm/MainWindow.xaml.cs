@@ -2,6 +2,7 @@
 {
     using PKWat.AgentSimulation.Core;
     using PKWat.AgentSimulation.Core.Builder;
+    using PKWat.AgentSimulation.Examples.AntColonyOptimizationAlgorithm.Simulation;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -10,17 +11,14 @@
     /// </summary>
     public partial class MainWindow : Window
     {
-        private const int Scale = 2;
         private ISimulation _simulation;
+        private int counter = 0;
 
-        private readonly ISimulationBuilder _simulationBuilder;
-        private readonly ColonyDrawer _colonyDrawer;
+        private readonly AntColonySimulationBuilder _simulationBuilder;
 
-        public MainWindow(ISimulationBuilder simulationBuilder, ColonyDrawer colonyDrawer)
+        public MainWindow(AntColonySimulationBuilder antColonySimulationBuilder)
         {
-            _simulationBuilder = simulationBuilder;
-            _colonyDrawer = colonyDrawer;
-            _colonyDrawer.Initialize(Scale * 60, Scale * 60);
+            _simulationBuilder = antColonySimulationBuilder;
 
             InitializeComponent();
         }
@@ -31,52 +29,14 @@
             {
                 await _simulation.StopAsync();
             }
-
-            var environmentState = new ColonyEnvironmentState(
-                Scale * 50, 
-                Scale * 50, 
-                new AntHill(new ColonyCoordinates(Scale * 10, Scale * 10)), 
-                new FoodSource(new ColonyCoordinates(Scale * 40, Scale * 40)),
-                new(),
-                new());
-
-            _simulation = _simulationBuilder
-                .CreateNewSimulation<ColonyEnvironment, ColonyEnvironmentState>(environmentState)
-                .AddAgents<Ant>(1000)
-                .AddEnvironmentUpdates(DecreasePheromones)
-                .AddEnvironmentUpdates(AddPheromones)
-                .AddCallback(RenderAsync)
-                .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(1))
-                .SetRandomSeed(12557)
-                .Build();
-
-            await _simulation.StartAsync();
-        }
-
-        private async Task DecreasePheromones(ISimulationContext<ColonyEnvironment> context)
-        {
-            context.SimulationEnvironment.DecreasePheromones();
-        }
-
-        private async Task AddPheromones(ISimulationContext<ColonyEnvironment> context)
-        {
-            var environment = context.SimulationEnvironment;
-            var ants = context.GetAgents<Ant>();
-            foreach (var ant in ants)
+            _simulation = _simulationBuilder.Build(bitmapSource =>
             {
-                if (ant.State.IsCarryingFood)
-                {
-                    environment.AddFoodPheromones(ant.State.Coordinates, ant.State.PheromonesStrength);
-                }
-                else
-                {
-                    environment.AddHomePheromones(ant.State.Coordinates, ant.State.PheromonesStrength);
-                }
-            }
-        }
+                if (counter++ % 1 == 0)
+                    Dispatcher.Invoke(() => simulationImage.Source = bitmapSource);
+            });
 
-        private async Task RenderAsync(ISimulationContext<ColonyEnvironment> context)
-            => simulationImage.Source = _colonyDrawer.Draw(context);
+            await Task.Run(async () => await _simulation.StartAsync());
+        }
 
         private async void stopSimulationButton_Click(object sender, RoutedEventArgs e)
         {

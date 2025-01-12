@@ -3,12 +3,11 @@ using PKWat.AgentSimulation.Core.RandomNumbers;
 
 namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation;
 
-public record LifeMatrixEnvironmentState(bool[,] Matrix, int Generation);
-
 public class LifeMatrixEnvironment(
-    IRandomNumbersGenerator randomNumbersGenerator, 
-    NewMatrixOnGPUGenerator newMatrixOnGPUGenerator) : DefaultSimulationEnvironment<LifeMatrixEnvironmentState>
+    IRandomNumbersGenerator randomNumbersGenerator) : DefaultSimulationEnvironment
 {
+    public bool[,] Matrix => matrices[currentMatrixIndex];
+
     private bool[][,] matrices;
     private int currentMatrixIndex = 0;
     private int width;
@@ -32,19 +31,14 @@ public class LifeMatrixEnvironment(
                 matrix[i, j] = randomNumbersGenerator.GetNextBool();
             }
         }
-        LoadState(new LifeMatrixEnvironmentState(matrix, 0));
     }
 
-    public void Update()
+    public void Update(int numberOfThreads)
     {
-        var state = GetState();
-
         var newMatrix = matrices[currentMatrixIndex];
         currentMatrixIndex = (currentMatrixIndex + 1) % 2;
 
-        var numberOfThreads = 8;
-
-        Parallel.For(0, numberOfThreads, i =>
+        Parallel.For(0, numberOfThreads, new ParallelOptions() { MaxDegreeOfParallelism = numberOfThreads }, i =>
         {
             var start = i * width / numberOfThreads;
             var end = (i + 1) * width / numberOfThreads;
@@ -53,7 +47,7 @@ public class LifeMatrixEnvironment(
                 for (int y = 0; y < height; y++)
                 {
                     var aliveNeighbours = GetAliveNeighboursCount(x, y, width, height);
-                    if (state.Matrix[x, y])
+                    if (Matrix[x, y])
                     {
                         var isStillAlive = aliveNeighbours == 2 || aliveNeighbours == 3;
                         newMatrix[x, y] = isStillAlive;
@@ -66,32 +60,25 @@ public class LifeMatrixEnvironment(
                 }
             }
         });
-
-        LoadState(new LifeMatrixEnvironmentState(newMatrix, state.Generation + 1));
     }
 
     public int GetWidth()
     {
-        var state = GetState();
-        return state.Matrix.GetLength(0);
+        return width;
     }
 
     public int GetHeight()
     {
-        var state = GetState();
-        return state.Matrix.GetLength(1);
+        return height;
     }
 
     public bool IsCellAlive(int x, int y)
     {
-        var state = GetState();
-        return state.Matrix[x, y];
+        return Matrix[x, y];
     }
 
     private int GetAliveNeighboursCount(int x, int y, int width, int height)
     {
-        var state = GetState();
-
         var aliveNeighbours = 0;
 
         for (int i = x - 1; i <= x + 1; i++)
@@ -102,7 +89,7 @@ public class LifeMatrixEnvironment(
                 {
                     continue;
                 }
-                if (i >= 0 && i < width && j >= 0 && j < height && state.Matrix[i, j])
+                if (i >= 0 && i < width && j >= 0 && j < height && Matrix[i, j])
                 {
                     aliveNeighbours++;
                 }
@@ -110,12 +97,5 @@ public class LifeMatrixEnvironment(
         }
 
         return aliveNeighbours;
-    }
-
-    public void UpdateOnGPU()
-    {
-        var newMatrix = newMatrixOnGPUGenerator.Generate(GetState().Matrix);
-
-        LoadState(new LifeMatrixEnvironmentState(newMatrix, GetState().Generation + 1));
     }
 }

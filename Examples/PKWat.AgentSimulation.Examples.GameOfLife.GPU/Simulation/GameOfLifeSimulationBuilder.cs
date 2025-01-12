@@ -1,30 +1,22 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Builder;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation.Stages;
 using System.Windows.Media.Imaging;
 
 namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU.Simulation;
 
 public class GameOfLifeSimulationBuilder(ISimulationBuilder simulationBuilder, GameOfLifeDrawer drawer)
 {
-    public ISimulation Build(Action<BitmapSource> drawing, int width, int height)
+    public ISimulation Build(Action<BitmapSource> drawing)
     {
         var simulation = simulationBuilder
-            .CreateNewSimulation<LifeMatrixEnvironment, LifeMatrixEnvironmentState>(
-                new LifeMatrixEnvironmentState(new bool[0, 0], 0))
-            .AddEnvironmentInitialization(async c => c.SimulationEnvironment.Initialize(width, height))
-            .AddEnvironmentUpdates(c => UpdateMatrix(c))
+            .CreateNewSimulation<LifeMatrixEnvironment>()
+            .AddInitializationStage<InitializeSize>(s => s.UseSize(1000, 1000))
+            .AddStage<UpdateMatrix>(s => s.UseNumberOfThreads(32))
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)
             .Build();
 
         return simulation;
     }
-
-    private async Task UpdateMatrix(ISimulationContext<LifeMatrixEnvironment> context)
-        => context.SimulationEnvironment.Update();
 }

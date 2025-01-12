@@ -1,131 +1,35 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation;
 
 using PKWat.AgentSimulation.Core.Agent;
-using PKWat.AgentSimulation.Core.Crash;
 using PKWat.AgentSimulation.Core.Environment;
+using System;
 
-public record AirportEnvironmentState(
-    int[] AllLandingLines,
-    AgentId[] AirplanesAskingForLand,
-    IReadOnlyDictionary<AgentId, int> LandingAirplanes,
-    IReadOnlyDictionary<AgentId, int> AllowedForLand,
-    IReadOnlyDictionary<AgentId, int> LandedAirplanes,
-    IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane)
+public class AirportEnvironment : DefaultSimulationEnvironment
 {
-    public static AirportEnvironmentState CreateUsingNumberOfLandingLines(int numberOfLandingLines)
-        => new AirportEnvironmentState(
-            Enumerable.Range(1, numberOfLandingLines).ToArray(),
-            new AgentId[0],
-            new Dictionary<AgentId, int>(),
-            new Dictionary<AgentId, int>(),
-            new Dictionary<AgentId, int>(),
-            new Dictionary<AgentId, AgentId[]>());
-}
+    public TimeSpan? NewAirplaneArrival { get; private set; }
+    public bool IsNewAirplaneArrivalScheduled => NewAirplaneArrival.HasValue;
 
-public class AirportEnvironment : DefaultSimulationEnvironment<AirportEnvironmentState>
-{
-    public int[] AllLandingLines => GetState().AllLandingLines;
+    public Queue<AgentId> WaitingAirplanes { get; } = new();
+    public Queue<int> AvailableLines { get; } = new();
 
-    public AgentId[] AirplanesAskingForLand => GetState().AirplanesAskingForLand;
+    public int[] AllLandingLines { get; private set; } = new int[0];
 
-    public IReadOnlyDictionary<AgentId, int> AllowedForLand => GetState().AllowedForLand;
-
-    public IReadOnlyDictionary<AgentId, int> LandingAirplanes => GetState().LandingAirplanes;
-
-    public IReadOnlyDictionary<AgentId, int> LandedAirplanes => GetState().LandedAirplanes;
-
-    public IReadOnlyDictionary<AgentId, AgentId[]> PassengersInEachAirplane => GetState().PassengersInEachAirplane;
-
-    public void SetAirplanesAskingForLand(AgentId[] airplanesAskingForLand) 
-        => LoadState(
-            GetState() with { AirplanesAskingForLand = airplanesAskingForLand });
-
-    public void SetAllowedForLand(IReadOnlyDictionary<AgentId, int> allowedForLand)
-        => LoadState(
-            GetState() with { AllowedForLand = allowedForLand });
-
-    public void SetLandingAirplane(IReadOnlyDictionary<AgentId, int> landingAirplanes)
-        => LoadState(
-            GetState() with { LandingAirplanes = landingAirplanes });
-
-    public void SetLandedAirplanes(IReadOnlyDictionary<AgentId, int> landedAirplanes)
-        => LoadState(
-            GetState() with { LandedAirplanes = landedAirplanes });
-
-    public void SetPassengersInEachAirplane(IReadOnlyDictionary<AgentId, AgentId[]> passengersInEachAirplane)
-        => LoadState(
-            GetState() with { PassengersInEachAirplane = passengersInEachAirplane });
-
-    public bool NoPassengerInAirplane(AgentId airplaneId)
+    internal void SetLandingLines(int[] landingLines)
     {
-        var state = GetState();
-        return state.PassengersInEachAirplane.ContainsKey(airplaneId) == false 
-            || state.PassengersInEachAirplane[airplaneId].Length == 0;
-    }
-
-    public int? GetAssignedLine(AgentId id)
-    {
-        var state = GetState();
-        if(state.AllowedForLand.TryGetValue(id, out var line))
+        AllLandingLines = landingLines;
+        foreach (var line in landingLines)
         {
-            return line;
+            AvailableLines.Enqueue(line);
         }
-
-        return null;
     }
 
-    public bool AirplaneLanded(AgentId airplaneId)
+    internal void ScheduleNewAirplaneArrival(TimeSpan nextArrival)
     {
-        var state = GetState();
-        return state.LandedAirplanes.ContainsKey(airplaneId);
+        NewAirplaneArrival = nextArrival;
     }
 
-    internal bool PassengerAllowedToCheckout(AgentId passengerId, AgentId airplaneId)
+    internal void AddAirplaneToWaitingList(AgentId id)
     {
-        var state = GetState();
-        return state.PassengersInEachAirplane[airplaneId].First() == passengerId;
-    }
-
-    public override SimulationCrashResult CheckCrashConditions()
-    {
-        if (GetState()
-                .LandingAirplanes
-                .GroupBy(x => x.Value)
-                .Any(x => x.Count() > 1))
-        {
-            return SimulationCrashResult.Crash("More than one landing airplanes on the same line.");
-        }
-
-        if (GetState()
-            .LandedAirplanes
-            .GroupBy(x => x.Value)
-            .Any(x => x.Count() > 1))
-        {
-            return SimulationCrashResult.Crash("More than one landed airplanes on the same line.");
-        }
-
-        if (GetState()
-            .AllowedForLand
-            .GroupBy(x => x.Value)
-            .Any(x => x.Count() > 1))
-        {
-            return SimulationCrashResult.Crash("More than one allowed airplanes on the same line.");
-        }
-
-        return SimulationCrashResult.NoCrash;
-    }
-
-    public override object CreateSnapshot()
-    {
-        var state = GetState();
-        return new
-        {
-            state.AllLandingLines,
-            state.AirplanesAskingForLand,
-            LandingAirplanes = state.LandingAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
-            AllowedForLand = state.AllowedForLand.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
-            LandedAirplanes = state.LandedAirplanes.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray(),
-            PassengersInEachAirplane = state.PassengersInEachAirplane.Select(x => new { Airplane = x.Key.Id, Line = x.Value }).ToArray()
-        };
+        WaitingAirplanes.Enqueue(id);
     }
 }

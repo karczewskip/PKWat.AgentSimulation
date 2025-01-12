@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Builder;
 using PKWat.AgentSimulation.Core.Environment;
-using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
@@ -23,7 +22,6 @@ public static class AgentSimulationServiceCollectionExtensions
         Type[] registeringGenericTypes = [
             typeof(ISimulationEnvironment), 
             typeof(ISimulationAgent), 
-            typeof(ISimulationEvent),
             typeof(ISimulationStage)];
 
         foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface))

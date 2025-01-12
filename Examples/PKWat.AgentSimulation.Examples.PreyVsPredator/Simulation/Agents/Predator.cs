@@ -30,7 +30,7 @@ public class HealthStatus
 }
 
 internal class Predator(IRandomNumbersGenerator randomNumbersGenerator) :
-    SimpleSimulationAgent<PreyVsPredatorEnvironment>
+    SimpleSimulationAgent
 {
     private HealthStatus _healthStatus = HealthStatus.FullHealth();
 

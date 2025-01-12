@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage<PreyVsPredatorEnvironment>
+internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage
 {
     private double pregnancyUpdate = 0.001;
 
@@ -18,15 +18,17 @@ internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePer
         pregnancyUpdate = newPregnancyUpdate;
     }
 
-    public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
+
         using var _ = simulationCyclePerformanceInfo.AddStep("Born new preyers");
         var newBornPreyersWithParents = new List<(AgentId NewBorn, AgentId Parent)>();
         var allPreys = context.GetAgents<Prey>().ToArray();
 
         foreach (var prey in allPreys)
         {
-            if (context.SimulationEnvironment.AnotherPrey(prey.Id))
+            if (environment.AnotherPrey(prey.Id))
             {
                 continue;
             }
@@ -41,6 +43,6 @@ internal class BornNewPreyers(ISimulationCyclePerformanceInfo simulationCyclePer
             }
         }
 
-        context.SimulationEnvironment.PlaceNewBornPreys(newBornPreyersWithParents);
+        environment.PlaceNewBornPreys(newBornPreyersWithParents);
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Drawing;
+using PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation;
 using System.Reflection;
 using System.Windows;
 
@@ -17,7 +18,7 @@ public partial class App : Application
             .ConfigureServices((hostContext, services) =>
             {
                 services.AddSingleton<MainWindow>();
-                services.AddSingleton<BouncingBallStateInitializer>();
+                services.AddSingleton<ButterflyEffectSimulationBuilder>();
                 services.AddSingleton<ColorsGenerator>();
                 services.AddSingleton<PictureRenderer>();
                 services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));

@@ -2,7 +2,6 @@
 {
     using PKWat.AgentSimulation.Core.Crash;
     using PKWat.AgentSimulation.Core.Environment;
-    using PKWat.AgentSimulation.Core.Event;
     using PKWat.AgentSimulation.Core.Snapshots;
     using PKWat.AgentSimulation.Core.Stage;
 
@@ -15,17 +14,13 @@
         Task StopAsync();
     }
 
-    internal class Simulation<T, ENVIRONMENT_STATE> : ISimulation where T : ISimulationEnvironment<ENVIRONMENT_STATE>
+    internal class Simulation : ISimulation
     {
-        private readonly SimulationContext<T> _context;
+        private readonly SimulationContext _context;
         private readonly ISimulationSnapshotStore _snapshotStore;
-        private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
-        private readonly Func<SimulationContext<T>, Task> _environmentInitialization;
-        private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
-        private readonly IReadOnlyList<ISimulationEvent<T>> _events;
-        private readonly ISimulationStage<T>[] _initializationStages;
-        private readonly ISimulationStage<T>[] _stages;
-        private readonly bool _runAgentsInParallel;
+        private readonly IReadOnlyList<Func<SimulationContext, Task>> _callbacks;
+        private readonly ISimulationStage[] _initializationStages;
+        private readonly ISimulationStage[] _stages;
 
         private RunningSimulationState _runningState = RunningSimulationState.CreateNotRunningState();
 
@@ -33,25 +28,17 @@
         public SimulationCrashResult Crash => _runningState.CrashResult;
 
         public Simulation(
-            SimulationContext<T> context,
+            SimulationContext context,
             ISimulationSnapshotStore simulationSnapshotStore,
-            IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
-            Func<SimulationContext<T>, Task> environmentInitialization,
-            IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
-            IReadOnlyList<ISimulationEvent<T>> events,
-            ISimulationStage<T>[] initializationStages,
-            ISimulationStage<T>[] stages,
-            bool runAgentsInParallel)
+            IReadOnlyList<Func<SimulationContext, Task>> callbacks,
+            ISimulationStage[] initializationStages,
+            ISimulationStage[] stages)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
-            _environmentUpdates = environmentUpdates;
-            _environmentInitialization = environmentInitialization;
             _callbacks = callbacks;
-            _events = events;
             _initializationStages = initializationStages;
             _stages = stages;
-            _runAgentsInParallel = runAgentsInParallel;
         }
 
         public async Task StartAsync()
@@ -62,13 +49,6 @@
             {
                 await stage.Execute(_context);
             }
-
-            await _environmentInitialization(_context);
-
-            await Parallel.ForEachAsync(
-                    _context.Agents,
-                    new ParallelOptions() { MaxDegreeOfParallelism = 10 },
-                    (x, c) => new ValueTask(Task.Run(() => x.Value.Initialize(_context.SimulationEnvironment))));
 
             _snapshotStore.CleanExistingSnapshots();
 
@@ -84,55 +64,9 @@
 
                 _context.StartNewCycle();
 
-                foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context.SimulationTime)))
-                {
-                    _context.Agents.Remove(agentToRemove.Id);
-                }
-
-                //using (_context.PerformanceInfo.AddStep("Environment update"))
-                {
-                    foreach (var environmentUpdate in _environmentUpdates)
-                    {
-                        await environmentUpdate(_context);
-                    }
-                }
-
-                foreach (var simulationEvent in _events)
-                {
-                    if(await simulationEvent.ShouldBeExecuted(_context))
-                    {
-                        await simulationEvent.Execute(_context);
-                    }
-                }
-
                 foreach (var stage in _stages)
                 {
                     await stage.Execute(_context);
-                }
-
-                //using (_context.PerformanceInfo.AddStep("Agents update"))
-                if (_runAgentsInParallel)
-                {
-                    var agentsCount = _context.Agents.Count;
-
-                    if(agentsCount > 0)
-                    {
-                        var numberOfThreads = 8;
-                        var chunkSize = 1 + (agentsCount - 1) / numberOfThreads;
-                        var chunkedAgents = _context.Agents.Values.Chunk(chunkSize).ToArray();
-
-                        await Parallel.ForEachAsync(
-                            chunkedAgents,
-                            new ParallelOptions() { MaxDegreeOfParallelism = numberOfThreads },
-                            (chunk, c) => new ValueTask(Task.Run(() =>
-                            {
-                                using var step = _context.PerformanceInfo.AddStep("Chunk");
-                                foreach (var agent in chunk)
-                                {
-                                    agent.Act(_context.SimulationEnvironment, _context.SimulationTime);
-                                }
-                            })));
-                    }
                 }
 
                 foreach (var callback in _callbacks)

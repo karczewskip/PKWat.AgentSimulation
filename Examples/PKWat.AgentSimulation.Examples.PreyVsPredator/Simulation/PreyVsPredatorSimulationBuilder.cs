@@ -13,11 +13,10 @@ public class PreyVsPredatorSimulationBuilder(
     public ISimulation Build(Action<BitmapSource> drawing)
     {
         var simulation = simulationBuilder
-            .CreateNewSimulation<PreyVsPredatorEnvironment, PreyVsPredatorEnvironmentState>(
-                PreyVsPredatorEnvironmentState.New(200, 200))
+            .CreateNewSimulation<PreyVsPredatorEnvironment>()
             .AddAgents<Prey>(100)
             .AddAgents<Predator>(100)
-            .AddInitializationStage<ActorsPlaced>()
+            .AddInitializationStage<ActorsPlaced>(c => c.SetSize(200, 200))
             .AddStage<PredatorsStarved>(c => c.ChangeStarvationIncrement(0.04))
             .AddStage<MovedPreyers>()
             .AddStage<MovedPredators>()
@@ -25,7 +24,6 @@ public class PreyVsPredatorSimulationBuilder(
             .AddStage<PreyersEaten>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetRandomSeed(100)
-            .StopAgents()
             .Build();
 
         return simulation;

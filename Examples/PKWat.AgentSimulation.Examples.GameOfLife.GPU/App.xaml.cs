@@ -22,7 +22,6 @@ namespace PKWat.AgentSimulation.Examples.GameOfLife.GPU
                     services.AddSingleton<MainWindow>();
                     services.AddScoped<GameOfLifeSimulationBuilder>();
                     services.AddScoped<GameOfLifeDrawer>();
-                    services.AddScoped<NewMatrixOnGPUGenerator>();
                     services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
                 })
                 .Build();

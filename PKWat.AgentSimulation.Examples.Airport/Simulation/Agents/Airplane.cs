@@ -1,63 +1,52 @@
 ﻿namespace PKWat.AgentSimulation.Examples.Airport.Simulation.Agents;
 
 using PKWat.AgentSimulation.Core.Agent;
-using PKWat.AgentSimulation.Core.Time;
-using PKWat.AgentSimulation.Math.Extensions;
 
-public class Airplane : SimulationAgent<AirportEnvironment, AirplaneState>
+public class Airplane : SimpleSimulationAgent
 {
-    protected override AirplaneState GetInitialState(AirportEnvironment environment)
+    public int? AssignedLine { get; set; }
+    public TimeSpan? StartedLandingTime { get; private set; }
+    public TimeSpan? PlannedFinishedLandingTime { get; private set; }
+
+    public TimeSpan? StartedDepartureTime { get; private set; }
+    public TimeSpan? PlannedFinishedDepartureTime { get; private set; }
+
+    public bool IsBeforeDeparture => !StartedDepartureTime.HasValue;
+
+    public Queue<AgentId> PassengersInAirplane { get; } = new();
+    public TimeSpan? PassengerCheckoutBlockTime { get; set; }
+
+    public bool WaitsForLanding => !StartedLandingTime.HasValue;
+
+    public void StartLanding(TimeSpan landingTime, TimeSpan plannedFinishLandingTime)
     {
-        return new AirplaneState();
+        StartedLandingTime = landingTime;
+        PlannedFinishedLandingTime = plannedFinishLandingTime;
     }
 
-    protected override AirplaneState GetNextState(AirportEnvironment environment, IReadOnlySimulationTime simulationTime)
+    internal bool IsLanding(TimeSpan now)
+        => StartedLandingTime.HasValue && now >= StartedLandingTime && now < PlannedFinishedLandingTime;
+
+    public bool IsLanded(TimeSpan time)
+        => PlannedFinishedLandingTime.HasValue && time >= PlannedFinishedLandingTime;
+
+    public void StartDeparture(TimeSpan departureTime, TimeSpan plannedFinishDepartureTime)
     {
-        if (!State.AskedForLand)
-        {
-            return State with { AskedForLand = true, AskingForLand = true };
-        }
-
-        if (State.AskingForLand)
-        {
-            var givenLine = environment.GetAssignedLine(Id);
-            if(givenLine == null)
-            {
-                return State;
-            }
-
-            return State with { AskingForLand = false, LandingLine = givenLine, LandingStart = simulationTime.Time, LandingFinish = simulationTime.Time + (simulationTime.Step * 10) };
-        }
-
-        if(State.WaitsForDeparture(simulationTime.Time) && environment.NoPassengerInAirplane(Id))
-        {
-            return State with { DepartureStart = simulationTime.Time, DepartureFinished = simulationTime.Time + (simulationTime.Step * 10) };
-        }
-
-        return State;
+        StartedDepartureTime = departureTime;
+        PlannedFinishedDepartureTime = plannedFinishDepartureTime;
     }
 
-    override public bool ShouldBeRemovedFromSimulation(IReadOnlySimulationTime simulationTime)
-    {
-        return State.HasDeparted(simulationTime.Time);
-    }
-}
+    internal bool IsDeparting(TimeSpan now)
+        => StartedDepartureTime.HasValue && now >= StartedDepartureTime && now <= PlannedFinishedDepartureTime;
 
-public record AirplaneState(
-    bool AskedForLand = false,
-    bool AskingForLand = false,
-    int? LandingLine = null,
-    TimeSpan? LandingStart = null,
-    TimeSpan? LandingFinish = null,
-    TimeSpan? DepartureStart = null,
-    TimeSpan? DepartureFinished = null)
-{
-    public bool IsBeforeLanding(TimeSpan now) => LandingStart == null || LandingStart > now;
-    public bool IsLanding(TimeSpan now) => LandingStart <= now && now <= LandingFinish;
-    public double LandingProgress(TimeSpan now) => LandingStart.HasValue && LandingFinish.HasValue ? now.GetProgressBetween(LandingStart.Value, LandingFinish.Value) : 0;
-    public bool HasLanded(TimeSpan now) => LandingProgress(now) >= 1.0;
-    public bool IsDeparting(TimeSpan now) => DepartureStart <= now && now <= DepartureFinished;
-    public double DepartureProgress(TimeSpan now) => DepartureStart.HasValue && DepartureFinished.HasValue ? now.GetProgressBetween(DepartureStart.Value, DepartureFinished.Value) : 0;
-    public bool HasDeparted(TimeSpan now) => DepartureProgress(now) >= 1.0;
-    public bool WaitsForDeparture(TimeSpan now) => DepartureStart == null && HasLanded(now);
+    public bool IsAway(TimeSpan time)
+        => PlannedFinishedDepartureTime.HasValue && time >= PlannedFinishedDepartureTime;
+
+    internal bool WaitsForPassangersCheckout(TimeSpan now)
+        => IsLanded(now) 
+        && (PassengersInAirplane.Any() 
+            || (PassengerCheckoutBlockTime.HasValue && now < PassengerCheckoutBlockTime));
+
+    internal bool IsDepartured(TimeSpan time)
+        => PlannedFinishedDepartureTime.HasValue && time > PlannedFinishedDepartureTime;
 }

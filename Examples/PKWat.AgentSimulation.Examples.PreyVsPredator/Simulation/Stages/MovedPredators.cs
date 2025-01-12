@@ -8,13 +8,15 @@ using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using System.Linq;
 using System.Threading.Tasks;
 
-internal class MovedPredators(IRandomNumbersGenerator randomNumbersGenerator, ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage<PreyVsPredatorEnvironment>
+internal class MovedPredators(IRandomNumbersGenerator randomNumbersGenerator, ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage
 {
     private readonly MovingDirection[] possibleDirections = [MovingDirection.Up, MovingDirection.Down, MovingDirection.Left, MovingDirection.Right];
 
-    public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
+
         using var step = simulationCyclePerformanceInfo.AddStep("MovedPredators");
-        context.SimulationEnvironment.MovePredators(context.GetAgents<Predator>().Select(x => (x.Id, possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)])));
+        environment.MovePredators(context.GetAgents<Predator>().Select(x => (x.Id, possibleDirections[randomNumbersGenerator.Next(possibleDirections.Length)])));
     }
 }

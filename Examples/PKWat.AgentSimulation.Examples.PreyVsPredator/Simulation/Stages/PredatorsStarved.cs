@@ -6,7 +6,7 @@ using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.PreyVsPredator.Simulation.Agents;
 using System.Threading.Tasks;
 
-internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage<PreyVsPredatorEnvironment>
+internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage
 {
     private double starvationIncrement = 0.0008;
 
@@ -15,8 +15,10 @@ internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCycleP
         starvationIncrement = newIncrement;
     }
 
-    public async Task Execute(ISimulationContext<PreyVsPredatorEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
+        var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
+
         using var _ = simulationCyclePerformanceInfo.AddStep("PredatorsStarved");
         var deadPredators = new List<Predator>();
         var allPredators = context.GetAgents<Predator>();
@@ -31,7 +33,7 @@ internal class PredatorsStarved(ISimulationCyclePerformanceInfo simulationCycleP
 
         foreach (var predator in deadPredators)
         {
-            context.SimulationEnvironment.RemovePredator(predator.Id);
+            environment.RemovePredator(predator.Id);
             context.RemoveAgent(predator.Id);
         }
     }
