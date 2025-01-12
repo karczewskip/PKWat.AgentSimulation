@@ -4,7 +4,7 @@ using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
 using System.Threading.Tasks;
 
-internal class InitializeSize : ISimulationStage<LifeMatrixEnvironment>
+internal class InitializeSize : ISimulationStage
 {
     private int width = 100;
     private int height = 100;
@@ -15,8 +15,10 @@ internal class InitializeSize : ISimulationStage<LifeMatrixEnvironment>
         this.height = height;
     }
 
-    public async Task Execute(ISimulationContext<LifeMatrixEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        context.SimulationEnvironment.Initialize(width, height);
+        var environment = context.GetSimulationEnvironment<LifeMatrixEnvironment>();
+
+        environment.Initialize(width, height);
     }
 }

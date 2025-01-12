@@ -4,7 +4,7 @@ using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
 using System.Threading.Tasks;
 
-internal class UpdateMatrix : ISimulationStage<LifeMatrixEnvironment>
+internal class UpdateMatrix : ISimulationStage
 {
     private int _numberOfThreads = 2;
 
@@ -13,8 +13,10 @@ internal class UpdateMatrix : ISimulationStage<LifeMatrixEnvironment>
         _numberOfThreads = numberOfThreads;
     }
 
-    public async Task Execute(ISimulationContext<LifeMatrixEnvironment> context)
+    public async Task Execute(ISimulationContext context)
     {
-        context.SimulationEnvironment.Update(_numberOfThreads);
+        var environment = context.GetSimulationEnvironment<LifeMatrixEnvironment>();
+
+        environment.Update(_numberOfThreads);
     }
 }
