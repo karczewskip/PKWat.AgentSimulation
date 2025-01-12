@@ -1,8 +1,0 @@
-﻿<Application x:Class="PKWat.AgentSimulation.Examples.ButterflyEffect.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:PKWat.AgentSimulation.Examples.ButterflyEffect">
-    <Application.Resources>
-         
-    </Application.Resources>
-</Application>
