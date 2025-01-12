@@ -1,23 +1,14 @@
 ﻿namespace PKWat.AgentSimulation.ExamplesVisualizer.Simulations.GameOfLife;
 
 using PKWat.AgentSimulation.Core;
-using PKWat.AgentSimulation.Core.PerformanceInfo;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 
-public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoProvider) : IVisualizationDrawer
+public class GameOfLifeDrawer : IVisualizationDrawer
 {
-    private WriteableBitmap _lastWritableBitmap;
-    private DateTime _lastDrawTime = DateTime.MinValue;
-
     public BitmapSource Draw(ISimulationContext context)
     {
         var environment = context.GetSimulationEnvironment<LifeMatrixEnvironment>();
-
-        if (_lastWritableBitmap != null && DateTime.Now - _lastDrawTime < TimeSpan.FromMilliseconds(60))
-        {
-            return _lastWritableBitmap;
-        }
 
         var width = environment.GetWidth();
         var height = environment.GetHeight();
@@ -47,22 +38,6 @@ public class GameOfLifeDrawer(ISimulationCyclePerformanceInfo performanceInfoPro
             }
         }
         writableBitmap.WritePixels(new System.Windows.Int32Rect(0, 0, width, height), pixels, width * 4, 0);
-
-        var pixelPtr = writableBitmap.BackBuffer;
-        var bitmap = new Bitmap(width, height, stride, System.Drawing.Imaging.PixelFormat.Format32bppRgb, pixelPtr);
-
-        writableBitmap.Lock();
-
-        using var graphic = Graphics.FromImage(bitmap);
-
-        var fontSize = 8 * height / 100;
-        graphic.DrawString(performanceInfoProvider.GetPerformanceInfo(), new Font("Consolas", fontSize), Brushes.Red, 0, 0);
-
-        writableBitmap.AddDirtyRect(new System.Windows.Int32Rect(0, 0, width, height));
-        writableBitmap.Unlock();
-
-        _lastWritableBitmap = writableBitmap;
-        _lastDrawTime = DateTime.Now;
 
         writableBitmap.Freeze();
 

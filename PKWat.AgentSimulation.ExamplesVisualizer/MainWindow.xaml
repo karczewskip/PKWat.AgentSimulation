@@ -25,7 +25,7 @@
                     Width="80" />
             <ComboBox 
                       Name="simulationBuildersComboBox"
-                      Width="150" 
+                      Width="250" 
                       Margin="5,0,5,0">
             </ComboBox>
         </StackPanel>
