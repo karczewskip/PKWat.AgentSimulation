@@ -18,8 +18,6 @@
     {
         private readonly SimulationContext<T> _context;
         private readonly ISimulationSnapshotStore _snapshotStore;
-        private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _environmentUpdates;
-        private readonly Func<SimulationContext<T>, Task> _environmentInitialization;
         private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
         private readonly ISimulationStage<T>[] _initializationStages;
         private readonly ISimulationStage<T>[] _stages;
@@ -33,8 +31,6 @@
         public Simulation(
             SimulationContext<T> context,
             ISimulationSnapshotStore simulationSnapshotStore,
-            IReadOnlyList<Func<SimulationContext<T>, Task>> environmentUpdates,
-            Func<SimulationContext<T>, Task> environmentInitialization,
             IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
             ISimulationStage<T>[] initializationStages,
             ISimulationStage<T>[] stages,
@@ -42,8 +38,6 @@
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
-            _environmentUpdates = environmentUpdates;
-            _environmentInitialization = environmentInitialization;
             _callbacks = callbacks;
             _initializationStages = initializationStages;
             _stages = stages;
@@ -58,8 +52,6 @@
             {
                 await stage.Execute(_context);
             }
-
-            await _environmentInitialization(_context);
 
             await Parallel.ForEachAsync(
                     _context.Agents,
@@ -83,14 +75,6 @@
                 foreach (var agentToRemove in _context.Agents.Values.Where(x => x.ShouldBeRemovedFromSimulation(_context.SimulationTime)))
                 {
                     _context.Agents.Remove(agentToRemove.Id);
-                }
-
-                //using (_context.PerformanceInfo.AddStep("Environment update"))
-                {
-                    foreach (var environmentUpdate in _environmentUpdates)
-                    {
-                        await environmentUpdate(_context);
-                    }
                 }
 
                 foreach (var stage in _stages)

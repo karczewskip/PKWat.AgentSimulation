@@ -13,8 +13,6 @@ public interface ISimulationBuilderContext<ENVIRONMENT> where ENVIRONMENT : ISim
 {
     ISimulationBuilderContext<ENVIRONMENT> AddAgent<AGENT>() where AGENT : ISimulationAgent<ENVIRONMENT>;
     ISimulationBuilderContext<ENVIRONMENT> AddAgents<AGENT>(int number) where AGENT : ISimulationAgent<ENVIRONMENT>;
-    ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update);
-    ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization);
     ISimulationBuilderContext<ENVIRONMENT> AddCallback(Func<ISimulationContext<ENVIRONMENT>, Task> callback);
     ISimulationBuilderContext<ENVIRONMENT> AddCallback(Action<ISimulationContext<ENVIRONMENT>> callback);
     ISimulationBuilderContext<ENVIRONMENT> SetSimulationStep(TimeSpan simulationStep);
@@ -37,8 +35,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
     private List<Func<ISimulationAgent<ENVIRONMENT>>> _agentsToGenerate = new();
     private List<Func<ISimulationStage<ENVIRONMENT>>> _initializationStagesToGenerate = new();
     private List<Func<ISimulationStage<ENVIRONMENT>>> _stagesToGenerate = new();
-    private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _environmentUpdates = new();
-    private Func<ISimulationContext<ENVIRONMENT>, Task> _environmentInitilization = async c => { };
     private List<Func<ISimulationContext<ENVIRONMENT>, Task>> _callbacks = new();
     private TimeSpan _simulationStep = TimeSpan.Zero;
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
@@ -62,20 +58,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
             .Range(0, number)
             .Select(x => new Func<ISimulationAgent<ENVIRONMENT>>(
                 () => _serviceProvider.GetRequiredService<U>())));
-
-        return this;
-    }
-
-    public ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentUpdates(Func<ISimulationContext<ENVIRONMENT>, Task> update)
-    {
-        _environmentUpdates.Add(update);
-
-        return this;
-    }
-
-    public ISimulationBuilderContext<ENVIRONMENT> AddEnvironmentInitialization(Func<ISimulationContext<ENVIRONMENT>, Task> initialization)
-    {
-        _environmentInitilization = initialization;
 
         return this;
     }
@@ -137,8 +119,6 @@ internal class SimulationBuilderContext<ENVIRONMENT> : ISimulationBuilderContext
                 _simulationStep,
                 _waitingTimeBetweenSteps),
             CreateSimulationSnapshotStore(),
-            _environmentUpdates,
-            _environmentInitilization,
             _callbacks,
             initializationStages,
             stages,
