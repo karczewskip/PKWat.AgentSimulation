@@ -5,9 +5,9 @@ using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation.Agents;
 using System.Threading.Tasks;
 
-internal class MoveBallsSlightly : ISimulationStage<BouncingBallBulb>
+internal class MoveBallsSlightly : ISimulationStage
 {
-    public async Task Execute(ISimulationContext<BouncingBallBulb> context)
+    public async Task Execute(ISimulationContext context)
     {
         var allBalls = context.GetAgents<BouncingBall>().ToArray();
         var allBallsNumber = allBalls.Length;

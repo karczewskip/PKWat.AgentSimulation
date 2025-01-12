@@ -6,7 +6,7 @@ using PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation;
 using PKWat.AgentSimulation.Examples.ButterflyEffect.Simulation.Agents;
 using System.Threading.Tasks;
 
-internal class InitializeSize(PictureRenderer pictureRenderer) : ISimulationStage<BouncingBallBulb>
+internal class InitializeSize(PictureRenderer pictureRenderer) : ISimulationStage
 {
     public double BulbRadius { get; private set; } = 400;
     public double BallRadius { get; set; } = 10;
@@ -19,9 +19,11 @@ internal class InitializeSize(PictureRenderer pictureRenderer) : ISimulationStag
         Gravity = gravity;
     }
 
-    public async Task Execute(ISimulationContext<BouncingBallBulb> context)
+    public async Task Execute(ISimulationContext context)
     {
-        context.SimulationEnvironment.UseSize(BulbRadius, BallRadius, Gravity);
+        var environment = context.GetSimulationEnvironment<BouncingBallBulb>();
+
+        environment.UseSize(BulbRadius, BallRadius, Gravity);
 
         var bitmapSize = (int)BulbRadius * 2;
 

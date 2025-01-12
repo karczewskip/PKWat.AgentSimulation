@@ -28,8 +28,10 @@
             }
         }
 
-        public BitmapSource Draw(ISimulationContext<BouncingBallBulb> context)
+        public BitmapSource Draw(ISimulationContext context)
         {
+            var environment = context.GetSimulationEnvironment<BouncingBallBulb>();
+
             var bouncingBalls = context.GetAgents<BouncingBall>().ToArray();
 
             if(_brushes == null)
@@ -45,7 +47,7 @@
             using var graphic = Graphics.FromImage(_bmp);
             graphic.Clear(Color.Black);
             var pen = new Pen(Brushes.White, 0);
-            graphic.DrawEllipse(pen, 0, 0, (float)context.SimulationEnvironment.BulbRadius * 2, (float)context.SimulationEnvironment.BulbRadius * 2);
+            graphic.DrawEllipse(pen, 0, 0, (float)environment.BulbRadius * 2, (float)environment.BulbRadius * 2);
 
             graphic.TranslateTransform(_bmp.Width / 2, _bmp.Height / 2);
             //graphic.Clear(Color.White);
@@ -53,7 +55,7 @@
             foreach (var b in bouncingBalls)
             {
                 var brush = _brushes[b.Id];
-                graphic.FillEllipse(brush, (int)b.Position.X, (int)b.Position.Y, (float)context.SimulationEnvironment.BallRadius, (float)context.SimulationEnvironment.BallRadius);
+                graphic.FillEllipse(brush, (int)b.Position.X, (int)b.Position.Y, (float)environment.BallRadius, (float)environment.BallRadius);
             }
 
             var bitmapSource = _bmp.ConvertToBitmapSource();
