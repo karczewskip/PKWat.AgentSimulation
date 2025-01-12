@@ -19,12 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Math"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Extensions", "PKWat.AgentSimulation.Extensions\PKWat.AgentSimulation.Extensions.csproj", "{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaApplicationTest2", "AvaloniaApplicationTest2\AvaloniaApplicationTest2.csproj", "{9FF7E683-8171-4C64-B766-AC8274049B53}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.ConsoleApp", "PKWat.AgentSimulation.ConsoleApp\PKWat.AgentSimulation.ConsoleApp.csproj", "{13E1046A-36E2-49EE-8D26-E104218BC45F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Abstraction", "PKWat.AgentSimulation.Abstraction\PKWat.AgentSimulation.Abstraction.csproj", "{DB9880C5-0E3E-417B-9642-0A59208710D8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.GameOfLife.GPU", "Examples\PKWat.AgentSimulation.Examples.GameOfLife.GPU\PKWat.AgentSimulation.Examples.GameOfLife.GPU.csproj", "{E4511F4C-0209-4393-9693-BB349B4F93A3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples.PreyVsPredator", "Examples\PKWat.AgentSimulation.Examples.PreyVsPredator\PKWat.AgentSimulation.Examples.PreyVsPredator.csproj", "{331DC0F9-D151-457C-906E-36031448A7D9}"
@@ -63,18 +57,6 @@ Global
 		{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73AC12F1-AC35-4B08-B8A3-4C61A8E03F84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9FF7E683-8171-4C64-B766-AC8274049B53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9FF7E683-8171-4C64-B766-AC8274049B53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9FF7E683-8171-4C64-B766-AC8274049B53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9FF7E683-8171-4C64-B766-AC8274049B53}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13E1046A-36E2-49EE-8D26-E104218BC45F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13E1046A-36E2-49EE-8D26-E104218BC45F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13E1046A-36E2-49EE-8D26-E104218BC45F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13E1046A-36E2-49EE-8D26-E104218BC45F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB9880C5-0E3E-417B-9642-0A59208710D8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4511F4C-0209-4393-9693-BB349B4F93A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E4511F4C-0209-4393-9693-BB349B4F93A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4511F4C-0209-4393-9693-BB349B4F93A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
