@@ -36,7 +36,7 @@ internal class NewAirplaneArrival(IRandomNumbersGenerator randomNumbersGenerator
         {
             var passanger = context.AddAgent<Passenger>();
             passanger.SetAirplane(newAirplane.Id);
-            newAirplane.Passengers.Add(passanger.Id);
+            newAirplane.PassengersInAirplane.Enqueue(passanger.Id);
         }
         context.SimulationEnvironment.AddAirplaneToWaitingList(newAirplane.Id);
     }

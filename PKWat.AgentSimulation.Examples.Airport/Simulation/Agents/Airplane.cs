@@ -11,7 +11,8 @@ public class Airplane : SimpleSimulationAgent<AirportEnvironment>
     public TimeSpan? StartedDepartureTime { get; private set; }
     public TimeSpan? PlannedFinishedDepartureTime { get; private set; }
 
-    public List<AgentId> Passengers { get; } = new();
+    public Queue<AgentId> PassengersInAirplane { get; } = new();
+    public TimeSpan? PassengerCheckoutBlockTime { get; set; }
 
     public bool WaitsForLanding => !StartedLandingTime.HasValue;
 

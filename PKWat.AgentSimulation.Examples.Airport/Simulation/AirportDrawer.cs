@@ -67,7 +67,7 @@ public class AirportDrawer
             var coordinates = GetCoordinatesForLandingAirplane(airplane, waitingCordinates, now);
 
             graphic.FillEllipse(Brushes.Blue, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(airplane.Passengers.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
 
             //if(context.SimulationEnvironment.LandingAirplanes.ContainsKey(airplane.Id))
             //{
@@ -88,7 +88,7 @@ public class AirportDrawer
             var coordinates = GetCoordinatesForDepartingAirplane(airplane, departureCoordinates, now);
 
             graphic.FillEllipse(Brushes.Green, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(airplane.Passengers.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
         }
 
         int i = 0;
@@ -97,7 +97,7 @@ public class AirportDrawer
             var coordinates = GetCoordinatesForWaitingAirplane(i, waitingCordinates);
 
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
-            graphic.DrawString(airplane.Passengers.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
+            graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
             if (airplane.LandingLine.HasValue)
             {
                 graphic.DrawString(airplane.LandingLine.Value.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);

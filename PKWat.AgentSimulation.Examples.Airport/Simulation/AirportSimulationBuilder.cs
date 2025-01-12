@@ -30,6 +30,7 @@
                 .AddStage<NewAirplaneArrival>()
                 .AddStage<AssignWaitingAirplanesToAvailableLines>()
                 .AddStage<StartLandingAirplane>()
+                .AddStage<StartCheckoutingPassengers>()
                 .AddCallback(c => RenderAsync(c, drawing))
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
