@@ -14,13 +14,13 @@
         Task StopAsync();
     }
 
-    internal class Simulation<T> : ISimulation where T : ISimulationEnvironment
+    internal class Simulation : ISimulation
     {
-        private readonly SimulationContext<T> _context;
+        private readonly SimulationContext _context;
         private readonly ISimulationSnapshotStore _snapshotStore;
-        private readonly IReadOnlyList<Func<SimulationContext<T>, Task>> _callbacks;
-        private readonly ISimulationStage<T>[] _initializationStages;
-        private readonly ISimulationStage<T>[] _stages;
+        private readonly IReadOnlyList<Func<SimulationContext, Task>> _callbacks;
+        private readonly ISimulationStage[] _initializationStages;
+        private readonly ISimulationStage[] _stages;
 
         private RunningSimulationState _runningState = RunningSimulationState.CreateNotRunningState();
 
@@ -28,11 +28,11 @@
         public SimulationCrashResult Crash => _runningState.CrashResult;
 
         public Simulation(
-            SimulationContext<T> context,
+            SimulationContext context,
             ISimulationSnapshotStore simulationSnapshotStore,
-            IReadOnlyList<Func<SimulationContext<T>, Task>> callbacks,
-            ISimulationStage<T>[] initializationStages,
-            ISimulationStage<T>[] stages)
+            IReadOnlyList<Func<SimulationContext, Task>> callbacks,
+            ISimulationStage[] initializationStages,
+            ISimulationStage[] stages)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;

@@ -4,7 +4,7 @@ namespace PKWat.AgentSimulation.Core.Builder;
 
 public interface ISimulationBuilder
 {
-    ISimulationBuilderContext<T> CreateNewSimulation<T>() where T : ISimulationEnvironment;
+    ISimulationBuilderContext CreateNewSimulation<T>() where T : ISimulationEnvironment;
 }
 
 internal class SimulationBuilder : ISimulationBuilder
@@ -16,9 +16,9 @@ internal class SimulationBuilder : ISimulationBuilder
         _serviceProvider = serviceProvider;
     }
 
-    public ISimulationBuilderContext<T> CreateNewSimulation<T>() where T : ISimulationEnvironment
+    public ISimulationBuilderContext CreateNewSimulation<T>() where T : ISimulationEnvironment
     {
-        var builderContext = new SimulationBuilderContext<T>(_serviceProvider);
+        var builderContext = new SimulationBuilderContext(_serviceProvider, typeof(T));
 
         return builderContext;
     }
