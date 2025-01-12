@@ -11,6 +11,8 @@ public class Airplane : SimpleSimulationAgent<AirportEnvironment>
     public TimeSpan? StartedDepartureTime { get; private set; }
     public TimeSpan? PlannedFinishedDepartureTime { get; private set; }
 
+    public bool IsBeforeDeparture => !StartedDepartureTime.HasValue;
+
     public Queue<AgentId> PassengersInAirplane { get; } = new();
     public TimeSpan? PassengerCheckoutBlockTime { get; set; }
 
@@ -23,7 +25,7 @@ public class Airplane : SimpleSimulationAgent<AirportEnvironment>
     }
 
     internal bool IsLanding(TimeSpan now)
-        => StartedLandingTime.HasValue && now >= StartedLandingTime;
+        => StartedLandingTime.HasValue && now >= StartedLandingTime && now < PlannedFinishedLandingTime;
 
     public bool IsLanded(TimeSpan time)
         => PlannedFinishedLandingTime.HasValue && time >= PlannedFinishedLandingTime;
@@ -39,4 +41,9 @@ public class Airplane : SimpleSimulationAgent<AirportEnvironment>
 
     public bool IsAway(TimeSpan time)
         => PlannedFinishedDepartureTime.HasValue && time >= PlannedFinishedDepartureTime;
+
+    internal bool WaitsForPassangersCheckout(TimeSpan now)
+        => IsLanded(now) 
+        && (PassengersInAirplane.Any() 
+            || (PassengerCheckoutBlockTime.HasValue && now < PassengerCheckoutBlockTime));
 }

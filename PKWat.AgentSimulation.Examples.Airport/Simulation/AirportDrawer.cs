@@ -68,11 +68,6 @@ public class AirportDrawer
 
             graphic.FillEllipse(Brushes.Blue, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
             graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
-
-            //if(context.SimulationEnvironment.LandingAirplanes.ContainsKey(airplane.Id))
-            //{
-            //    graphic.DrawString(context.SimulationEnvironment.LandingAirplanes[airplane.Id].ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);
-            //}
         }
 
         foreach(var passenger in context.GetAgents<Passenger>().Where(x => x.IsCheckouted(now)))
@@ -83,7 +78,7 @@ public class AirportDrawer
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, 5, 5);
         }
 
-        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.IsDeparting(now)))
+        foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.IsDeparting(now) || x.WaitsForPassangersCheckout(now)))
         {
             var coordinates = GetCoordinatesForDepartingAirplane(airplane, departureCoordinates, now);
 
@@ -116,7 +111,7 @@ public class AirportDrawer
     private DrawingCoordinates GetCoordinatesForLandingAirplane(Airplane airplane, DrawingCoordinates waitingCordinates, TimeSpan now)
     {
         var landingPlace = GetLandingPlace(airplane);
-        var lerp = waitingCordinates.Lerp(landingPlace, CalculateProgress(now, airplane.StartedLandingTime!.Value, airplane.PlannedFinishedLandingTime!.Value));
+        var lerp = waitingCordinates.Lerp(landingPlace, CalculateProgress(now, airplane.StartedLandingTime, airplane.PlannedFinishedLandingTime));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
@@ -124,14 +119,14 @@ public class AirportDrawer
     {
         var landingPlace = GetLandingPlace(airplane);
         var checkoutPlace = new DrawingCoordinates(0, landingPlace.Y);
-        var lerp = landingPlace.Lerp(checkoutPlace, CalculateProgress(now, passenger.StartedCheckoutTime.Value, passenger.EndPlannedCheckoutTime.Value));
+        var lerp = landingPlace.Lerp(checkoutPlace, CalculateProgress(now, passenger.StartedCheckoutTime, passenger.EndPlannedCheckoutTime));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
     private DrawingCoordinates GetCoordinatesForDepartingAirplane(Airplane airplane, DrawingCoordinates departureCoordinates, TimeSpan now)
     {
         var landingPlace = GetLandingPlace(airplane);
-        var lerp = landingPlace.Lerp(departureCoordinates, CalculateProgress(now, airplane.StartedDepartureTime.Value, airplane.PlannedFinishedDepartureTime.Value), convertY: x => 1 - Math.Cos(Math.PI * x/2));
+        var lerp = landingPlace.Lerp(departureCoordinates, CalculateProgress(now, airplane.StartedDepartureTime, airplane.PlannedFinishedDepartureTime), convertY: x => 1 - Math.Cos(Math.PI * x/2));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 
@@ -144,9 +139,14 @@ public class AirportDrawer
     private DrawingCoordinates GetLandingPlaceForLandingLine(int landingLine)
         => new DrawingCoordinates(100, _bmp.Height - landingLine * 30);
 
-    private double CalculateProgress(TimeSpan now, TimeSpan start, TimeSpan end)
+    private double CalculateProgress(TimeSpan now, TimeSpan? start, TimeSpan? end)
     {
-        if(now < start)
+        if(start == null || end == null)
+        {
+            return 0;
+        }
+
+        if (now < start)
         {
             return 0;
         }
@@ -158,7 +158,7 @@ public class AirportDrawer
 
         var total = end - start;
         var current = now - start;
-        return current.TotalMilliseconds / total.TotalMilliseconds;
+        return current.Value.TotalMilliseconds / total.Value.TotalMilliseconds;
     }
 
     private record DrawingCoordinates(int X, int Y)
