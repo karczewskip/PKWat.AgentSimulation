@@ -28,6 +28,7 @@
                 .CreateNewSimulation<AirportEnvironment>()
                 .AddInitializationStage<SetLindingLines>()
                 .AddStage<NewAirplaneArrival>()
+                .AddStage<ReleaseLines>()
                 .AddStage<AssignWaitingAirplanesToAvailableLines>()
                 .AddStage<StartLandingAirplane>()
                 .AddStage<StartCheckoutingPassengers>()

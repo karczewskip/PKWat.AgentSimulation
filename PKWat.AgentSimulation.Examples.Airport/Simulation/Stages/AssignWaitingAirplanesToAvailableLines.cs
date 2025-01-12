@@ -15,7 +15,7 @@ internal class AssignWaitingAirplanesToAvailableLines : ISimulationStage<Airport
             var airplaneId = context.SimulationEnvironment.WaitingAirplanes.Dequeue();
             var line = context.SimulationEnvironment.AvailableLines.Dequeue();
             var airplane = context.GetRequiredAgent<Airplane>(airplaneId);
-            airplane.LandingLine = line;
+            airplane.AssignedLine = line;
         }
     }
 }

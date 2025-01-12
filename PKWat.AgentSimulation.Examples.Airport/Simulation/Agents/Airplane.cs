@@ -4,7 +4,7 @@ using PKWat.AgentSimulation.Core.Agent;
 
 public class Airplane : SimpleSimulationAgent<AirportEnvironment>
 {
-    public int? LandingLine { get; set; }
+    public int? AssignedLine { get; set; }
     public TimeSpan? StartedLandingTime { get; private set; }
     public TimeSpan? PlannedFinishedLandingTime { get; private set; }
 
@@ -46,4 +46,7 @@ public class Airplane : SimpleSimulationAgent<AirportEnvironment>
         => IsLanded(now) 
         && (PassengersInAirplane.Any() 
             || (PassengerCheckoutBlockTime.HasValue && now < PassengerCheckoutBlockTime));
+
+    internal bool IsDepartured(TimeSpan time)
+        => PlannedFinishedDepartureTime.HasValue && time > PlannedFinishedDepartureTime;
 }

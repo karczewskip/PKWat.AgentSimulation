@@ -93,9 +93,9 @@ public class AirportDrawer
 
             graphic.FillEllipse(Brushes.Red, coordinates.X, coordinates.Y, AirplaneSize, AirplaneSize);
             graphic.DrawString(airplane.PassengersInAirplane.Count.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X + ShiftDetails, coordinates.Y + ShiftDetails);
-            if (airplane.LandingLine.HasValue)
+            if (airplane.AssignedLine.HasValue)
             {
-                graphic.DrawString(airplane.LandingLine.Value.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);
+                graphic.DrawString(airplane.AssignedLine.Value.ToString(), new Font("Arial", 8), Brushes.Black, coordinates.X, coordinates.Y);
             }
             i++;
         }
@@ -132,7 +132,7 @@ public class AirportDrawer
 
     private DrawingCoordinates GetLandingPlace(Airplane airplane)
     {
-        var landingLine = airplane.LandingLine!.Value;
+        var landingLine = airplane.AssignedLine!.Value;
         return new DrawingCoordinates(100, _bmp.Height - landingLine * 30);
     }
 
