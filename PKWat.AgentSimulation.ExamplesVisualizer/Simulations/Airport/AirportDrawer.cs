@@ -102,7 +102,11 @@ public class AirportDrawer : IVisualizationDrawer
             i++;
         }
 
-        return _bmp.ConvertToBitmapSource();
+        var bitmapSource = _bmp.ConvertToBitmapSource();
+
+        bitmapSource.Freeze();
+
+        return bitmapSource;
     }
 
     private DrawingCoordinates GetCoordinatesForWaitingAirplane(int index, DrawingCoordinates waitingCordinates)
