@@ -23,7 +23,7 @@ public class PreyVsPredatorSimulationBuilder(
             .AddStage<BornNewPreyers>(c => c.ChangePregnancyUpdate(0.1))
             .AddStage<PreyersEaten>()
             .AddCallback(c => drawing(drawer.Draw(c)))
-            //.SetRandomSeed(200)
+            .SetRandomSeed(200)
             .Build();
 
         return simulation;

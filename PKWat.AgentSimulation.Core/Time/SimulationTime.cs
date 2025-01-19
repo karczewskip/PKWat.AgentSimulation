@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core.Time;
 
-public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0) : IReadOnlySimulationTime
+public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0) 
+    : IReadOnlySimulationTime
 {
     public SimulationTime AddStep(TimeSpan step) => new(Time + step, step, StepNo + 1);
 

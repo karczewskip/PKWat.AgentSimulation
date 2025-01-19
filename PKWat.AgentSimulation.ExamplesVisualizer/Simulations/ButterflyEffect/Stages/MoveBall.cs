@@ -1,19 +1,21 @@
 ﻿namespace PKWat.AgentSimulation.ExamplesVisualizer.Simulations.ButterflyEffect.Stages;
 
 using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.ButterflyEffect;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.ButterflyEffect.Agents;
 using System.Threading.Tasks;
 
-internal class MoveBall : ISimulationStage
+internal class MoveBall(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage
 {
     public async Task Execute(ISimulationContext context)
     {
         var environment = context.GetSimulationEnvironment<BouncingBallBulb>();
 
-        Parallel.ForEach(context.GetAgents<BouncingBall>(), new ParallelOptions() { MaxDegreeOfParallelism = 32 }, ball =>
+        Parallel.ForEach(context.GetAgents<BouncingBall>(), new ParallelOptions() { MaxDegreeOfParallelism = 16 }, ball =>
         {
+            using var _ = simulationCyclePerformanceInfo.AddStep("Move ball");
             UpdateBall(
                 ball,
                 environment.BallRadius,
@@ -42,3 +44,4 @@ internal class MoveBall : ISimulationStage
         }
     }
 }
+

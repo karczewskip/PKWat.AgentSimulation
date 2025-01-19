@@ -27,4 +27,15 @@ public class Passenger : SimpleSimulationAgent
 
     public bool IsCheckouted(TimeSpan now)
         => EndPlannedCheckoutTime.HasValue && EndPlannedCheckoutTime.Value <= now;
+
+    public override object CreateSnapshot()
+    {
+        return new
+        {
+            Id,
+            AirplaneId,
+            StartedCheckoutTime,
+            EndPlannedCheckoutTime
+        };
+    }
 }

@@ -2,6 +2,8 @@
 {
     using PKWat.AgentSimulation.Core;
     using PKWat.AgentSimulation.Core.Builder;
+    using PKWat.AgentSimulation.Core.Crash;
+    using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.Airport.Agents;
     using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.Airport.Stages;
     using System;
     using System.Threading.Tasks;
@@ -34,6 +36,20 @@
                 .AddStage<StartCheckoutingPassengers>()
                 .AddStage<RemoveCheckoutedPassengers>()
                 .AddStage<StartDeparture>()
+                .AddCrashCondition(c =>
+                {
+                    var airplanes = c.GetAgents<Airplane>();
+                    var assignedLinesToAirplanes = airplanes
+                        .Where(a => a.AssignedLine.HasValue)
+                        .GroupBy(x => x.AssignedLine)
+                        .Where(x => x.Count() > 1);
+
+                    if(assignedLinesToAirplanes.Any())
+                        return SimulationCrashResult.Crash("Two airplanes are assigned to the same line");
+
+                    return SimulationCrashResult.NoCrash;
+
+                })
                 .AddCallback(c => RenderAsync(c, drawing))
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
                 .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.01))

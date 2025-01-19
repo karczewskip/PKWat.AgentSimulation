@@ -8,13 +8,12 @@ using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.PreyVsPredator;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.PreyVsPredator.Agents;
 using System.Threading.Tasks;
 
-internal class PreyersEaten(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage
+internal class PreyersEaten : ISimulationStage
 {
     public async Task Execute(ISimulationContext context)
     {
         var environment = context.GetSimulationEnvironment<PreyVsPredatorEnvironment>();
 
-        using var step = simulationCyclePerformanceInfo.AddStep("PreyersEaten");
         var newBornPredators = new List<(AgentId NewBorn, AgentId Parent)>();
         var predators = context.GetAgents<Predator>().ToArray();
 
