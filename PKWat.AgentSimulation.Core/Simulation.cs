@@ -13,79 +13,55 @@
         Task StopAsync();
     }
 
-    internal class Simulation : ISimulation
-    {
-        private readonly SimulationContext _context;
-        private readonly ISimulationSnapshotStore _snapshotStore;
-        private readonly IReadOnlyList<Func<SimulationContext, Task>> _callbacks;
-        private readonly ISimulationStage[] _initializationStages;
-        private readonly ISimulationStage[] _stages;
-        private readonly IReadOnlyList<Func<ISimulationContext, SimulationCrashResult>> _crashConditions;
-
-        public bool Running => _context.IsRunning;
-        public SimulationCrashResult Crash => _context.CrashResult;
-
-        public Simulation(
+    internal class Simulation(
             SimulationContext context,
-            ISimulationSnapshotStore simulationSnapshotStore,
+            ISimulationSnapshotStore snapshotStore,
             IReadOnlyList<Func<SimulationContext, Task>> callbacks,
             ISimulationStage[] initializationStages,
             ISimulationStage[] stages,
-            IReadOnlyList<Func<ISimulationContext, SimulationCrashResult>> crashConditions)
-        {
-            _context = context;
-            _snapshotStore = simulationSnapshotStore;
-            _callbacks = callbacks;
-            _initializationStages = initializationStages;
-            _stages = stages;
-            _crashConditions = crashConditions;
-        }
+            IReadOnlyList<Func<ISimulationContext, SimulationCrashResult>> crashConditions) : ISimulation
+    {
+        public bool Running => context.IsRunning;
+        public SimulationCrashResult Crash => context.CrashResult;
 
         public async Task StartAsync()
         {
-            _context.StartSimulation();
+            context.StartSimulation();
 
-            foreach (var stage in _initializationStages)
-            {
-                await stage.Execute(_context);
-            }
+            foreach (var stage in initializationStages)
+                await stage.Execute(context);
 
-            _snapshotStore.CleanExistingSnapshots();
-
-            _context.StartCycleZero();
+            snapshotStore.CleanExistingSnapshots();
+            context.StartCycleZero();
 
             while (Running)
             {
-                await _snapshotStore.SaveSnapshotAsync(_context);
+                await snapshotStore.SaveSnapshotAsync(context);
 
-                _context.StartNewCycle();
+                context.StartNewCycle();
 
-                foreach (var stage in _stages)
+                foreach (var stage in stages)
+                    await stage.Execute(context);
+
+                foreach (var callback in callbacks)
+                    await callback(context);
+
+                foreach (var crashCondition in crashConditions)
                 {
-                    await stage.Execute(_context);
-                }
-
-                foreach (var callback in _callbacks)
-                {
-                    await callback(_context);
-                }
-
-                foreach (var crashCondition in _crashConditions)
-                {
-                    var crashResult = crashCondition(_context);
+                    var crashResult = crashCondition(context);
                     if (crashResult.IsCrash)
                     {
-                        _context.Crash(crashResult);
+                        context.Crash(crashResult);
                     }
                 }
 
-                await _context.OnCycleFinishAsync();
+                await context.OnCycleFinishAsync();
             }
         }
 
         public async Task StopAsync()
         {
-            _context.StopSimulation();
+            context.StopSimulation();
         }
     }
 }
