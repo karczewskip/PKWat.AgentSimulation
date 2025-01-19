@@ -2,5 +2,5 @@
 
 public interface ISimulationTimeProvider
 {
-    IReadOnlySimulationTime SimulationTime { get; }
+    IReadOnlySimulationTime Time { get; }
 }

@@ -43,7 +43,7 @@ internal class SimulationContext : ISimulationContext
     }
 
     public ISimulationEnvironment SimulationEnvironment { get; }
-    public IReadOnlySimulationTime SimulationTime => _simulationTime;
+    public IReadOnlySimulationTime Time => _simulationTime;
     public ISimulationCyclePerformanceInfo PerformanceInfo => _performanceInfo;
 
     public bool IsRunning => _runningState.IsRunning;
@@ -74,12 +74,12 @@ internal class SimulationContext : ISimulationContext
     {
         _performanceInfo = _serviceProvider.GetRequiredService<SimulationPerformanceInfo>();
         _performanceInfo.Clear();
-        _simulationTime = new SimulationTime(TimeSpan.Zero, _simulationStep);
+        _simulationTime = SimulationTime.CreateZero();
     }
 
     internal void StartNewCycle()
     {
-        _simulationTime = _simulationTime.AddStep();
+        _simulationTime = _simulationTime.AddStep(_simulationStep);
         _performanceInfo.StartNewCycle();
     }
 
@@ -96,9 +96,11 @@ internal class SimulationContext : ISimulationContext
         Agents.Remove(agentId);
     }
 
-    internal void OnCycleFinish()
+    internal async Task OnCycleFinishAsync()
     {
         _performanceInfo.NotifySubscribers();
+
+        await Task.Delay(WaitingTimeBetweenSteps);
     }
 
     internal void Crash(SimulationCrashResult crashResult)

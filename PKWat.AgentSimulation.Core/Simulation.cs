@@ -74,9 +74,7 @@
                     _context.Crash(crashResult);
                 }
 
-                _context.OnCycleFinish();
-
-                await Task.Delay(_context.WaitingTimeBetweenSteps);
+                await _context.OnCycleFinishAsync();
             }
         }
 

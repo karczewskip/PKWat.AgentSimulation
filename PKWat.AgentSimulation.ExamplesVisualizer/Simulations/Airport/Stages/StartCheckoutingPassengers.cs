@@ -17,7 +17,7 @@ internal class StartCheckoutingPassengers : ISimulationStage
 
     public async Task Execute(ISimulationContext context)
     {
-        var simulationTime = context.SimulationTime;
+        var simulationTime = context.Time;
 
         foreach (var airplane in context.GetAgents<Airplane>().Where(x => x.IsLanded(simulationTime.Time)))
         {

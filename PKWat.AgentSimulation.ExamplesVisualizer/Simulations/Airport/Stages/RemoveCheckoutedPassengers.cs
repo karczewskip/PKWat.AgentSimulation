@@ -11,7 +11,7 @@ internal class RemoveCheckoutedPassengers : ISimulationStage
     public async Task Execute(ISimulationContext context)
     {
         var checkoutedPassengers = context.GetAgents<Passenger>()
-            .Where(p => p.IsCheckouted(context.SimulationTime.Time));
+            .Where(p => p.IsCheckouted(context.Time.Time));
 
         foreach (var passenger in checkoutedPassengers)
         {

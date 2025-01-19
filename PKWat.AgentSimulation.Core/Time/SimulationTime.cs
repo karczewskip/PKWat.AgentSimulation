@@ -2,5 +2,7 @@
 
 public record SimulationTime(TimeSpan Time, TimeSpan Step, long StepNo = 0) : IReadOnlySimulationTime
 {
-    public SimulationTime AddStep() => this with { Time = Time + Step, StepNo = StepNo + 1 };
+    public SimulationTime AddStep(TimeSpan step) => new(Time + step, step, StepNo + 1);
+
+    public static SimulationTime CreateZero() => new(TimeSpan.Zero, TimeSpan.Zero, 0);
 }

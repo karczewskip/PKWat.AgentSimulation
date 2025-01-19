@@ -21,7 +21,7 @@ internal class StartLandingAirplane : ISimulationStage
         var airplanes = context.GetAgents<Airplane>().Where(x => x.WaitsForLanding && x.AssignedLine.HasValue);
         foreach (var airplane in airplanes)
         {
-            var start = context.SimulationTime.Time;
+            var start = context.Time.Time;
             var end = start + landingTime;
             airplane.StartLanding(start, end);
         }

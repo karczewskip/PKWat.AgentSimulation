@@ -12,7 +12,7 @@ internal class ReleaseLines : ISimulationStage
     public async Task Execute(ISimulationContext context)
     {
         foreach (var airplane in context.GetAgents<Airplane>().Where(
-            x => x.IsDepartured(context.SimulationTime.Time)
+            x => x.IsDepartured(context.Time.Time)
             && x.AssignedLine.HasValue).ToArray())
         {
             var environment = context.GetSimulationEnvironment<AirportEnvironment>();

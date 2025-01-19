@@ -35,7 +35,7 @@ public class AirportDrawer : IVisualizationDrawer
         using var graphic = Graphics.FromImage(_bmp);
         graphic.Clear(Color.White);
 
-        var now = context.SimulationTime.Time;
+        var now = context.Time.Time;
 
         foreach (var landingLine in environment.AllLandingLines)
         {

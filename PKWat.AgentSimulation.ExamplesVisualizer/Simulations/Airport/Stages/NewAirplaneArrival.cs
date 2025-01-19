@@ -18,7 +18,7 @@ internal class NewAirplaneArrival(IRandomNumbersGenerator randomNumbersGenerator
         var environment = context.GetSimulationEnvironment<AirportEnvironment>();
 
         if (environment.IsNewAirplaneArrivalScheduled
-            && environment.NewAirplaneArrival < context.SimulationTime.Time)
+            && environment.NewAirplaneArrival < context.Time.Time)
         {
             var previousArrival = environment.NewAirplaneArrival;
 
@@ -50,7 +50,7 @@ internal class NewAirplaneArrival(IRandomNumbersGenerator randomNumbersGenerator
     {
         var environment = context.GetSimulationEnvironment<AirportEnvironment>();
 
-        var nextArrival = (lastArrival ?? context.SimulationTime.Time)
+        var nextArrival = (lastArrival ?? context.Time.Time)
             + TimeSpan.FromMinutes(randomNumbersGenerator.GetNextExponential(1.0 / meanTimeBetweenArrivalsInMinutes));
 
         environment.ScheduleNewAirplaneArrival(nextArrival);

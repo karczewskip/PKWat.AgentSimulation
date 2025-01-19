@@ -36,7 +36,7 @@ internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulatio
     public async Task SaveSnapshotAsync(SimulationContext simulationContext)
     {
         await SaveSnapshotAsync(
-            new SimulationSnapshot(new SimulationTimeSnapshot(simulationContext.SimulationTime),
+            new SimulationSnapshot(new SimulationTimeSnapshot(simulationContext.Time),
                     new SimulationEnvironmentSnapshot(simulationContext.SimulationEnvironment.CreateSnapshot()),
                     simulationContext.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
                     simulationContext.CancellationToken);

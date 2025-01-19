@@ -19,11 +19,11 @@ internal class StartDeparture : ISimulationStage
     public async Task Execute(ISimulationContext context)
     {
         foreach (var airplane in context.GetAgents<Airplane>().Where(
-            x => x.IsLanded(context.SimulationTime.Time)
+            x => x.IsLanded(context.Time.Time)
             && x.PassengersInAirplane.Any() == false
             && x.IsBeforeDeparture))
         {
-            var startDepartureTime = context.SimulationTime.Time;
+            var startDepartureTime = context.Time.Time;
             var endDepartureTime = startDepartureTime + departureTime;
             airplane.StartDeparture(startDepartureTime, endDepartureTime);
         }
