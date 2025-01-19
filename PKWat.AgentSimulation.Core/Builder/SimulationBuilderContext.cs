@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.Core.Crash;
 using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Snapshots;
@@ -22,6 +23,7 @@ public interface ISimulationBuilderContext
     ISimulationBuilderContext AddInitializationStage<U>(Action<U> initialization) where U : ISimulationStage;
     ISimulationBuilderContext AddStage<U>() where U : ISimulationStage;
     ISimulationBuilderContext AddStage<U>(Action<U> initialization) where U : ISimulationStage;
+    ISimulationBuilderContext AddCrashCondition(Func<ISimulationContext, SimulationCrashResult> crashCondition);
     ISimulationBuilderContext WithSnapshots();
 
     ISimulation Build();
@@ -35,6 +37,7 @@ internal class SimulationBuilderContext(
     private List<Func<ISimulationStage>> _initializationStagesToGenerate = new();
     private List<Func<ISimulationStage>> _stagesToGenerate = new();
     private List<Func<ISimulationContext, Task>> _callbacks = new();
+    private List<Func<ISimulationContext, SimulationCrashResult>> _crashConditions = new();
     private TimeSpan _simulationStep = TimeSpan.Zero;
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
@@ -114,7 +117,8 @@ internal class SimulationBuilderContext(
             CreateSimulationSnapshotStore(),
             _callbacks,
             initializationStages,
-            stages);
+            stages,
+            _crashConditions);
     }
 
     private ISimulationSnapshotStore CreateSimulationSnapshotStore()
@@ -158,6 +162,12 @@ internal class SimulationBuilderContext(
             return stage;
         });
 
+        return this;
+    }
+
+    public ISimulationBuilderContext AddCrashCondition(Func<ISimulationContext, SimulationCrashResult> crashCondition)
+    {
+        _crashConditions.Add(crashCondition);
         return this;
     }
 }

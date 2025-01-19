@@ -20,6 +20,7 @@
         private readonly IReadOnlyList<Func<SimulationContext, Task>> _callbacks;
         private readonly ISimulationStage[] _initializationStages;
         private readonly ISimulationStage[] _stages;
+        private readonly IReadOnlyList<Func<ISimulationContext, SimulationCrashResult>> _crashConditions;
 
         public bool Running => _context.IsRunning;
         public SimulationCrashResult Crash => _context.CrashResult;
@@ -29,13 +30,15 @@
             ISimulationSnapshotStore simulationSnapshotStore,
             IReadOnlyList<Func<SimulationContext, Task>> callbacks,
             ISimulationStage[] initializationStages,
-            ISimulationStage[] stages)
+            ISimulationStage[] stages,
+            IReadOnlyList<Func<ISimulationContext, SimulationCrashResult>> crashConditions)
         {
             _context = context;
             _snapshotStore = simulationSnapshotStore;
             _callbacks = callbacks;
             _initializationStages = initializationStages;
             _stages = stages;
+            _crashConditions = crashConditions;
         }
 
         public async Task StartAsync()
@@ -67,11 +70,13 @@
                     await callback(_context);
                 }
 
-                var crashResult = _context.SimulationEnvironment.CheckCrashConditions();
-
-                if (crashResult.IsCrash)
+                foreach (var crashCondition in _crashConditions)
                 {
-                    _context.Crash(crashResult);
+                    var crashResult = crashCondition(_context);
+                    if (crashResult.IsCrash)
+                    {
+                        _context.Crash(crashResult);
+                    }
                 }
 
                 await _context.OnCycleFinishAsync();

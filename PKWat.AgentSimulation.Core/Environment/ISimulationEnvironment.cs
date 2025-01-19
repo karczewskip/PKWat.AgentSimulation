@@ -5,5 +5,4 @@ using PKWat.AgentSimulation.Core.Snapshots;
 
 public interface ISimulationEnvironment : ISnapshotCreator
 {
-    SimulationCrashResult CheckCrashConditions();
 }
