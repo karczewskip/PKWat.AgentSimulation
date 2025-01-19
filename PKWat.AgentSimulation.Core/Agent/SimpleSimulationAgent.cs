@@ -1,9 +1,10 @@
 ﻿namespace PKWat.AgentSimulation.Core.Agent;
+
 public abstract class SimpleSimulationAgent : ISimulationAgent
 {
     public AgentId Id { get; } = AgentId.GenerateNew();
 
-    public object CreateSnapshot()
+    public virtual object CreateSnapshot()
     {
         return new { Id };
     }

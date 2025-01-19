@@ -1,7 +1,6 @@
 ﻿namespace PKWat.AgentSimulation.Core
 {
     using PKWat.AgentSimulation.Core.Crash;
-    using PKWat.AgentSimulation.Core.Environment;
     using PKWat.AgentSimulation.Core.Snapshots;
     using PKWat.AgentSimulation.Core.Stage;
 
@@ -22,10 +21,8 @@
         private readonly ISimulationStage[] _initializationStages;
         private readonly ISimulationStage[] _stages;
 
-        private RunningSimulationState _runningState = RunningSimulationState.CreateNotRunningState();
-
-        public bool Running => _runningState.IsRunning;
-        public SimulationCrashResult Crash => _runningState.CrashResult;
+        public bool Running => _context.IsRunning;
+        public SimulationCrashResult Crash => _context.CrashResult;
 
         public Simulation(
             SimulationContext context,
@@ -43,7 +40,7 @@
 
         public async Task StartAsync()
         {
-            _runningState = RunningSimulationState.CreateRunningState();
+            _context.StartSimulation();
 
             foreach (var stage in _initializationStages)
             {
@@ -56,11 +53,7 @@
 
             while (Running)
             {
-                await _snapshotStore.SaveSnapshotAsync(
-                    new SimulationSnapshot(new SimulationTimeSnapshot(_context.SimulationTime),
-                    new SimulationEnvironmentSnapshot(_context.SimulationEnvironment.CreateSnapshot()),
-                    _context.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
-                    _runningState.CancellationToken);
+                await _snapshotStore.SaveSnapshotAsync(_context);
 
                 _context.StartNewCycle();
 
@@ -78,7 +71,7 @@
 
                 if (crashResult.IsCrash)
                 {
-                    _runningState.Crash(crashResult);
+                    _context.Crash(crashResult);
                 }
 
                 _context.OnCycleFinish();
@@ -89,51 +82,7 @@
 
         public async Task StopAsync()
         {
-            _runningState.Stop();
-        }
-
-        private class RunningSimulationState
-        {
-            private CancellationTokenSource? _cancellationTokenSource;
-
-            public bool IsRunning { get; private set; }
-            public CancellationToken CancellationToken { get; private set; }
-            public SimulationCrashResult CrashResult { get; private set; } = SimulationCrashResult.NoCrash;
-
-            private RunningSimulationState(
-                CancellationTokenSource? cancellationTokenSource, 
-                bool isRunning, 
-                CancellationToken cancellationToken)
-            {
-                _cancellationTokenSource = cancellationTokenSource;
-
-                IsRunning = isRunning;
-                CancellationToken = cancellationToken;
-            }
-
-            public static RunningSimulationState CreateRunningState()
-            {
-                var cancellationTokenSource = new CancellationTokenSource();
-                var cancellationToken = cancellationTokenSource.Token;
-                return new RunningSimulationState(cancellationTokenSource, true, cancellationToken);
-            }
-
-            public static RunningSimulationState CreateNotRunningState()
-            {
-                return new RunningSimulationState(null, false, CancellationToken.None);
-            }
-
-            public void Stop()
-            {
-                IsRunning = false;
-                _cancellationTokenSource?.Cancel();
-            }
-
-            public void Crash(SimulationCrashResult crash)
-            {
-                CrashResult = crash;
-                Stop();
-            }
+            _context.StopSimulation();
         }
     }
 }

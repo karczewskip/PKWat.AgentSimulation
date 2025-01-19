@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.Core.Crash;
 using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.Time;
@@ -22,6 +23,7 @@ internal class SimulationContext : ISimulationContext
     private readonly IServiceProvider _serviceProvider;
     private readonly TimeSpan _simulationStep;
 
+    private RunningSimulationState _runningState = RunningSimulationState.CreateNotRunningState();
     private SimulationTime _simulationTime;
     private SimulationPerformanceInfo _performanceInfo;
 
@@ -43,6 +45,15 @@ internal class SimulationContext : ISimulationContext
     public ISimulationEnvironment SimulationEnvironment { get; }
     public IReadOnlySimulationTime SimulationTime => _simulationTime;
     public ISimulationCyclePerformanceInfo PerformanceInfo => _performanceInfo;
+
+    public bool IsRunning => _runningState.IsRunning;
+    public CancellationToken CancellationToken => _runningState.CancellationToken;
+    public SimulationCrashResult CrashResult => _runningState.CrashResult;
+
+    internal void StartSimulation()
+    {
+        _runningState = RunningSimulationState.CreateRunningState();
+    }
 
     public Dictionary<AgentId, ISimulationAgent> Agents { get; }
     public TimeSpan WaitingTimeBetweenSteps { get; }
@@ -88,5 +99,15 @@ internal class SimulationContext : ISimulationContext
     internal void OnCycleFinish()
     {
         _performanceInfo.NotifySubscribers();
+    }
+
+    internal void Crash(SimulationCrashResult crashResult)
+    {
+        _runningState.Crash(crashResult);
+    }
+
+    internal void StopSimulation()
+    {
+        _runningState.Stop();
     }
 }

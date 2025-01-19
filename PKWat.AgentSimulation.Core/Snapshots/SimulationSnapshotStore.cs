@@ -18,7 +18,7 @@ internal record SimulationSnapshot(SimulationTimeSnapshot TimeSnapshot, Simulati
 internal interface ISimulationSnapshotStore
 {
     void CleanExistingSnapshots();
-    Task SaveSnapshotAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken);
+    Task SaveSnapshotAsync(SimulationContext simulationContext);
 }
 
 internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulationSnapshotConfiguration) : ISimulationSnapshotStore
@@ -33,7 +33,16 @@ internal class SimulationSnapshotStore(SimulationSnapshotConfiguration simulatio
         Directory.CreateDirectory(simulationSnapshotConfiguration.Directory);
     }
 
-    public async Task SaveSnapshotAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken)
+    public async Task SaveSnapshotAsync(SimulationContext simulationContext)
+    {
+        await SaveSnapshotAsync(
+            new SimulationSnapshot(new SimulationTimeSnapshot(simulationContext.SimulationTime),
+                    new SimulationEnvironmentSnapshot(simulationContext.SimulationEnvironment.CreateSnapshot()),
+                    simulationContext.Agents.Select(x => new SimulationAgentSnapshot(x.Value.GetType().FullName, x.Key, x.Value.CreateSnapshot())).ToArray()),
+                    simulationContext.CancellationToken);
+    }
+
+    private async Task SaveSnapshotAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken)
     {
         string filePath = Path.Combine(simulationSnapshotConfiguration.Directory, $"{snapshot.TimeSnapshot.SimulationTime.StepNo}.json");
 
@@ -83,7 +92,8 @@ internal class NullSimulationSnapshotStore : ISimulationSnapshotStore
     public void CleanExistingSnapshots()
     {
     }
-    public Task SaveSnapshotAsync(SimulationSnapshot snapshot, CancellationToken cancellationToken)
+
+    public Task SaveSnapshotAsync(SimulationContext simulationContext)
     {
         return Task.CompletedTask;
     }
