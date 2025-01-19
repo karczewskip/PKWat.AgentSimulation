@@ -14,16 +14,16 @@ public class PreyVsPredatorSimulationBuilder(
     {
         var simulation = simulationBuilder
             .CreateNewSimulation<PreyVsPredatorEnvironment>()
-            .AddAgents<Prey>(100)
-            .AddAgents<Predator>(100)
+            .AddAgents<Prey>(1000)
+            .AddAgents<Predator>(1000)
             .AddInitializationStage<ActorsPlaced>(c => c.SetSize(200, 200))
-            .AddStage<PredatorsStarved>(c => c.ChangeStarvationIncrement(0.04))
+            .AddStage<PredatorsStarved>(c => c.ChangeStarvationIncrement(0.001))
             .AddStage<MovedPreyers>()
             .AddStage<MovedPredators>()
-            .AddStage<BornNewPreyers>(c => c.ChangePregnancyUpdate(0.2))
+            .AddStage<BornNewPreyers>(c => c.ChangePregnancyUpdate(0.1))
             .AddStage<PreyersEaten>()
             .AddCallback(c => drawing(drawer.Draw(c)))
-            .SetRandomSeed(100)
+            //.SetRandomSeed(200)
             .Build();
 
         return simulation;

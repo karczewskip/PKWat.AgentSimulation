@@ -26,7 +26,7 @@
 
             var simulation = _simulationBuilder
                 .CreateNewSimulation<AirportEnvironment>()
-                .AddInitializationStage<SetLindingLines>()
+                .AddInitializationStage<SetLindingLines>(s => s.SetMaxLandingLines(8))
                 .AddStage<NewAirplaneArrival>()
                 .AddStage<ReleaseLines>()
                 .AddStage<AssignWaitingAirplanesToAvailableLines>()
@@ -36,7 +36,7 @@
                 .AddStage<StartDeparture>()
                 .AddCallback(c => RenderAsync(c, drawing))
                 .SetSimulationStep(TimeSpan.FromMinutes(1))
-                .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
+                .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.01))
                 .SetRandomSeed(100)
                 .WithSnapshots()
                 .Build();

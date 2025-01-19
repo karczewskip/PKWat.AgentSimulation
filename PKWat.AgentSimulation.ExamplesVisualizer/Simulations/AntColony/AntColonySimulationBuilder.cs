@@ -27,7 +27,7 @@ public class AntColonySimulationBuilder(ISimulationBuilder simulationBuilder, Co
             .AddInitializationStage<SetAntsInRandomPositions>()
             .AddStage<ChangeAfterVisitHill>()
             .AddStage<ChangeAfterVisitFood>()
-            .AddStage<DecreasePheromones>()
+            .AddStage<DecreasePheromones>(s => s.SetDecreaseRate(0.8))
             .AddStage<AddFoodPheromones>(s => s.SetPheromonesPersistence(10))
             .AddStage<AddHomePheromones>(s => s.SetPheromonesPersistence(10))
             .AddStage<MoveAnts>(s => s.SetTemperature(0.04))

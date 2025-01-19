@@ -94,16 +94,11 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
         }
     }
 
-    private class DisposeAfterFinish : IDisposable
+    private class DisposeAfterFinish(Action onDispose) : IDisposable
     {
-        private readonly Action _onDispose;
-        public DisposeAfterFinish(Action onDispose)
-        {
-            _onDispose = onDispose;
-        }
         public void Dispose()
         {
-            _onDispose();
+            onDispose();
         }
     }
 }
