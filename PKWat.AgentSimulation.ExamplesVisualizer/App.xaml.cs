@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Drawing;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations;
+using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.Airport;
 using System.Reflection;
 using System.Windows;
 
@@ -23,7 +24,10 @@ public partial class App : Application
                 services.AddSingleton<MainWindow>();
                 services.AddSingleton<ColorsGenerator>();
                 services.AddBuilders();
-                services.AddAgentSimulation(Assembly.GetAssembly(typeof(App)));
+                services.AddAgentSimulation(
+                    Assembly.GetAssembly(typeof(AirportEnvironment)),
+                    Assembly.GetAssembly(typeof(App))
+                    );
             })
             .Build();
     }

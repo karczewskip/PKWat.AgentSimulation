@@ -11,7 +11,7 @@ using System.Reflection;
 
 public static class AgentSimulationServiceCollectionExtensions
 {
-    public static void AddAgentSimulation(this IServiceCollection services, Assembly assembly)
+    public static void AddAgentSimulation(this IServiceCollection services, params Assembly[] assemblies)
     {
         services.AddSingleton<ISimulationBuilder, SimulationBuilder>();
         services.AddScoped<RandomNumbersGeneratorFactory>();
@@ -24,7 +24,7 @@ public static class AgentSimulationServiceCollectionExtensions
             typeof(ISimulationAgent), 
             typeof(ISimulationStage)];
 
-        foreach (var type in assembly.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface))
+        foreach (var type in assemblies.SelectMany(x => x.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface)))
         {
             var interfaces = type.GetInterfaces();
             if(interfaces.Any(i => registeringGenericTypes.Contains(i)))
