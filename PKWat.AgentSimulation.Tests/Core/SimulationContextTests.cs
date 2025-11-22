@@ -5,6 +5,7 @@ using Moq;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Environment;
+using PKWat.AgentSimulation.Core.Time;
 using System;
 
 [TestFixture]
@@ -13,7 +14,7 @@ public class SimulationContextTests : IDisposable
     private IServiceProvider _serviceProviderMock;
     private ISimulationEnvironment _simulationEnvironmentMock;
     private ISimulationAgent _simulationAgentMock;
-    private TimeSpan _simulationStep;
+    private ISimulationTimeMover _simulationTimeMover;
     private TimeSpan _waitingTimeBetweenSteps;
 
     [SetUp]
@@ -24,7 +25,7 @@ public class SimulationContextTests : IDisposable
         _simulationAgentMock = simulationAgentMock.Object;
 
         _simulationEnvironmentMock = new Mock<ISimulationEnvironment>().Object;
-        _simulationStep = TimeSpan.FromSeconds(1);
+        _simulationTimeMover = new IntervalBasedSimulationTimeMover(TimeSpan.FromSeconds(1));
         _waitingTimeBetweenSteps = TimeSpan.FromMilliseconds(100);
 
         var services = new ServiceCollection();
@@ -54,7 +55,7 @@ public class SimulationContextTests : IDisposable
             _serviceProviderMock,
             _simulationEnvironmentMock,
             [],
-            _simulationStep,
+            _simulationTimeMover,
             _waitingTimeBetweenSteps);
 
         // Act
@@ -73,7 +74,7 @@ public class SimulationContextTests : IDisposable
             _serviceProviderMock,
             _simulationEnvironmentMock,
             agents,
-            _simulationStep,
+            _simulationTimeMover,
             _waitingTimeBetweenSteps);
 
         // Act
@@ -92,7 +93,7 @@ public class SimulationContextTests : IDisposable
             _serviceProviderMock,
             _simulationEnvironmentMock,
             agents,
-            _simulationStep,
+            _simulationTimeMover,
             _waitingTimeBetweenSteps);
 
         // Act
@@ -111,7 +112,7 @@ public class SimulationContextTests : IDisposable
             _serviceProviderMock,
             _simulationEnvironmentMock,
             agents,
-            _simulationStep,
+            _simulationTimeMover,
             _waitingTimeBetweenSteps);
 
         // Act
@@ -130,7 +131,7 @@ public class SimulationContextTests : IDisposable
             _serviceProviderMock,
             _simulationEnvironmentMock,
             agents,
-            _simulationStep,
+            _simulationTimeMover,
             _waitingTimeBetweenSteps);
 
         // Act

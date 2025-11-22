@@ -21,21 +21,20 @@ public interface ISimulationContext : ISimulationTimeProvider
 internal class SimulationContext : ISimulationContext
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly TimeSpan _simulationStep;
+    private readonly ISimulationTimeMover _simulationTimeMover;
 
     private RunningSimulationState _runningState = RunningSimulationState.CreateNotRunningState();
-    private SimulationTime _simulationTime;
     private SimulationPerformanceInfo _performanceInfo;
 
     public SimulationContext(
         IServiceProvider serviceProvider,
         ISimulationEnvironment simulationEnvironment,
         ISimulationAgent[] agents,
-        TimeSpan simulationStep,
+        ISimulationTimeMover simulationTimeMover,
         TimeSpan waitingTimeBetweenSteps)
     {
         _serviceProvider = serviceProvider;
-        _simulationStep = simulationStep;
+        _simulationTimeMover = simulationTimeMover;
 
         SimulationEnvironment = simulationEnvironment;
         Agents = agents.ToDictionary(x => x.Id);
@@ -43,7 +42,7 @@ internal class SimulationContext : ISimulationContext
     }
 
     public ISimulationEnvironment SimulationEnvironment { get; }
-    public IReadOnlySimulationTime Time => _simulationTime;
+    public IReadOnlySimulationTime Time => _simulationTimeMover.Time;
     public ISimulationCyclePerformanceInfo PerformanceInfo => _performanceInfo;
 
     public bool IsRunning => _runningState.IsRunning;
@@ -74,12 +73,12 @@ internal class SimulationContext : ISimulationContext
     {
         _performanceInfo = _serviceProvider.GetRequiredService<SimulationPerformanceInfo>();
         _performanceInfo.Clear();
-        _simulationTime = SimulationTime.CreateZero();
+        _simulationTimeMover.ResetTime();
     }
 
     internal void StartNewCycle()
     {
-        _simulationTime = _simulationTime.AddStep(_simulationStep);
+        _simulationTimeMover.MoveSimulationTime();
         _performanceInfo.StartNewCycle();
     }
 

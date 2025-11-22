@@ -8,6 +8,7 @@ using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Snapshots;
 using PKWat.AgentSimulation.Core.Stage;
+using PKWat.AgentSimulation.Core.Time;
 using System.Reflection;
 
 public interface ISimulationBuilderContext
@@ -38,7 +39,7 @@ internal class SimulationBuilderContext(
     private List<Func<ISimulationStage>> _stagesToGenerate = new();
     private List<Func<ISimulationContext, Task>> _callbacks = new();
     private List<Func<ISimulationContext, SimulationCrashResult>> _crashConditions = new();
-    private TimeSpan _simulationStep = TimeSpan.Zero;
+    private ISimulationTimeMover _simulationTimeMover = new IntervalBasedSimulationTimeMover(TimeSpan.Zero);
     private TimeSpan _waitingTimeBetweenSteps = TimeSpan.Zero;
     private int? _randomSeed;
     private bool _doSnapshot = false;
@@ -74,7 +75,7 @@ internal class SimulationBuilderContext(
 
     public ISimulationBuilderContext SetSimulationStep(TimeSpan simulationStep)
     {
-        _simulationStep = simulationStep;
+        _simulationTimeMover = new IntervalBasedSimulationTimeMover(simulationStep);
 
         return this;
     }
@@ -112,7 +113,7 @@ internal class SimulationBuilderContext(
                 serviceProvider,
                 simulationEnvironment,
                 agents,
-                _simulationStep,
+                _simulationTimeMover,
                 _waitingTimeBetweenSteps),
             CreateSimulationSnapshotStore(),
             _callbacks,
