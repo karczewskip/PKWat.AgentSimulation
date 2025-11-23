@@ -15,10 +15,11 @@ public class Passenger : SimpleSimulationAgent
 
     public bool IsBeforeCheckout => StartedCheckoutTime == null;
 
-    public void StartCheckout(TimeSpan startCheckout, TimeSpan plannedEndCheckout)
+    public TimeSpan StartCheckout(TimeSpan startCheckout)
     {
         StartedCheckoutTime = startCheckout;
-        EndPlannedCheckoutTime = plannedEndCheckout;
+        EndPlannedCheckoutTime = startCheckout + TimeSpan.FromMinutes(3);
+        return EndPlannedCheckoutTime.Value;
     }
 
     public bool IsCheckouting(TimeSpan now)

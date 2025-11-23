@@ -5,7 +5,7 @@ using PKWat.AgentSimulation.Examples.Airport3.Agents;
 
 namespace PKWat.AgentSimulation.Examples.Airport3.Events;
 
-internal class AirplaneLandingStarted : ISimulationEvent
+internal class AirplaneLandingStarted(ISimulationEventStore simulationEventStore) : ISimulationEvent
 {
     private AgentId? _airplaneId = null;
 
@@ -16,6 +16,11 @@ internal class AirplaneLandingStarted : ISimulationEvent
 
     public async Task Execute(ISimulationContext context)
     {
+        if(_airplaneId == null)
+        {
+            throw new InvalidOperationException("Airplane ID is not set.");
+        }
+
         var landingTime = TimeSpan.FromMinutes(10);
         if (_airplaneId != null)
         {
@@ -23,15 +28,10 @@ internal class AirplaneLandingStarted : ISimulationEvent
             var start = context.Time.Time;
             var end = start + landingTime;
             airplane.StartLanding(start, end);
+            simulationEventStore.ScheduleEventAt<AirplaneLandingFinished>(end, e => e.SetAirplane(airplane.Id));
             return;
         }
 
-        var airplanes = context.GetAgents<Airplane>().Where(x => x.WaitsForLanding && x.AssignedLine.HasValue);
-        foreach (var airplane in airplanes)
-        {
-            var start = context.Time.Time;
-            var end = start + landingTime;
-            airplane.StartLanding(start, end);
-        }
+        
     }
 }
