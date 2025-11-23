@@ -1,6 +1,7 @@
 ﻿namespace PKWat.AgentSimulation.Core
 {
     using PKWat.AgentSimulation.Core.Crash;
+    using PKWat.AgentSimulation.Core.Event;
     using PKWat.AgentSimulation.Core.Snapshots;
     using PKWat.AgentSimulation.Core.Stage;
 
@@ -19,6 +20,8 @@
             IReadOnlyList<Func<SimulationContext, Task>> callbacks,
             ISimulationStage[] initializationStages,
             ISimulationStage[] stages,
+            ISimulationEvent[] initializationEvents,
+            SimulationEventStore eventStore,
             IReadOnlyList<Func<ISimulationContext, SimulationCrashResult>> crashConditions) : ISimulation
     {
         public bool Running => context.IsRunning;
@@ -34,14 +37,24 @@
             snapshotStore.CleanExistingSnapshots();
             context.StartCycleZero();
 
+            foreach (var initEvent in initializationEvents)
+                await initEvent.Execute(context);
+
             while (Running)
             {
                 await snapshotStore.SaveSnapshotAsync(context);
 
-                context.StartNewCycle();
+                if (!context.StartNewCycle())
+                {
+                    context.StopSimulation();
+                    break;
+                }
 
                 foreach (var stage in stages)
                     await stage.Execute(context);
+
+                foreach (var scheduledEvent in eventStore.GetAndRemoveEventsAt(context.Time.Time))
+                    await scheduledEvent.Execute(context);
 
                 foreach (var callback in callbacks)
                     await callback(context);

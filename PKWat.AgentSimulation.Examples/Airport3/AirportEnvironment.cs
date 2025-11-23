@@ -1,12 +1,11 @@
 ﻿using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Environment;
+using System;
 
 namespace PKWat.AgentSimulation.Examples.Airport3;
 
 public class AirportEnvironment : DefaultSimulationEnvironment
 {
-    public TimeSpan? NewAirplaneArrival { get; private set; }
-    public bool IsNewAirplaneArrivalScheduled => NewAirplaneArrival.HasValue;
 
     public Queue<AgentId> WaitingAirplanes { get; } = new();
     public Queue<int> AvailableLines { get; } = new();
@@ -20,11 +19,6 @@ public class AirportEnvironment : DefaultSimulationEnvironment
         {
             AvailableLines.Enqueue(line);
         }
-    }
-
-    internal void ScheduleNewAirplaneArrival(TimeSpan nextArrival)
-    {
-        NewAirplaneArrival = nextArrival;
     }
 
     internal void AddAirplaneToWaitingList(AgentId id)

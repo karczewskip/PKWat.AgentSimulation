@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Builder;
 using PKWat.AgentSimulation.Core.Environment;
+using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
@@ -22,11 +23,14 @@ public static class AgentSimulationServiceCollectionExtensions
         services.AddScoped<ISimulationCalendar>(c => c.GetRequiredService<SimulationCalendar>());
         services.AddScoped<ISimulationCalendarScheduler>(c => c.GetRequiredService<SimulationCalendar>());
         services.AddScoped<ISimulationCyclePerformanceInfo>(c => c.GetRequiredService<SimulationPerformanceInfo>());
+        services.AddScoped<SimulationEventStore>();
+        services.AddScoped<ISimulationEventStore>(c => c.GetRequiredService<SimulationEventStore>());
 
         Type[] registeringGenericTypes = [
-            typeof(ISimulationEnvironment), 
-            typeof(ISimulationAgent), 
-            typeof(ISimulationStage)];
+            typeof(ISimulationEnvironment),
+            typeof(ISimulationAgent),
+            typeof(ISimulationStage),
+            typeof(ISimulationEvent)];
 
         foreach (var type in assemblies.SelectMany(x => x.GetTypes().Where(type => !type.IsAbstract && !type.IsInterface)))
         {

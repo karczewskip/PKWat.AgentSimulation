@@ -2,7 +2,7 @@
 
 internal interface ISimulationTimeMover : ISimulationTimeProvider
 {
-    void MoveSimulationTime();
+    bool MoveSimulationTime();
     void ResetTime();
 }
 
@@ -11,9 +11,10 @@ internal class IntervalBasedSimulationTimeMover(TimeSpan stepInterval) : ISimula
     private SimulationTime _currentTime = SimulationTime.CreateZero();
 
     public IReadOnlySimulationTime Time => _currentTime;
-    public void MoveSimulationTime()
+    public bool MoveSimulationTime()
     {
         _currentTime = _currentTime.AddStep(stepInterval);
+        return true;
     }
 
     public void ResetTime()
@@ -28,13 +29,16 @@ internal class CalendarSimulationTimeMover(ISimulationCalendar calendar) : ISimu
 
     public IReadOnlySimulationTime Time => _currentTime;
 
-    public void MoveSimulationTime()
+    public bool MoveSimulationTime()
     {
         if (calendar.HaveNextStep)
         {
             var timeSpan = calendar.MoveToNextStep();
             _currentTime = _currentTime.SetTime(timeSpan);
+            return true;
         }
+
+        return false;
     }
 
     public void ResetTime()

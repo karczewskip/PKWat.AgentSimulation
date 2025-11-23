@@ -1,6 +1,7 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Builder;
 using PKWat.AgentSimulation.Examples.Airport3;
+using PKWat.AgentSimulation.Examples.Airport3.Events;
 using PKWat.AgentSimulation.Examples.Airport3.Stages;
 using System.Windows.Media.Imaging;
 
@@ -16,6 +17,7 @@ internal class Airport3SimulationBuilder(ISimulationBuilder simulationBuilder,
         var simulation = simulationBuilder
             .CreateNewSimulation<AirportEnvironment>()
             .AddInitializationStage<SetLandingLines>(s => s.SetMaxLandingLines(8))
+            .AddInitializationEvent<NewAirplaneArrivedEvent>()
             .AddCallback(c => RenderAsync(c, drawing))
             .UseCalendar()
             .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
