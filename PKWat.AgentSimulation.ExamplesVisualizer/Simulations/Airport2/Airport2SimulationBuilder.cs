@@ -18,9 +18,11 @@ internal class Airport2SimulationBuilder(ISimulationBuilder simulationBuilder,
             .AddInitializationStage<SetLandingLines>(s => s.SetMaxLandingLines(8))
             .AddInitializationStage<NewAirplaneArrival>()
             .AddStage<NewAirplaneArrival>()
+            .AddStage<AssignWaitingAirplanesToAvailableLines>()
             .AddCallback(c => RenderAsync(c, drawing))
             .UseCalendar()
             .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.01))
+            .WithSnapshots()
             .Build();
 
         return simulation;

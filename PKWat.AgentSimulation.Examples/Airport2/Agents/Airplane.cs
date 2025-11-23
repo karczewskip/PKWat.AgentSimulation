@@ -49,4 +49,13 @@ public class Airplane : SimpleSimulationAgent
 
     internal bool IsDepartured(TimeSpan time)
         => PlannedFinishedDepartureTime.HasValue && time > PlannedFinishedDepartureTime;
+
+    override public object CreateSnapshot()
+    {
+        return new
+        {
+            Id,
+            AssignedLine
+        };
+    }
 }
