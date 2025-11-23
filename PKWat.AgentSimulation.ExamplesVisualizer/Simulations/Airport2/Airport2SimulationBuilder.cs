@@ -22,9 +22,11 @@ internal class Airport2SimulationBuilder(ISimulationBuilder simulationBuilder,
             .AddStage<StartLandingAirplane>()
             .AddStage<StartCheckoutingPassengers>()
             .AddStage<RemoveCheckoutedPassengers>()
+            .AddStage<StartDeparture>()
+            .AddStage<ReleaseLines>()
             .AddCallback(c => RenderAsync(c, drawing))
             .UseCalendar()
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
+            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
             .WithSnapshots()
             .Build();
 
