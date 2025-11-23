@@ -7,6 +7,7 @@ using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
+using PKWat.AgentSimulation.Core.Time;
 using System.Reflection;
 
 public static class AgentSimulationServiceCollectionExtensions
@@ -17,6 +18,9 @@ public static class AgentSimulationServiceCollectionExtensions
         services.AddScoped<RandomNumbersGeneratorFactory>();
         services.AddTransient(s => s.GetRequiredService<RandomNumbersGeneratorFactory>().Create());
         services.AddScoped<SimulationPerformanceInfo>();
+        services.AddScoped<SimulationCalendar>();
+        services.AddScoped<ISimulationCalendar>(c => c.GetRequiredService<SimulationCalendar>());
+        services.AddScoped<ISimulationCalendarScheduler>(c => c.GetRequiredService<SimulationCalendar>());
         services.AddScoped<ISimulationCyclePerformanceInfo>(c => c.GetRequiredService<SimulationPerformanceInfo>());
 
         Type[] registeringGenericTypes = [

@@ -21,3 +21,24 @@ internal class IntervalBasedSimulationTimeMover(TimeSpan stepInterval) : ISimula
         _currentTime = SimulationTime.CreateZero();
     }
 }
+
+internal class CalendarSimulationTimeMover(ISimulationCalendar calendar) : ISimulationTimeMover
+{
+    private SimulationTime _currentTime = SimulationTime.CreateZero();
+
+    public IReadOnlySimulationTime Time => _currentTime;
+
+    public void MoveSimulationTime()
+    {
+        if (calendar.HaveNextStep)
+        {
+            var timeSpan = calendar.MoveToNextStep();
+            _currentTime = _currentTime.SetTime(timeSpan);
+        }
+    }
+
+    public void ResetTime()
+    {
+        _currentTime = SimulationTime.CreateZero();
+    }
+}

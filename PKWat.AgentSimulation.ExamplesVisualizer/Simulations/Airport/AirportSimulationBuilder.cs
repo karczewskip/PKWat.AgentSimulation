@@ -9,24 +9,16 @@
     using System.Threading.Tasks;
     using System.Windows.Media.Imaging;
 
-    public class AirportSimulationBuilder : IExampleSimulationBuilder
-    {
-        private readonly ISimulationBuilder _simulationBuilder;
-        private readonly AirportDrawer _airportDrawer;
-
-        public AirportSimulationBuilder(
+    public class AirportSimulationBuilder(
             ISimulationBuilder simulationBuilder,
-            AirportDrawer airportDrawer)
-        {
-            _simulationBuilder = simulationBuilder;
-            _airportDrawer = airportDrawer;
-        }
+            AirportDrawer airportDrawer) : IExampleSimulationBuilder
 
+    {
         public ISimulation Build(Action<BitmapSource> drawing)
         {
-            _airportDrawer.InitializeIfNeeded(800, 800);
+            airportDrawer.InitializeIfNeeded(800, 800);
 
-            var simulation = _simulationBuilder
+            var simulation = simulationBuilder
                 .CreateNewSimulation<AirportEnvironment>()
                 .AddInitializationStage<SetLindingLines>(s => s.SetMaxLandingLines(8))
                 .AddStage<NewAirplaneArrival>()
@@ -44,7 +36,7 @@
                         .GroupBy(x => x.AssignedLine)
                         .Where(x => x.Count() > 1);
 
-                    if(assignedLinesToAirplanes.Any())
+                    if (assignedLinesToAirplanes.Any())
                         return SimulationCrashResult.Crash("Two airplanes are assigned to the same line");
 
                     return SimulationCrashResult.NoCrash;
@@ -61,6 +53,6 @@
         }
 
         private async Task RenderAsync(ISimulationContext context, Action<BitmapSource> drawing)
-            => drawing(_airportDrawer.Draw(context));
+            => drawing(airportDrawer.Draw(context));
     }
 }

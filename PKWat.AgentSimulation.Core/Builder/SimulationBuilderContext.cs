@@ -18,6 +18,7 @@ public interface ISimulationBuilderContext
     ISimulationBuilderContext AddCallback(Func<ISimulationContext, Task> callback);
     ISimulationBuilderContext AddCallback(Action<ISimulationContext> callback);
     ISimulationBuilderContext SetSimulationStep(TimeSpan simulationStep);
+    ISimulationBuilderContext UseCalendar();
     ISimulationBuilderContext SetWaitingTimeBetweenSteps(TimeSpan waitingTimeBetweenSteps);
     ISimulationBuilderContext SetRandomSeed(int seed);
     ISimulationBuilderContext AddInitializationStage<U>() where U : ISimulationStage;
@@ -76,6 +77,13 @@ internal class SimulationBuilderContext(
     public ISimulationBuilderContext SetSimulationStep(TimeSpan simulationStep)
     {
         _simulationTimeMover = new IntervalBasedSimulationTimeMover(simulationStep);
+
+        return this;
+    }
+
+    public ISimulationBuilderContext UseCalendar()
+    {
+        _simulationTimeMover = new CalendarSimulationTimeMover(serviceProvider.GetRequiredService<ISimulationCalendar>());
 
         return this;
     }
