@@ -20,6 +20,7 @@ internal class Airport2SimulationBuilder(ISimulationBuilder simulationBuilder,
             .AddStage<NewAirplaneArrival>()
             .AddStage<AssignWaitingAirplanesToAvailableLines>()
             .AddStage<StartLandingAirplane>()
+            .AddStage<StartCheckoutingPassengers>()
             .AddCallback(c => RenderAsync(c, drawing))
             .UseCalendar()
             .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
