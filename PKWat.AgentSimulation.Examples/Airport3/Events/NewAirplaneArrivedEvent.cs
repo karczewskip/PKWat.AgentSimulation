@@ -31,6 +31,7 @@ public class NewAirplaneArrivedEvent(IRandomNumbersGenerator randomNumbersGenera
             newAirplane.PassengersInAirplane.Enqueue(passanger.Id);
         }
         environment.AddAirplaneToWaitingList(newAirplane.Id);
+        simulationEventStore.ScheduleEventAt<AssignedNextAirplaneToLine>(context.Time.Time + TimeSpan.FromMinutes(1), e => e.SetAirplaneId(newAirplane.Id));
     }
 
     private void ScheduleNextAirplaneArrival(ISimulationContext context)

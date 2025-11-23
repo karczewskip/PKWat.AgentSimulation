@@ -10,12 +10,17 @@ internal class SimulationEventStore(IServiceProvider serviceProvider, ISimulatio
 
     public void ScheduleEventAt<U>(TimeSpan moment) where U : ISimulationEvent
     {
+        ScheduleEventAt<U>(moment, _ => { });
+    }
+
+    public void ScheduleEventAt<U>(TimeSpan moment, Action<U> initialization) where U : ISimulationEvent
+    {
         if (!_scheduledEvents.ContainsKey(moment))
         {
             _scheduledEvents[moment] = new List<ISimulationEvent>();
         }
         var newEvent = serviceProvider.GetRequiredService<U>();
-
+        initialization(newEvent);
         _scheduledEvents[moment].Add(newEvent);
 
         simulationCalendarScheduler.ScheduleNewStepAt(moment);

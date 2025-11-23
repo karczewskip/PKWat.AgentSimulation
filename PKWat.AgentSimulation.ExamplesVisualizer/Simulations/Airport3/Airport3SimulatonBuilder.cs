@@ -20,7 +20,7 @@ internal class Airport3SimulationBuilder(ISimulationBuilder simulationBuilder,
             .AddInitializationEvent<NewAirplaneArrivedEvent>()
             .AddCallback(c => RenderAsync(c, drawing))
             .UseCalendar()
-            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.1))
+            .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(0.2))
             .WithSnapshots()
             .Build();
 
