@@ -36,7 +36,7 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
     {
         var bestParameters = GetBestParamters(context, 20);
         context.RemoveAgents(context.GetAgents<PolynomialCheckAgent>().Select(x => x.Id));
-        var mutationRate = 0.1;
+        var mutationRate = 0.4;
         var mutationAmount = 1.0;
         for (int i = 0; i < numberOfAgentsToGenerate; i++)
         {

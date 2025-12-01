@@ -10,7 +10,7 @@ internal class InitializeBlackboard : ISimulationStage
         var environment = context.GetSimulationEnvironment<CalculationsBlackboard>();
         var from = -5.0;
         var to = 4.0;
-        var freq = 50_000;
+        var freq = 1_000;
         environment.SetExpectedValues(
             ExpectedValues.Build(
                 Enumerable.Range(0, freq + 1).Select(x => from + (to - from) * x / freq),
