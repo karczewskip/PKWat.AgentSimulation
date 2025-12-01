@@ -25,10 +25,16 @@ var simulation = simulationBuilder.CreateNewSimulation<CalculationsBlackboard>()
 
         Console.WriteLine($"Cycle {c.Time.StepNo}");
 
-        foreach (var calculatedErrorsForSingleAgent in environment.AgentErrors.OrderBy(x => x.Value.AbsoluteError).Take(5))
+        var bestErrors = environment.AgentErrors.OrderBy(x => x.Value.AbsoluteError).Take(5);
+        foreach (var calculatedErrorsForSingleAgent in bestErrors)
         {
-            Console.WriteLine($"Agent ID: {calculatedErrorsForSingleAgent.Key}, Calculated with error: {calculatedErrorsForSingleAgent.Value.AbsoluteError}");
+            Console.WriteLine($"Agent ID: {calculatedErrorsForSingleAgent.Key}, Calculated with error: {calculatedErrorsForSingleAgent.Value.MeanAbsoluteError}");
         }
+
+        var bestAgent = c.GetRequiredAgent<PolynomialCheckAgent>(bestErrors.First().Key);
+        Console.WriteLine($"Best coeeficients: {bestAgent.Parameters}");
+
+        
     })
     .Build();
 

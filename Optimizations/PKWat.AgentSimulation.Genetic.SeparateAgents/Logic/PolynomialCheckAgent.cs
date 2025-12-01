@@ -8,6 +8,11 @@ internal record PolynomialParameters(int Degree, double[] Coefficients)
     {
         return new PolynomialParameters(coefficients.Length - 1, coefficients);
     }
+
+    public override string ToString()
+    {
+        return $"Degree: {Degree}, Coefficients: [{string.Join(", ", Coefficients.Select(x => x.ToString("F2")))}]";
+    }
 }
 
 internal record ExpectedValues(double[] X, double[] Y)
@@ -24,7 +29,7 @@ internal record ExpectedValues(double[] X, double[] Y)
     }
 }
 
-internal record ErrorResult(double AbsoluteError);
+internal record ErrorResult(double AbsoluteError, double MeanAbsoluteError);
 
 internal class PolynomialCheckAgent() : SimpleSimulationAgent
 {
@@ -57,6 +62,6 @@ internal class PolynomialCheckAgent() : SimpleSimulationAgent
             absoluteError += absError;
         }
 
-        return new ErrorResult(absoluteError);
+        return new ErrorResult(absoluteError, absoluteError / expectedValues.X.Length);
     }
 }
