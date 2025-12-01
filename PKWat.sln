@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34616.47
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11222.15 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PKWat.AgentSimulation.Core", "PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj", "{8BF9D0A0-AA86-43AE-AFA3-D0BF4387440C}"
 EndProject
@@ -18,6 +18,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Tests", "PKWat.AgentSimulation.Tests\PKWat.AgentSimulation.Tests.csproj", "{230976A0-C242-4197-9AFB-5C2A020EDD41}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Examples", "PKWat.AgentSimulation.Examples\PKWat.AgentSimulation.Examples.csproj", "{DCA49447-D50C-496A-B9F8-29BCA4FB7196}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Optimizations", "Optimizations", "{AFF1581E-DF19-4DB6-9FD4-AC2C94F32B7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Genetic.SeparateAgents", "Optimizations\PKWat.AgentSimulation.Genetic.SeparateAgents\PKWat.AgentSimulation.Genetic.SeparateAgents.csproj", "{AE2DA052-DFA6-4B75-BA75-E2DC7E4F4E82}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,9 +61,16 @@ Global
 		{DCA49447-D50C-496A-B9F8-29BCA4FB7196}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DCA49447-D50C-496A-B9F8-29BCA4FB7196}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DCA49447-D50C-496A-B9F8-29BCA4FB7196}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE2DA052-DFA6-4B75-BA75-E2DC7E4F4E82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE2DA052-DFA6-4B75-BA75-E2DC7E4F4E82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE2DA052-DFA6-4B75-BA75-E2DC7E4F4E82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE2DA052-DFA6-4B75-BA75-E2DC7E4F4E82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AE2DA052-DFA6-4B75-BA75-E2DC7E4F4E82} = {AFF1581E-DF19-4DB6-9FD4-AC2C94F32B7B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CADF5998-4CDB-4A6B-B457-52B27C507580}
