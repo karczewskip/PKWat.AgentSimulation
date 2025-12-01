@@ -18,7 +18,7 @@ var simulation = simulationBuilder.CreateNewSimulation<CalculationsBlackboard>()
     .AddInitializationStage<InitializeBlackboard>()
     .AddStage<BuildNewAgents>()
     .AddStage<CalculateForAllAgents>()
-    .SetRandomSeed(123)
+    //.SetRandomSeed(123)
     .AddCallback(c =>
     {
         var environment = c.GetSimulationEnvironment<CalculationsBlackboard>();

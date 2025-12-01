@@ -17,7 +17,7 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
             return;
         }
 
-        GenerateNewGeneration(context, numberOfAgentsToGenerate, numberOfCoefficients);
+        GenerateNewGenerationUsingNumberOfParents(context, 20, 2, numberOfAgentsToGenerate, numberOfCoefficients);
     }
 
     private void GenerateFirstGeneration(ISimulationContext context, int numberOfAgentsToGenerate, int numberOfCoefficients)
@@ -32,27 +32,40 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
         }
     }
 
-    private void GenerateNewGeneration(ISimulationContext context, int numberOfAgentsToGenerate, int numberOfCoefficients)
+    private void GenerateNewGenerationUsingNumberOfParents(ISimulationContext context, int bestPopulationSize, int numberOfParents, int numberOfAgentsToGenerate, int numberOfCoefficients)
     {
-        var bestParameters = GetBestParamters(context, 20);
+        var bestParameters = GetBestParamters(context, bestPopulationSize);
         context.RemoveAgents(context.GetAgents<PolynomialCheckAgent>().Select(x => x.Id));
-        var mutationRate = 0.4;
+        var mutationRate = 0.1;
         var mutationAmount = 1.0;
-        for (int i = 0; i < numberOfAgentsToGenerate; i++)
+        for (int i = 0; i < numberOfAgentsToGenerate - bestPopulationSize; i++)
         {
-            var parentParameters = bestParameters[randomNumbersGenerator.Next(bestParameters.Length)];
+            var allParentParameters = new PolynomialParameters[numberOfParents];
+            for (int p = 0; p < numberOfParents; p++)
+            {
+                allParentParameters[p] = bestParameters[randomNumbersGenerator.Next(bestParameters.Length)];
+            }
+
             var newCoefficients = new double[numberOfCoefficients];
             for (int j = 0; j < numberOfCoefficients; j++)
             {
-                var coefficient = parentParameters.Coefficients[j];
+                var parentIndex = randomNumbersGenerator.Next(numberOfParents);
+                var coefficient = allParentParameters[parentIndex].Coefficients[j];
                 if (randomNumbersGenerator.NextDouble(0, 1) < mutationRate)
                 {
                     coefficient += randomNumbersGenerator.NextDouble(-mutationAmount, mutationAmount);
                 }
                 newCoefficients[j] = coefficient;
             }
+
             var agent = context.AddAgent<PolynomialCheckAgent>();
             agent.SetParameters(PolynomialParameters.BuildFromCoefficients(newCoefficients));
+        }
+
+        for (int i = 0; i < bestPopulationSize; i++)
+        {
+            var agent = context.AddAgent<PolynomialCheckAgent>();
+            agent.SetParameters(bestParameters[i]);
         }
     }
 
