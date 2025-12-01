@@ -5,6 +5,7 @@ using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.Crash;
 using PKWat.AgentSimulation.Core.Environment;
+using PKWat.AgentSimulation.Core.Event;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Snapshots;
 using PKWat.AgentSimulation.Core.Stage;
@@ -25,6 +26,8 @@ public interface ISimulationBuilderContext
     ISimulationBuilderContext AddInitializationStage<U>(Action<U> initialization) where U : ISimulationStage;
     ISimulationBuilderContext AddStage<U>() where U : ISimulationStage;
     ISimulationBuilderContext AddStage<U>(Action<U> initialization) where U : ISimulationStage;
+    ISimulationBuilderContext AddInitializationEvent<U>() where U : ISimulationEvent;
+    ISimulationBuilderContext AddInitializationEvent<U>(Action<U> initialization) where U : ISimulationEvent;
     ISimulationBuilderContext AddCrashCondition(Func<ISimulationContext, SimulationCrashResult> crashCondition);
     ISimulationBuilderContext WithSnapshots();
 
@@ -37,6 +40,7 @@ internal class SimulationBuilderContext(
 {
     private List<Func<ISimulationAgent>> _agentsToGenerate = new();
     private List<Func<ISimulationStage>> _initializationStagesToGenerate = new();
+    private List<Func<ISimulationEvent>> _initializationEventsToGenerate = new();
     private List<Func<ISimulationStage>> _stagesToGenerate = new();
     private List<Func<ISimulationContext, Task>> _callbacks = new();
     private List<Func<ISimulationContext, SimulationCrashResult>> _crashConditions = new();
@@ -115,6 +119,8 @@ internal class SimulationBuilderContext(
         var agents = _agentsToGenerate.Select(x => x()).ToArray();
         var initializationStages = _initializationStagesToGenerate.Select(x => x()).ToArray();
         var stages = _stagesToGenerate.Select(x => x()).ToArray();
+        var initializationEvents = _initializationEventsToGenerate.Select(x => x()).ToArray();
+        var eventStore = serviceProvider.GetRequiredService<SimulationEventStore>();
 
         return new Simulation(
             new SimulationContext(
@@ -127,6 +133,8 @@ internal class SimulationBuilderContext(
             _callbacks,
             initializationStages,
             stages,
+            initializationEvents,
+            eventStore,
             _crashConditions);
     }
 
@@ -172,6 +180,20 @@ internal class SimulationBuilderContext(
         });
 
         return this;
+    }
+
+    public ISimulationBuilderContext AddInitializationEvent<U>() where U : ISimulationEvent
+        => AddInitializationEvent<U>(_ => { });
+
+    public ISimulationBuilderContext AddInitializationEvent<U>(Action<U> initialization) where U : ISimulationEvent
+        {
+            _initializationEventsToGenerate.Add(() =>
+            {
+                var simulationEvent = serviceProvider.GetRequiredService<U>();
+                initialization(simulationEvent);
+                return simulationEvent;
+            });
+            return this;
     }
 
     public ISimulationBuilderContext AddCrashCondition(Func<ISimulationContext, SimulationCrashResult> crashCondition)

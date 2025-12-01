@@ -76,10 +76,15 @@ internal class SimulationContext : ISimulationContext
         _simulationTimeMover.ResetTime();
     }
 
-    internal void StartNewCycle()
+    internal bool StartNewCycle()
     {
-        _simulationTimeMover.MoveSimulationTime();
-        _performanceInfo.StartNewCycle();
+        if (_simulationTimeMover.MoveSimulationTime())
+        {
+            _performanceInfo.StartNewCycle();
+            return true;
+        }
+
+        return false;
     }
 
     public AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent
