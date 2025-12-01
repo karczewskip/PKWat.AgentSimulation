@@ -12,14 +12,15 @@ internal record PolynomialParameters(int Degree, double[] Coefficients)
 
 internal record ExpectedValues(double[] X, double[] Y)
 {
-    public static ExpectedValues Build(double[] X, Func<double, double> function)
+    public static ExpectedValues Build(IEnumerable<double> X, Func<double, double> function)
     {
-        double[] Y = new double[X.Length];
-        for (int i = 0; i < X.Length; i++)
+        var x = X.ToArray();
+        double[] Y = new double[x.Length];
+        for (int i = 0; i < x.Length; i++)
         {
-            Y[i] = function(X[i]);
+            Y[i] = function(x[i]);
         }
-        return new ExpectedValues(X, Y);
+        return new ExpectedValues(x, Y);
     }
 }
 

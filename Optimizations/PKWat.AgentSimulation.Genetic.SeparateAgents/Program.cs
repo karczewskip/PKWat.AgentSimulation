@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Builder;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Genetic.SeparateAgents.Logic;
+using PKWat.AgentSimulation.Genetic.SeparateAgents.Logic.Stages;
 
 var services = new ServiceCollection();
 services.AddAgentSimulation(typeof(PolynomialCheckAgent).Assembly);
@@ -9,18 +11,22 @@ services.AddAgentSimulation(typeof(PolynomialCheckAgent).Assembly);
 var serviceProvider = services.BuildServiceProvider();
 
 var simulationBuilder = serviceProvider.GetRequiredService<ISimulationBuilder>();
+var performanceInfo = serviceProvider.GetRequiredService<ISimulationCyclePerformanceInfo>();
+performanceInfo.Subscribe(x => Console.WriteLine(x));
 
-var simulation = simulationBuilder.CreateNewSimulationForDefaultEnvironment()
-    .AddAgent<PolynomialCheckAgent>(x => x.SetParameters(PolynomialParameters.BuildFromCoefficients([1, 2, 3])))
-    .AddAgent<PolynomialCheckAgent>(x => x.SetParameters(PolynomialParameters.BuildFromCoefficients([1, 2, 4])))
-    .SetWaitingTimeBetweenSteps(TimeSpan.FromSeconds(1))
+var simulation = simulationBuilder.CreateNewSimulation<CalculationsBlackboard>()
+    .AddInitializationStage<InitializeBlackboard>()
+    .AddStage<BuildNewAgents>()
+    .AddStage<CalculateForAllAgents>()
     .AddCallback(c =>
     {
-        var agents = c.GetAgents<PolynomialCheckAgent>();
-        var expectedValues = ExpectedValues.Build(Enumerable.Range(0, 50_000_000).Select(x => (double)x).ToArray(), x => x * x + 2 * x + 3);
-        foreach (var agent in agents)
+        var environment = c.GetSimulationEnvironment<CalculationsBlackboard>();
+
+        Console.WriteLine($"Cycle {c.Time.StepNo}");
+
+        foreach (var calculatedErrorsForSingleAgent in environment.AgentErrors.OrderBy(x => x.Value.AbsoluteError).Take(5))
         {
-            Console.WriteLine($"Agent ID: {agent.Id}, Calculated with error: {agent.CalculateError(expectedValues).AbsoluteError}");
+            Console.WriteLine($"Agent ID: {calculatedErrorsForSingleAgent.Key}, Calculated with error: {calculatedErrorsForSingleAgent.Value.AbsoluteError}");
         }
     })
     .Build();
