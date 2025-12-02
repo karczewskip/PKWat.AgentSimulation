@@ -17,7 +17,8 @@ performanceInfo.Subscribe(x => Console.WriteLine(x));
 var simulation = simulationBuilder.CreateNewSimulation<CalculationsBlackboard>()
     .AddInitializationStage<InitializeBlackboard>()
     .AddStage<BuildNewAgents>()
-    .AddStage<CalculateForAllAgents>()
+    .AddStage<CalculateForAllAgentsByGPU>()
+    //.AddStage<CalculateForAllAgents>()
     //.SetRandomSeed(123)
     .AddCallback(c =>
     {

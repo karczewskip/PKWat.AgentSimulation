@@ -18,13 +18,14 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
             return;
         }
 
-        if(context.GetSimulationEnvironment<CalculationsBlackboard>().NumberOfChecksWithoutImprovement >= 100)
+        var numberOfChecksWithoutImprovement = context.GetSimulationEnvironment<CalculationsBlackboard>().NumberOfChecksWithoutImprovement;
+        if (numberOfChecksWithoutImprovement % 50 == 0)
         {
             GenerateNewWithElite(context, 1, numberOfAgentsToGenerate, numberOfCoefficients);
             return;
         }
 
-        var numberOfNewRandomAgents = (int)(numberOfAgentsToGenerate * 0);
+        var numberOfNewRandomAgents = (int)(numberOfAgentsToGenerate * 0.1);
         GenerateUsingTournament(context, numberOfAgentsToGenerate - numberOfNewRandomAgents, numberOfCoefficients);
         AddRandomGeneration(context, numberOfNewRandomAgents, numberOfCoefficients);
     }
@@ -209,8 +210,8 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
 
     private PolynomialParameters MutateProportional(PolynomialParameters parameters)
     {
-        double mutationRate = 0.2;
-        double mutationScale = 0.1;
+        double mutationRate = 0.1;
+        double mutationScale = 0.5;
 
         var numberOfCoefficients = parameters.Coefficients.Length;
         var newCoefficients = new double[numberOfCoefficients];
