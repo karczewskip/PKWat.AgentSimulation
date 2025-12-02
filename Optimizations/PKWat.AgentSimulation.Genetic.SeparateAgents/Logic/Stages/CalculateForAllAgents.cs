@@ -17,5 +17,7 @@ internal class CalculateForAllAgents : ISimulationStage
             var errorsForAgent = agent.CalculateError(blackboard.ExpectedValues);
             blackboard.AgentErrors[agent.Id] = errorsForAgent;
         });
+
+        blackboard.CheckBestResult();
     }
 }
