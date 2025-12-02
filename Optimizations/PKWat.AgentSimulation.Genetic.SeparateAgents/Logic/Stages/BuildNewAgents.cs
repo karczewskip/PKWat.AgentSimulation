@@ -24,7 +24,7 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
             return;
         }
 
-        var numberOfNewRandomAgents = (int)(numberOfAgentsToGenerate * 0.2);
+        var numberOfNewRandomAgents = (int)(numberOfAgentsToGenerate * 0);
         GenerateUsingTournament(context, numberOfAgentsToGenerate - numberOfNewRandomAgents, numberOfCoefficients);
         AddRandomGeneration(context, numberOfNewRandomAgents, numberOfCoefficients);
     }
@@ -91,16 +91,9 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
             var parent1 = TournamentSelection(context, allAgentsWithErrors, 5); // 5 fighters in tournament
             var parent2 = TournamentSelection(context, allAgentsWithErrors, 5);
 
-            var newCoeffs = new double[numberOfCoefficients];
-            for (int j = 0; j < numberOfCoefficients; j++)
-            {
-                double val = (parent1.Coefficients[j] + parent2.Coefficients[j]) / 2.0;
-                newCoeffs[j] = val;
-            }
+            var newParameters = GaussianFromParents([parent1, parent2]);
 
-            MutateProportional(newCoeffs);
-
-            generatedParamters.Add(PolynomialParameters.BuildFromCoefficients(newCoeffs));
+            generatedParamters.Add(MutateProportional(newParameters));
         }
 
         var bestId = allAgentsWithErrors.OrderBy(x => x.Value.AbsoluteError).First().Key;
@@ -167,7 +160,7 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
         return PolynomialParameters.BuildFromCoefficients(newCoefficients);
     }
 
-    private PolynomialParameters GausianFromParents(PolynomialParameters[] parents)
+    private PolynomialParameters GaussianFromParents(PolynomialParameters[] parents)
     {
         var numberOfCoefficients = parents[0].Coefficients.Length;
         var newCoefficients = new double[numberOfCoefficients];
@@ -214,21 +207,29 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
         return PolynomialParameters.BuildFromCoefficients(newCoefficients);
     }
 
-    private void MutateProportional(double[] coefficients)
+    private PolynomialParameters MutateProportional(PolynomialParameters parameters)
     {
         double mutationRate = 0.2;
         double mutationScale = 0.1;
 
-        for (int i = 0; i < coefficients.Length; i++)
+        var numberOfCoefficients = parameters.Coefficients.Length;
+        var newCoefficients = new double[numberOfCoefficients];
+
+        for (int i = 0; i < numberOfCoefficients; i++)
         {
+            var coefficient = parameters.Coefficients[i];
+
             if (randomNumbersGenerator.NextDouble(0, 1) < mutationRate)
             {
                 double percentChange = 1.0 + randomNumbersGenerator.NextDouble(-mutationScale, mutationScale);
-                coefficients[i] *= percentChange;
+                coefficient *= percentChange;
 
-                coefficients[i] += randomNumbersGenerator.NextDouble(-0.01, 0.01);
+                coefficient += randomNumbersGenerator.NextDouble(-0.01, 0.01);
             }
+            newCoefficients[i] = coefficient;
         }
+
+        return PolynomialParameters.BuildFromCoefficients(newCoefficients);
     }
 
     private PolynomialParameters[] GetBestParamters(ISimulationContext context, int count)
