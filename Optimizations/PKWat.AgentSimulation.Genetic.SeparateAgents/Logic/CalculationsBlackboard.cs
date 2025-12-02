@@ -19,7 +19,7 @@ internal class CalculationsBlackboard : DefaultSimulationEnvironment
     internal void CheckBestResult()
     {
         var currentBestError = AgentErrors.Values.Min(x => x.MeanAbsoluteError);
-        if (Math.Abs(currentBestError - BestErrorSoFar) < 1e-4)
+        if (Math.Abs(currentBestError - BestErrorSoFar) < 1e-6)
         {
             BestErrorSoFar = currentBestError;
             NumberOfChecksWithoutImprovement = 0;

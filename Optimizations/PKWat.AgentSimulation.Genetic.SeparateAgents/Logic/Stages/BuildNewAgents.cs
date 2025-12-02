@@ -9,7 +9,7 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
     public async Task Execute(ISimulationContext context)
     {
         var numberOfAgentsToGenerate = 1000;
-        var numberOfCoefficients = 6;
+        var numberOfCoefficients = 10;
 
         if (context.Time.StepNo == 1)
         {
@@ -18,7 +18,7 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
         }
 
         var numberOfChecksWithoutImprovement = context.GetSimulationEnvironment<CalculationsBlackboard>().NumberOfChecksWithoutImprovement;
-        if(numberOfChecksWithoutImprovement % 10 == 0)
+        if(numberOfChecksWithoutImprovement % 3 == 0)
         {
             GenerateNewWithElite(context, 1, numberOfAgentsToGenerate, numberOfCoefficients);
             return;
@@ -28,7 +28,10 @@ internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : 
             ? GausianFromParents
             : RandomFromParents;
 
-        GenerateNewGenerationUsingNumberOfParents(context, 20, 2, numberOfAgentsToGenerate, numberOfCoefficients, parents => MutateParameters(calculatingFunc(parents), numberOfChecksWithoutImprovement+1));
+        var numberOfParents = ((numberOfChecksWithoutImprovement / 10) % 2) + 2;
+        var bestPopulationSize = Math.Min(20 + numberOfChecksWithoutImprovement, numberOfAgentsToGenerate / 20);
+
+        GenerateNewGenerationUsingNumberOfParents(context, bestPopulationSize, numberOfParents, numberOfAgentsToGenerate, numberOfCoefficients, parents => MutateParameters(calculatingFunc(parents), numberOfChecksWithoutImprovement+1));
     }
 
     private void GenerateFirstGeneration(ISimulationContext context, int numberOfAgentsToGenerate, int numberOfCoefficients)
