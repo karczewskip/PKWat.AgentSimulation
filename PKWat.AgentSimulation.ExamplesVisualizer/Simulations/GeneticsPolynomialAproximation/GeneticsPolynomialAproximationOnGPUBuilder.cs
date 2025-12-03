@@ -6,7 +6,7 @@ using System.Windows.Media.Imaging;
 
 namespace PKWat.AgentSimulation.ExamplesVisualizer.Simulations.GeneticsPolynomialInterpolation;
 
-public class GeneticsPolynomialInterpolationOnGPUBuilder(ISimulationBuilder simulationBuilder, GeneticsPolynomialAproximationDrawer drawer) : IExampleSimulationBuilder
+public class GeneticsPolynomialAproximationOnGPUBuilder(ISimulationBuilder simulationBuilder, GeneticsPolynomialAproximationDrawer drawer) : IExampleSimulationBuilder
 {
     public ISimulation Build(Action<BitmapSource> drawing) =>
         simulationBuilder.CreateNewSimulation<CalculationsBlackboard>()
