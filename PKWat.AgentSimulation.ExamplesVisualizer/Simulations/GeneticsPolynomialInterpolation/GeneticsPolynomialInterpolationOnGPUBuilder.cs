@@ -1,7 +1,7 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Builder;
-using PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
-using PKWat.AgentSimulation.Genetics.PolynomialInterpolation.Stages;
+using PKWat.AgentSimulation.Genetics.PolynomialAproximation;
+using PKWat.AgentSimulation.Genetics.PolynomialAproximation.Stages;
 using System.Windows.Media.Imaging;
 
 namespace PKWat.AgentSimulation.ExamplesVisualizer.Simulations.GeneticsPolynomialInterpolation;

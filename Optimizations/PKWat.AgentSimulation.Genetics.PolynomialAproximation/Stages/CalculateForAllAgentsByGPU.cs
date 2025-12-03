@@ -1,7 +1,8 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
+using PKWat.AgentSimulation.Genetics.PolynomialAproximation;
 
-namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation.Stages;
+namespace PKWat.AgentSimulation.Genetics.PolynomialAproximation.Stages;
 
 public class CalculateForAllAgentsByGPU : ISimulationStage
 {

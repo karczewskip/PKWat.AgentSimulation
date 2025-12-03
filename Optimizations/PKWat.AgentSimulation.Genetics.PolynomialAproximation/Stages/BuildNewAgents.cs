@@ -2,9 +2,9 @@
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
-using PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
+using PKWat.AgentSimulation.Genetics.PolynomialAproximation;
 
-namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation.Stages;
+namespace PKWat.AgentSimulation.Genetics.PolynomialAproximation.Stages;
 
 public class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage
 {

@@ -1,6 +1,6 @@
 ﻿using PKWat.AgentSimulation.Core.Agent;
 
-namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
+namespace PKWat.AgentSimulation.Genetics.PolynomialAproximation;
 
 public record PolynomialParameters(int Degree, double[] Coefficients)
 {

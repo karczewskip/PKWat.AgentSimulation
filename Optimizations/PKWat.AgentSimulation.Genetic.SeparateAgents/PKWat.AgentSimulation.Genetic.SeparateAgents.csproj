@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PKWat.AgentSimulation.Genetics.PolynomialInterpolation\PKWat.AgentSimulation.Genetics.PolynomialInterpolation.csproj" />
+    <ProjectReference Include="..\PKWat.AgentSimulation.Genetics.PolynomialAproximation\PKWat.AgentSimulation.Genetics.PolynomialAproximation.csproj" />
   </ItemGroup>
 
 </Project>

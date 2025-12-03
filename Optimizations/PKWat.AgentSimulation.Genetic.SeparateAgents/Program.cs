@@ -2,8 +2,8 @@
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Builder;
 using PKWat.AgentSimulation.Core.PerformanceInfo;
-using PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
-using PKWat.AgentSimulation.Genetics.PolynomialInterpolation.Stages;
+using PKWat.AgentSimulation.Genetics.PolynomialAproximation;
+using PKWat.AgentSimulation.Genetics.PolynomialAproximation.Stages;
 
 var services = new ServiceCollection();
 services.AddAgentSimulation(typeof(PolynomialCheckAgent).Assembly);

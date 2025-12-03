@@ -2,7 +2,7 @@
 using PKWat.AgentSimulation.Core.Environment;
 using System.Collections.Concurrent;
 
-namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
+namespace PKWat.AgentSimulation.Genetics.PolynomialAproximation;
 
 public class CalculationsBlackboard : DefaultSimulationEnvironment
 {
