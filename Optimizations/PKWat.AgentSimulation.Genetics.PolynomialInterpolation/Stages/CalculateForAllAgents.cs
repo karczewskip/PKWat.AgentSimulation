@@ -1,9 +1,9 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
 
-namespace PKWat.AgentSimulation.Genetic.SeparateAgents.Logic.Stages;
+namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation.Stages;
 
-internal class CalculateForAllAgents : ISimulationStage
+public class CalculateForAllAgents : ISimulationStage
 {
     public async Task Execute(ISimulationContext context)
     {

@@ -2,9 +2,9 @@
 using PKWat.AgentSimulation.Core.Environment;
 using System.Collections.Concurrent;
 
-namespace PKWat.AgentSimulation.Genetic.SeparateAgents.Logic;
+namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
 
-internal class CalculationsBlackboard : DefaultSimulationEnvironment
+public class CalculationsBlackboard : DefaultSimulationEnvironment
 {
     public ConcurrentDictionary<AgentId, ErrorResult> AgentErrors { get; } = new();
     public ExpectedValues ExpectedValues { get; private set; }

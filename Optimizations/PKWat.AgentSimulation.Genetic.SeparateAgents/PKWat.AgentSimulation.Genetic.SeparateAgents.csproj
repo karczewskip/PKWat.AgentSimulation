@@ -8,12 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ILGPU" Version="1.5.3" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.11" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj" />
+    <ProjectReference Include="..\PKWat.AgentSimulation.Genetics.PolynomialInterpolation\PKWat.AgentSimulation.Genetics.PolynomialInterpolation.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,8 @@
 ﻿using PKWat.AgentSimulation.Core.Agent;
 
-namespace PKWat.AgentSimulation.Genetic.SeparateAgents.Logic;
+namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
 
-internal record PolynomialParameters(int Degree, double[] Coefficients)
+public record PolynomialParameters(int Degree, double[] Coefficients)
 {
     public static PolynomialParameters BuildFromCoefficients(double[] coefficients)
     {
@@ -15,7 +15,7 @@ internal record PolynomialParameters(int Degree, double[] Coefficients)
     }
 }
 
-internal record ExpectedValues(double[] X, double[] Y)
+public record ExpectedValues(double[] X, double[] Y)
 {
     public static ExpectedValues Build(IEnumerable<double> X, Func<double, double> function)
     {
@@ -29,9 +29,9 @@ internal record ExpectedValues(double[] X, double[] Y)
     }
 }
 
-internal record ErrorResult(double AbsoluteError, double MeanAbsoluteError);
+public record ErrorResult(double AbsoluteError, double MeanAbsoluteError);
 
-internal class PolynomialCheckAgent() : SimpleSimulationAgent
+public class PolynomialCheckAgent() : SimpleSimulationAgent
 {
     public PolynomialParameters? Parameters { get; private set; }
 

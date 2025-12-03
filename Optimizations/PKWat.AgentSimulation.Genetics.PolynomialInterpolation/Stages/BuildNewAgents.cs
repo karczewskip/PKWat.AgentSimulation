@@ -2,10 +2,11 @@
 using PKWat.AgentSimulation.Core.Agent;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
+using PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
 
-namespace PKWat.AgentSimulation.Genetic.SeparateAgents.Logic.Stages;
+namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation.Stages;
 
-internal class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage
+public class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage
 {
     public async Task Execute(ISimulationContext context)
     {

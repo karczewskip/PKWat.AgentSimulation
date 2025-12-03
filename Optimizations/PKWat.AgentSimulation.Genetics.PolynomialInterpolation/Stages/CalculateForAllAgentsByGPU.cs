@@ -1,9 +1,9 @@
 ﻿using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
 
-namespace PKWat.AgentSimulation.Genetic.SeparateAgents.Logic.Stages;
+namespace PKWat.AgentSimulation.Genetics.PolynomialInterpolation.Stages;
 
-internal class CalculateForAllAgentsByGPU : ISimulationStage
+public class CalculateForAllAgentsByGPU : ISimulationStage
 {
     // Consider injecting this as a singleton to avoid re-initializing CUDA context every time
     private readonly GpuPolynomialEvaluator _gpuEvaluator = new GpuPolynomialEvaluator();
