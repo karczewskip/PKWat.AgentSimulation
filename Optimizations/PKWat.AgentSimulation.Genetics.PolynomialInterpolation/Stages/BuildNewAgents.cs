@@ -10,7 +10,7 @@ public class BuildNewAgents(IRandomNumbersGenerator randomNumbersGenerator) : IS
 {
     public async Task Execute(ISimulationContext context)
     {
-        var numberOfAgentsToGenerate = 1000;
+        var numberOfAgentsToGenerate = 4000;
         var numberOfCoefficients = 6;
 
         if (context.Time.StepNo == 1)

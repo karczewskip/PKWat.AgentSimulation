@@ -64,4 +64,25 @@ public class PolynomialCheckAgent() : SimpleSimulationAgent
 
         return new ErrorResult(absoluteError, absoluteError / expectedValues.X.Length);
     }
+
+    public double[] CalculateValues(double[] x)
+    {
+        if (Parameters == null)
+        {
+            throw new InvalidOperationException("Parameters must be set before calculating values.");
+        }
+        double[] results = new double[x.Length];
+        for (int i = 0; i < x.Length; i++)
+        {
+            double xi = x[i];
+            double yi = 0;
+            for (int d = 0; d <= Parameters.Degree; d++)
+            {
+                yi *= xi;
+                yi += Parameters.Coefficients[d];
+            }
+            results[i] = yi;
+        }
+        return results;
+    }
 }
