@@ -6,6 +6,7 @@ using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Drawing;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.Airport;
+using PKWat.AgentSimulation.Genetics.PolynomialInterpolation;
 using System.Reflection;
 using System.Windows;
 
@@ -26,6 +27,7 @@ public partial class App : Application
                 services.AddBuilders();
                 services.AddAgentSimulation(
                     Assembly.GetAssembly(typeof(AirportEnvironment)),
+                    Assembly.GetAssembly(typeof(CalculationsBlackboard)),
                     Assembly.GetAssembly(typeof(App))
                     );
             })

@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Optimizations\PKWat.AgentSimulation.Genetics.PolynomialInterpolation\PKWat.AgentSimulation.Genetics.PolynomialInterpolation.csproj" />
         <ProjectReference Include="..\PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj" />
         <ProjectReference Include="..\PKWat.AgentSimulation.Drawing\PKWat.AgentSimulation.Drawing.csproj" />
         <ProjectReference Include="..\PKWat.AgentSimulation.Examples\PKWat.AgentSimulation.Examples.csproj" />
