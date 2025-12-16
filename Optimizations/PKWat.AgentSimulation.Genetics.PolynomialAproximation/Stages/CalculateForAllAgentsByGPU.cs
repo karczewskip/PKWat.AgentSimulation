@@ -1,13 +1,14 @@
 ﻿using PKWat.AgentSimulation.Core;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Genetics.PolynomialAproximation;
 
 namespace PKWat.AgentSimulation.Genetics.PolynomialAproximation.Stages;
 
-public class CalculateForAllAgentsByGPU : ISimulationStage
+public class CalculateForAllAgentsByGPU(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo) : ISimulationStage
 {
     // Consider injecting this as a singleton to avoid re-initializing CUDA context every time
-    private readonly GpuPolynomialEvaluator _gpuEvaluator = new GpuPolynomialEvaluator();
+    private readonly GpuPolynomialEvaluator _gpuEvaluator = new GpuPolynomialEvaluator(simulationCyclePerformanceInfo);
 
     public async Task Execute(ISimulationContext context)
     {

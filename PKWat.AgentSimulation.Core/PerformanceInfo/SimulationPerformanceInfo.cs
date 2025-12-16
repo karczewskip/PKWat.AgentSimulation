@@ -5,6 +5,7 @@ namespace PKWat.AgentSimulation.Core.PerformanceInfo;
 public interface ISimulationCyclePerformanceInfo
 {
     IDisposable AddStep(string name);
+    SimulationPerformanceInfoStep AddManualStep(string name);
     string GetPerformanceInfo();
     void Subscribe(Action<string> notify);
 }
@@ -92,6 +93,13 @@ internal class SimulationPerformanceInfo : ISimulationCyclePerformanceInfo
         {
             subscriber(performanceInfo);
         }
+    }
+
+    public SimulationPerformanceInfoStep AddManualStep(string name)
+    {
+        var newStep = SimulationPerformanceInfoStep.Start(name);
+        _currentCycleSteps.Add(newStep);
+        return newStep;
     }
 
     private class DisposeAfterFinish(Action onDispose) : IDisposable

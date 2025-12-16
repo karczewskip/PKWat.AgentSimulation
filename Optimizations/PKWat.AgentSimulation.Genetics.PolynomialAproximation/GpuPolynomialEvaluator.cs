@@ -1,17 +1,20 @@
 ﻿using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
+using PKWat.AgentSimulation.Core.PerformanceInfo;
 
 public class GpuPolynomialEvaluator : IDisposable
 {
     private readonly Context _context;
     private readonly Accelerator _accelerator;
+    private readonly ISimulationCyclePerformanceInfo _simulationCyclePerformanceInfo;
 
-    public GpuPolynomialEvaluator()
+    public GpuPolynomialEvaluator(ISimulationCyclePerformanceInfo simulationCyclePerformanceInfo)
     {
         // Initialize ILGPU context and select CUDA device
         _context = Context.Create(builder => builder.Cuda());
         _accelerator = _context.GetCudaDevice(0).CreateAccelerator(_context);
+        _simulationCyclePerformanceInfo = simulationCyclePerformanceInfo;
     }
 
     // struct to match your logic: sum and mean
@@ -88,6 +91,8 @@ public class GpuPolynomialEvaluator : IDisposable
     /// <returns>Array of ErrorResults for each agent</returns>
     public GpuErrorResult[] CalculateErrors(double[] expectedX, double[] expectedY, double[][] agentsCoefficients)
     {
+        var loadDataToGpuStep = _simulationCyclePerformanceInfo.AddManualStep("Load data to GPU");
+
         int numAgents = agentsCoefficients.Length;
         int numPoints = expectedX.Length;
         // Assuming all agents have the same polynomial degree based on the first agent
@@ -113,6 +118,10 @@ public class GpuPolynomialEvaluator : IDisposable
         using var deviceCoeffs = _accelerator.Allocate1D(flatCoefficients);
         using var deviceResults = _accelerator.Allocate1D<GpuErrorResult>(numAgents);
 
+        loadDataToGpuStep.Stop();
+
+        var calculationStep = _simulationCyclePerformanceInfo.AddManualStep("GPU Calculation");
+
         // 3. Load Kernel
         var kernel = _accelerator.LoadAutoGroupedStreamKernel<
             Index1D, int, int, ArrayView<double>, ArrayView<double>, ArrayView<double>, ArrayView<GpuErrorResult>
@@ -124,6 +133,9 @@ public class GpuPolynomialEvaluator : IDisposable
 
         // 5. Synchronize and get results
         _accelerator.Synchronize();
+
+        calculationStep.Stop();
+
         return deviceResults.GetAsArray1D();
     }
 
