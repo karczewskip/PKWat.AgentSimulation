@@ -14,6 +14,9 @@ public class RunBruteForce : ISimulationStage
         if (agent == null || environment.CurrentDistanceMatrix == null)
             return;
 
+        // Start timing for this test case
+        agent.StartNewRound(environment.CurrentPointCount, environment.CurrentExampleIndex);
+
         if (agent.CheckTimeLimit())
             return;
 

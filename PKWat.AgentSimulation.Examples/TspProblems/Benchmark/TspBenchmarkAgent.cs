@@ -48,6 +48,11 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         Stopwatch.Restart();
     }
 
+    public void ResetCompletion()
+    {
+        IsComplete = false;
+    }
+
     public void SetBestSolution(TspSolution solution)
     {
         BestSolution = solution;
