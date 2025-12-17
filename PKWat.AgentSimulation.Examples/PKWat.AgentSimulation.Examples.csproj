@@ -10,4 +10,8 @@
     <ProjectReference Include="..\PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="TspProblems\Examples\" />
+  </ItemGroup>
+
 </Project>
