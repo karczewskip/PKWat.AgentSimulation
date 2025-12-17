@@ -110,7 +110,7 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
         y += 30;
         
         // Header
-        string header = "Points  BruteForce              HeldKarp                MstPrim                 Best";
+        string header = "Points  BruteForce              HeldKarp                MstPrim                 Best Dist   Best Time";
         g.DrawString(header, font, brush, 10, y);
         y += 18;
         
@@ -137,7 +137,9 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
             string line = $"{pointCount,3}     ";
 
             double? minDistance = null;
-            string? bestAlgorithm = null;
+            string? bestDistanceAlgorithm = null;
+            double? minTime = null;
+            string? bestTimeAlgorithm = null;
 
             // Add stats for each algorithm
             foreach (var agent in agents.OrderBy(a => a.AlgorithmType))
@@ -159,7 +161,13 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
                         if (!minDistance.HasValue || avgDist < minDistance.Value)
                         {
                             minDistance = avgDist;
-                            bestAlgorithm = agent.AlgorithmType.ToString();
+                            bestDistanceAlgorithm = agent.AlgorithmType.ToString();
+                        }
+
+                        if (!minTime.HasValue || avgTime < minTime.Value)
+                        {
+                            minTime = avgTime;
+                            bestTimeAlgorithm = agent.AlgorithmType.ToString();
                         }
                         
                         string timeStr = avgTime < 1 ? $"{avgTime * 1000:F0}ms" : $"{avgTime:F2}s";
@@ -176,10 +184,20 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
                 }
             }
 
-            // Add best algorithm
-            if (bestAlgorithm != null)
+            // Add best distance algorithm
+            if (bestDistanceAlgorithm != null)
             {
-                line += bestAlgorithm;
+                line += $"{bestDistanceAlgorithm,-12}";
+            }
+            else
+            {
+                line += "            ";
+            }
+
+            // Add best time algorithm
+            if (bestTimeAlgorithm != null)
+            {
+                line += bestTimeAlgorithm;
             }
 
             // Draw with color based on completion
