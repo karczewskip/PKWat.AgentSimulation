@@ -13,6 +13,7 @@ public interface ISimulationContext : ISimulationTimeProvider
     ENVIRONMENT GetSimulationEnvironment<ENVIRONMENT>() where ENVIRONMENT : ISimulationEnvironment;
     AGENT AddAgent<AGENT>() where AGENT : ISimulationAgent;
     void RemoveAgent(AgentId agentId);
+    void RemoveAgents(IEnumerable<AgentId> agentIds);
     IEnumerable<AGENT> GetAgents<AGENT>() where AGENT : ISimulationAgent;
     AGENT GetRequiredAgent<AGENT>() where AGENT : ISimulationAgent;
     AGENT GetRequiredAgent<AGENT>(AgentId agentId) where AGENT : ISimulationAgent;
@@ -97,7 +98,15 @@ internal class SimulationContext : ISimulationContext
 
     public void RemoveAgent(AgentId agentId)
     {
-        Agents.Remove(agentId);
+        RemoveAgents([agentId]);
+    }
+
+    public void RemoveAgents(IEnumerable<AgentId> agentIds)
+    {
+        foreach (var agentId in agentIds)
+        {
+            Agents.Remove(agentId);
+        }
     }
 
     internal async Task OnCycleFinishAsync()

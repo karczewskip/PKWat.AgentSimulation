@@ -40,5 +40,6 @@ public static class AgentSimulationServiceCollectionExtensions
                 services.AddTransient(type);
             }
         }
+        services.AddTransient(typeof(DefaultSimulationEnvironment));
     }
 }

@@ -12,10 +12,12 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+        <PackageReference Include="ScottPlot" Version="5.1.57" />
         <PackageReference Include="System.Text.Json" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Optimizations\PKWat.AgentSimulation.Genetics.PolynomialAproximation\PKWat.AgentSimulation.Genetics.PolynomialAproximation.csproj" />
         <ProjectReference Include="..\PKWat.AgentSimulation.Core\PKWat.AgentSimulation.Core.csproj" />
         <ProjectReference Include="..\PKWat.AgentSimulation.Drawing\PKWat.AgentSimulation.Drawing.csproj" />
         <ProjectReference Include="..\PKWat.AgentSimulation.Examples\PKWat.AgentSimulation.Examples.csproj" />

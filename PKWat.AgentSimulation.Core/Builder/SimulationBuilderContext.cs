@@ -14,8 +14,8 @@ using System.Reflection;
 
 public interface ISimulationBuilderContext
 {
-    ISimulationBuilderContext AddAgent<AGENT>() where AGENT : ISimulationAgent;
-    ISimulationBuilderContext AddAgents<AGENT>(int number) where AGENT : ISimulationAgent;
+    ISimulationBuilderContext AddAgent<AGENT>(Action<AGENT>? initialization = null) where AGENT : ISimulationAgent;
+    ISimulationBuilderContext AddAgents<AGENT>(int number, Action<AGENT>? initialization = null) where AGENT : ISimulationAgent;
     ISimulationBuilderContext AddCallback(Func<ISimulationContext, Task> callback);
     ISimulationBuilderContext AddCallback(Action<ISimulationContext> callback);
     ISimulationBuilderContext SetSimulationStep(TimeSpan simulationStep);
@@ -49,17 +49,22 @@ internal class SimulationBuilderContext(
     private int? _randomSeed;
     private bool _doSnapshot = false;
 
-    public ISimulationBuilderContext AddAgent<U>() where U : ISimulationAgent
+    public ISimulationBuilderContext AddAgent<U>(Action<U>? initialization = null) where U : ISimulationAgent
     {
-        return AddAgents<U>(1);
+        return AddAgents<U>(1, initialization);
     }
 
-    public ISimulationBuilderContext AddAgents<U>(int number) where U : ISimulationAgent
+    public ISimulationBuilderContext AddAgents<U>(int number, Action<U>? initialization = null) where U : ISimulationAgent
     {
         _agentsToGenerate.AddRange(Enumerable
             .Range(0, number)
             .Select(x => new Func<ISimulationAgent>(
-                () => serviceProvider.GetRequiredService<U>())));
+                () =>
+                {
+                    var newAgent = serviceProvider.GetRequiredService<U>();
+                    initialization?.Invoke(newAgent);
+                    return newAgent;
+                })));
 
         return this;
     }
