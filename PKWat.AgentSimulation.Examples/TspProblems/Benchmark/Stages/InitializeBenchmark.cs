@@ -30,16 +30,11 @@ public class InitializeBenchmark : ISimulationStage
         var agents = context.GetAgents<TspBenchmarkAgent>().ToList();
 
         environment.SetStartingPointCount(_startingPointCount);
-        
-        var random = new Random(42);
-        environment.GenerateTestCases(_maxPointCount, random);
 
         foreach (var agent in agents)
         {
             agent.SetTimeLimit(_timeLimit);
         }
-
-        environment.LoadCurrentTestCase();
 
         await Task.CompletedTask;
     }
