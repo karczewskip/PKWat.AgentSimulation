@@ -20,7 +20,7 @@ public class TspBruteForceSimulationBuilder(
         var simulation = simulationBuilder
             .CreateNewSimulation<TspEnvironment>()
             .AddInitializationStage<InitializeTspSpace>(s => s.SetSize(100.0, 100.0))
-            .AddInitializationStage<InitializeTspPoints>(s => s.SetPointCount(6))
+            .AddInitializationStage<InitializeTspPoints>(s => s.SetPointCount(7))
             .AddInitializationStage<InitializeBruteForceAgent>()
             .AddStage<CheckNextPermutation>()
             .AddCallback(c => drawing(drawer.Draw(c)))
@@ -40,7 +40,6 @@ public class TspBruteForceSimulationBuilder(
                 
                 return SimulationCrashResult.NoCrash;
             })
-            .SetRandomSeed(42)
             .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
             .Build();
 
