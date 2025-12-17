@@ -106,7 +106,7 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
         using var brush = new SolidBrush(Color.Black);
         
         int y = 160;
-        g.DrawString("Statistics by Point Count:", headerFont, brush, 10, y);
+        g.DrawString("Statistics by Point Count (Last 20):", headerFont, brush, 10, y);
         y += 30;
         
         // Header
@@ -123,7 +123,10 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
         var allResults = agents.SelectMany(a => a.Results.Select(r => new { Agent = a, Result = r })).ToList();
         var pointCounts = allResults.Select(r => r.Result.PointCount).Distinct().OrderBy(p => p).ToList();
 
-        foreach (var pointCount in pointCounts)
+        // Take only the last 20 cases
+        var displayPointCounts = pointCounts.TakeLast(20).ToList();
+
+        foreach (var pointCount in displayPointCounts)
         {
             var resultsForPoints = allResults.Where(r => r.Result.PointCount == pointCount).ToList();
             

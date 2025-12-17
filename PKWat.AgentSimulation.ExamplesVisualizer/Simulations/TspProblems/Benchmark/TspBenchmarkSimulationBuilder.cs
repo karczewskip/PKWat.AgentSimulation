@@ -25,7 +25,7 @@ public class TspBenchmarkSimulationBuilder(
             {
                 s.SetMaxPointCount(15);
                 s.SetStartingPointCount(3);
-                s.SetTimeLimit(TimeSpan.FromSeconds(60));
+                s.SetTimeLimit(TimeSpan.FromSeconds(10));
             })
             .AddStage<RunBruteForce>()
             .AddStage<RunHeldKarp>()
