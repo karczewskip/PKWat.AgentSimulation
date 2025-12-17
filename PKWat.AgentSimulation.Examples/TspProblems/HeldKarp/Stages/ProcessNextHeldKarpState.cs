@@ -46,6 +46,9 @@ public class ProcessNextHeldKarpState : ISimulationStage
             var (mask, lastNode) = _currentStates[_currentStateIndex];
             ProcessState(agent, environment, mask, lastNode, n);
             _currentStateIndex++;
+
+            // Update partial best solution for visualization
+            UpdatePartialBestSolution(agent, environment, n);
         }
 
         await Task.CompletedTask;
@@ -165,5 +168,76 @@ public class ProcessNextHeldKarpState : ISimulationStage
         var solution = TspSolution.Create(route, minCost);
         agent.SetBestSolution(solution);
         environment.UpdateBestSolution(solution);
+    }
+
+    private void UpdatePartialBestSolution(HeldKarpAgent agent, TspEnvironment environment, int n)
+    {
+        var dpTable = agent.DpTable!;
+        var parentTable = agent.ParentTable!;
+
+        // Find the best partial path among all states processed so far
+        // We want the longest path (most nodes) with the best cost
+        double bestPartialCost = double.MaxValue;
+        int bestMask = 0;
+        int bestLastNode = -1;
+        int maxNodesVisited = 0;
+
+        foreach (var kvp in dpTable)
+        {
+            var (mask, lastNode) = kvp.Key;
+            double cost = kvp.Value;
+
+            // Count how many nodes are in this subset
+            int nodesInSubset = CountBits(mask);
+
+            // Prefer paths with more nodes, or if same number of nodes, prefer lower cost
+            if (nodesInSubset > maxNodesVisited || 
+                (nodesInSubset == maxNodesVisited && cost < bestPartialCost))
+            {
+                bestPartialCost = cost;
+                bestMask = mask;
+                bestLastNode = lastNode;
+                maxNodesVisited = nodesInSubset;
+            }
+        }
+
+        if (bestLastNode != -1)
+        {
+            // Reconstruct the partial path (without returning to start)
+            var route = new List<int>();
+            int currentMask = bestMask;
+            int currentNode = bestLastNode;
+
+            while (currentMask != (1 << 0))
+            {
+                route.Add(currentNode);
+                var key = (currentMask, currentNode);
+                if (!parentTable.ContainsKey(key))
+                    break;
+                
+                int parent = parentTable[key];
+                currentMask &= ~(1 << currentNode);
+                currentNode = parent;
+            }
+
+            route.Add(0); // Start node
+            route.Reverse();
+
+            // Use the actual partial path cost (not including return to start)
+            var partialSolution = TspSolution.Create(route, bestPartialCost);
+            agent.SetBestSolution(partialSolution);
+            environment.UpdateBestSolution(partialSolution);
+        }
+    }
+
+    private int CountBits(int mask)
+    {
+        int count = 0;
+        while (mask > 0)
+        {
+            count += mask & 1;
+            mask >>= 1;
+        }
+        return count;
     }
 }

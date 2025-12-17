@@ -20,7 +20,7 @@ public class TspHeldKarpSimulationBuilder(
         var simulation = simulationBuilder
             .CreateNewSimulation<TspEnvironment>()
             .AddInitializationStage<InitializeTspSpace>(s => s.SetSize(100.0, 100.0))
-            .AddInitializationStage<InitializeTspPoints>(s => s.SetPointCount(8))
+            .AddInitializationStage<InitializeTspPoints>(s => s.SetPointCount(10))
             .AddInitializationStage<InitializeHeldKarpAgent>()
             .AddStage<ProcessNextHeldKarpState>()
             .AddCallback(c => drawing(drawer.Draw(c)))
@@ -40,7 +40,6 @@ public class TspHeldKarpSimulationBuilder(
                 
                 return SimulationCrashResult.NoCrash;
             })
-            .SetRandomSeed(42)
             .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(10))
             .Build();
 

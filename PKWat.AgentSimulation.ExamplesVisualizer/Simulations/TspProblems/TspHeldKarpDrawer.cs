@@ -42,10 +42,17 @@ public class TspHeldKarpDrawer : IVisualizationDrawer
             DrawCurrentState(graphic, environment, agent);
         }
 
-        // Draw best solution found
+        // Draw best partial/complete solution found
         if (agent?.BestSolution != null && agent.BestSolution.Route.Count > 0)
         {
-            DrawRoute(graphic, environment, agent.BestSolution.Route, Color.FromArgb(200, 0, 255, 0), 3);
+            // Use different color for complete vs partial solution
+            Color routeColor = agent.IsComplete 
+                ? Color.FromArgb(200, 0, 255, 0)      // Green for complete
+                : Color.FromArgb(200, 255, 165, 0);   // Orange for partial
+            
+            int routeWidth = agent.IsComplete ? 3 : 2;
+            
+            DrawRoute(graphic, environment, agent.BestSolution.Route, routeColor, routeWidth, agent.IsComplete);
         }
 
         // Draw point labels
@@ -120,7 +127,7 @@ public class TspHeldKarpDrawer : IVisualizationDrawer
         }
     }
 
-    private void DrawRoute(Graphics graphic, TspEnvironment environment, List<int> route, Color color, int width)
+    private void DrawRoute(Graphics graphic, TspEnvironment environment, List<int> route, Color color, int width, bool isComplete)
     {
         if (route.Count < 2)
             return;
@@ -140,15 +147,18 @@ public class TspHeldKarpDrawer : IVisualizationDrawer
                 Scale * (float)p2.Y);
         }
 
-        // Draw return to start
-        var last = environment.Points[route[^1]];
-        var first = environment.Points[route[0]];
-        graphic.DrawLine(
-            pen,
-            Scale * (float)last.X,
-            Scale * (float)last.Y,
-            Scale * (float)first.X,
-            Scale * (float)first.Y);
+        // Only draw return to start if the route is complete
+        if (isComplete)
+        {
+            var last = environment.Points[route[^1]];
+            var first = environment.Points[route[0]];
+            graphic.DrawLine(
+                pen,
+                Scale * (float)last.X,
+                Scale * (float)last.Y,
+                Scale * (float)first.X,
+                Scale * (float)first.Y);
+        }
     }
 
     private void DrawPointLabels(Graphics graphic, TspEnvironment environment)
