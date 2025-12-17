@@ -15,7 +15,7 @@ public class TspBruteForceSimulationBuilder
         _simulationBuilder = simulationBuilder;
     }
 
-    public ISimulation Build(int pointCount = 8, long maxIterations = 50000)
+    public ISimulation Build(int pointCount = 6, long maxIterations = 50000)
     {
         var simulation = _simulationBuilder
             .CreateNewSimulation<TspEnvironment>()
