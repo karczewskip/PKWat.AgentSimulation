@@ -23,8 +23,6 @@ public class TspBenchmarkSimulationBuilder(
             .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.MstPrim)
             .AddInitializationStage<InitializeBenchmark>(s =>
             {
-                s.SetMaxPointCount(15);
-                s.SetStartingPointCount(3);
                 s.SetTimeLimit(TimeSpan.FromSeconds(3));
             })
             .AddStage<GenerateTestCasesForCurrentPointCount>()

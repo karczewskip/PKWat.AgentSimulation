@@ -5,14 +5,8 @@ using PKWat.AgentSimulation.Core.Stage;
 
 public class InitializeBenchmark : ISimulationStage
 {
-    private int _maxPointCount = 15;
-    private int _startingPointCount = 3;
+    private int _startingPointCount = 4;
     private TimeSpan _timeLimit = TimeSpan.FromSeconds(60);
-
-    public void SetMaxPointCount(int maxPointCount)
-    {
-        _maxPointCount = maxPointCount;
-    }
 
     public void SetStartingPointCount(int startingPointCount)
     {

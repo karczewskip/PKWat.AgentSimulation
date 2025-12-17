@@ -14,9 +14,9 @@ public class TspBenchmarkSimulationBuilder
         _simulationBuilder = simulationBuilder;
     }
 
-    public ISimulation Build(int maxPointCount = 15, int startingPointCount = 3, TimeSpan? timeLimit = null)
+    public ISimulation Build(TimeSpan? timeLimit = null)
     {
-        var actualTimeLimit = timeLimit ?? TimeSpan.FromSeconds(60);
+        var actualTimeLimit = timeLimit ?? TimeSpan.FromSeconds(3);
 
         var simulation = _simulationBuilder
             .CreateNewSimulation<TspBenchmarkEnvironment>()
@@ -25,8 +25,6 @@ public class TspBenchmarkSimulationBuilder
             .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.MstPrim)
             .AddInitializationStage<InitializeBenchmark>(s =>
             {
-                s.SetMaxPointCount(maxPointCount);
-                s.SetStartingPointCount(startingPointCount);
                 s.SetTimeLimit(actualTimeLimit);
             })
             .AddStage<RunBruteForce>()
