@@ -33,25 +33,19 @@ public class TspMstDrawer : IVisualizationDrawer
 
         var agent = context.GetAgents<MstAgent>().FirstOrDefault();
 
+        // Draw MST edges being built
+        if (agent?.MstEdges != null && agent.MstEdges.Count > 0)
+        {
+            DrawMstEdges(graphic, environment, agent.MstEdges);
+        }
+
         // Draw all TSP points
         DrawTspPoints(graphic, environment, agent);
 
-        // Draw MST route (full path after DFS)
-        if (agent?.MstRoute != null && agent.MstRoute.Count > 0)
+        // Draw DFS route being built (only during DFS phase)
+        if (agent?.IsDfsStarted == true && agent.CurrentRoute != null && agent.CurrentRoute.Count > 1)
         {
-            DrawRoute(graphic, environment, agent.MstRoute, Color.FromArgb(100, 150, 150, 255), 2);
-        }
-
-        // Draw current partial route being built
-        if (agent?.CurrentRoute != null && agent.CurrentRoute.Count > 1)
-        {
-            DrawRoute(graphic, environment, agent.CurrentRoute, Color.FromArgb(200, 255, 255, 0), 3);
-        }
-
-        // Draw best solution found
-        if (agent?.BestSolution != null && agent.BestSolution.Route.Count > 0)
-        {
-            DrawRoute(graphic, environment, agent.BestSolution.Route, Color.FromArgb(200, 0, 255, 0), 3);
+            DrawDfsRoute(graphic, environment, agent.CurrentRoute, agent.IsComplete);
         }
 
         // Draw point labels
@@ -66,15 +60,48 @@ public class TspMstDrawer : IVisualizationDrawer
         return bitmapSource;
     }
 
+    private void DrawMstEdges(Graphics graphic, TspEnvironment environment, List<(int from, int to)> edges)
+    {
+        using var pen = new Pen(Color.FromArgb(150, 100, 150, 255), 2);
+
+        foreach (var (from, to) in edges)
+        {
+            var p1 = environment.Points[from];
+            var p2 = environment.Points[to];
+
+            graphic.DrawLine(
+                pen,
+                Scale * (float)p1.X,
+                Scale * (float)p1.Y,
+                Scale * (float)p2.X,
+                Scale * (float)p2.Y);
+        }
+    }
+
     private void DrawTspPoints(Graphics graphic, TspEnvironment environment, MstAgent? agent)
     {
         foreach (var point in environment.Points)
         {
-            // Different color for visited nodes
-            bool isVisited = agent?.VisitedNodes?.Contains(point.Id) ?? false;
-            Color pointColor = isVisited 
-                ? Color.FromArgb(255, 100, 255, 100) 
-                : Color.FromArgb(255, 255, 200, 100);
+            // Color based on state:
+            // - Blue/Purple if in MST but not yet visited in DFS
+            // - Green if visited in DFS
+            // - Orange if not yet in MST
+            bool isInMst = agent?.NodesInMst?.Contains(point.Id) ?? false;
+            bool isVisitedInDfs = agent?.VisitedNodes?.Contains(point.Id) ?? false;
+            
+            Color pointColor;
+            if (isVisitedInDfs)
+            {
+                pointColor = Color.FromArgb(255, 100, 255, 100); // Green - visited in DFS
+            }
+            else if (isInMst)
+            {
+                pointColor = Color.FromArgb(255, 150, 150, 255); // Purple - in MST
+            }
+            else
+            {
+                pointColor = Color.FromArgb(255, 255, 200, 100); // Orange - not in MST yet
+            }
 
             using var brush = new SolidBrush(pointColor);
             using var pen = new Pen(Color.White, 2);
@@ -93,6 +120,50 @@ public class TspMstDrawer : IVisualizationDrawer
                 Scale * (float)point.Y - size / 2,
                 size,
                 size);
+        }
+    }
+
+    private void DrawDfsRoute(Graphics graphic, TspEnvironment environment, List<int> route, bool isComplete)
+    {
+        if (route.Count < 2)
+            return;
+
+        Color routeColor = isComplete 
+            ? Color.FromArgb(200, 0, 255, 0)      // Green for complete
+            : Color.FromArgb(200, 255, 255, 0);   // Yellow for in-progress
+
+        using var pen = new Pen(routeColor, 3);
+
+        for (int i = 0; i < route.Count - 1; i++)
+        {
+            if (route[i] >= environment.Points.Count || route[i + 1] >= environment.Points.Count)
+                continue;
+
+            var p1 = environment.Points[route[i]];
+            var p2 = environment.Points[route[i + 1]];
+
+            graphic.DrawLine(
+                pen,
+                Scale * (float)p1.X,
+                Scale * (float)p1.Y,
+                Scale * (float)p2.X,
+                Scale * (float)p2.Y);
+        }
+
+        // Draw return to start only for complete routes
+        if (isComplete && route.Count > 2)
+        {
+            var last = environment.Points[route[^1]];
+            var first = environment.Points[route[0]];
+            using var dashedPen = new Pen(routeColor, 3);
+            dashedPen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+            
+            graphic.DrawLine(
+                dashedPen,
+                Scale * (float)last.X,
+                Scale * (float)last.Y,
+                Scale * (float)first.X,
+                Scale * (float)first.Y);
         }
     }
 
@@ -161,16 +232,21 @@ public class TspMstDrawer : IVisualizationDrawer
         using var brush = new SolidBrush(Color.White);
         using var shadowBrush = new SolidBrush(Color.Black);
 
-        string mstStatus = agent?.IsMstBuilt == true ? "Built" : "Not Built";
-        int nodesAdded = agent?.CurrentRoute?.Count ?? 0;
+        int mstEdgesCount = agent?.MstEdges?.Count ?? 0;
+        int nodesInMst = agent?.NodesInMst?.Count ?? 0;
+        int dfsNodesVisited = agent?.VisitedNodes?.Count ?? 0;
+        
+        string phase = !agent?.IsMstBuilt ?? true 
+            ? "Building MST" 
+            : (agent.IsComplete ? "Complete" : "DFS Traversal");
         
         string info = $"Algorithm: MST Approximation (Prim's)\n" +
+                      $"Phase: {phase}\n" +
                       $"Iteration: {context.Time.StepNo}\n" +
                       $"Points: {environment.Points.Count}\n" +
-                      $"MST: {mstStatus}\n" +
-                      $"Nodes Added: {nodesAdded}/{environment.Points.Count}\n" +
-                      $"Best Distance: {agent?.BestSolution?.TotalDistance:F2}\n" +
-                      $"Status: {(agent?.IsComplete == true ? "COMPLETE" : "Running")}";
+                      $"MST Edges: {mstEdgesCount}/{environment.Points.Count - 1}\n" +
+                      $"DFS Progress: {dfsNodesVisited}/{environment.Points.Count}\n" +
+                      $"Best Distance: {agent?.BestSolution?.TotalDistance:F2}";
 
         graphic.DrawString(info, font, shadowBrush, 11, 11);
         graphic.DrawString(info, font, brush, 10, 10);

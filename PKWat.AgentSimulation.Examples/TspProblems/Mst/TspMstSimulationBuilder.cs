@@ -22,7 +22,7 @@ public class TspMstSimulationBuilder
             .AddInitializationStage<InitializeTspSpace>(s => s.SetSize(100.0, 100.0))
             .AddInitializationStage<InitializeTspPoints>(s => s.SetPointCount(pointCount))
             .AddInitializationStage<InitializeMstAgent>()
-            .AddInitializationStage<BuildMstWithPrim>()
+            .AddStage<BuildMstWithPrim>()
             .AddStage<AddNextMstNode>()
             .AddCrashCondition(c => 
             {

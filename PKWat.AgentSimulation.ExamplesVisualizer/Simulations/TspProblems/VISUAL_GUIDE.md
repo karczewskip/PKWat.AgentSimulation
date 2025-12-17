@@ -74,40 +74,49 @@
 
 ### What You'll See
 
-1. **Unvisited Cities (Orange Circles)**
-   - Cities not yet in tour
-   - Turn green when added
+1. **Phase 1: Building MST (Purple Edges)**
+   - **Orange circles:** Points not yet added to MST
+   - **Purple circles:** Points added to MST
+   - **Purple lines:** MST edges connecting nodes
+   - Each step adds one new edge to the MST
+   - Watch Prim's algorithm grow the tree
 
-2. **Visited Cities (Green Circles)**
-   - Cities already in tour
-   - Stay green
+2. **Phase 2: DFS Traversal (Yellow Route)**
+   - **Purple lines:** Complete MST structure (remains visible)
+   - **Purple circles:** Points in MST but not yet visited
+   - **Green circles:** Points visited in DFS traversal
+   - **Yellow route:** DFS path being built (in-progress)
+   - Each step adds one node to the tour
 
-3. **MST Route (Light Blue Path)**
-   - Thin blue line showing MST DFS order
-   - Complete path following tree structure
-   - Visible throughout
+3. **Phase 3: Completion (Green Route)**
+   - **Green circles:** All points visited
+   - **Green route:** Final TSP approximation
+   - **Dashed line:** Return to start
 
-4. **Current Partial Tour (Yellow)**
-   - Thick yellow line
-   - Grows as nodes are added
-   - One new segment per step
-
-5. **Best Route (Green)**
-   - Final complete tour
-   - Includes return to start (dashed)
-
-6. **Info Panel**
-   - MST build status
-   - Nodes added to tour
-   - Current best distance
+4. **Info Panel**
+   - Current phase (Building MST / DFS Traversal / Complete)
+   - MST edges built (out of n-1 total)
+   - DFS progress (nodes visited out of n total)
+   - Best distance
 
 ### What to Observe
-- **Initialization:** MST built instantly (Prim's algorithm)
-- **Step 1:** Node 0 added (start)
-- **Step 2-8:** Each step adds one node following MST DFS order
-- **Pattern:** Watch how tour follows tree structure
-- **Speed:** Much faster than exact algorithms
-- **Quality:** Usually close to optimal
+
+**MST Building Phase (Steps 1 to n):**
+- Starts with node 0 (purple)
+- Each step: one new purple edge appears
+- New nodes turn purple as they're added to MST
+- Prim's algorithm always picks the minimum-weight edge
+
+**DFS Traversal Phase (Steps n+1 to 2n):**
+- MST is complete (all purple edges visible)
+- Yellow route starts growing from node 0
+- Nodes turn green as they're visited
+- Route follows the tree structure (DFS order)
+
+**Completion:**
+- Yellow route turns green
+- Dashed line shows return to start
+- Final approximation is at most 2× optimal
 
 ---
 

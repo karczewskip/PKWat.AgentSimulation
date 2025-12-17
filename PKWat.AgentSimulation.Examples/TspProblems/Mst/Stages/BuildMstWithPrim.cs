@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 public class BuildMstWithPrim : ISimulationStage
 {
+    private bool[]? _inMst;
+    private int[]? _parent;
+    private double[]? _key;
+    private int _nodesAdded = 0;
+    private int _totalNodes = 0;
+
     public async Task Execute(ISimulationContext context)
     {
         var environment = context.GetSimulationEnvironment<TspEnvironment>();
@@ -18,21 +24,26 @@ public class BuildMstWithPrim : ISimulationStage
         int n = environment.Points.Count;
         var distances = environment.DistanceMatrix;
 
-        // Prim's algorithm to build MST
-        var inMst = new bool[n];
-        var parent = new int[n];
-        var key = new double[n];
-
-        for (int i = 0; i < n; i++)
+        // Initialize Prim's algorithm on first call
+        if (_inMst == null)
         {
-            key[i] = double.MaxValue;
-            parent[i] = -1;
+            _totalNodes = n;
+            _inMst = new bool[n];
+            _parent = new int[n];
+            _key = new double[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                _key[i] = double.MaxValue;
+                _parent[i] = -1;
+            }
+
+            _key[0] = 0;
+            _nodesAdded = 0;
         }
 
-        key[0] = 0;
-        var mstEdges = new List<(int from, int to)>();
-
-        for (int count = 0; count < n; count++)
+        // Add one node to MST per step
+        if (_nodesAdded < _totalNodes)
         {
             // Find minimum key vertex not yet in MST
             int u = -1;
@@ -40,41 +51,47 @@ public class BuildMstWithPrim : ISimulationStage
             
             for (int v = 0; v < n; v++)
             {
-                if (!inMst[v] && key[v] < minKey)
+                if (!_inMst[v] && _key[v] < minKey)
                 {
-                    minKey = key[v];
+                    minKey = _key[v];
                     u = v;
                 }
             }
 
-            if (u == -1) break;
+            if (u == -1) return;
 
-            inMst[u] = true;
+            _inMst[u] = true;
 
-            if (parent[u] != -1)
+            // Add edge to MST (except for the first node)
+            if (_parent[u] != -1)
             {
-                mstEdges.Add((parent[u], u));
+                agent.AddMstEdge(_parent[u], u);
             }
+
+            _nodesAdded++;
 
             // Update key values of adjacent vertices
             for (int v = 0; v < n; v++)
             {
-                if (!inMst[v] && distances[u, v] < key[v])
+                if (!_inMst[v] && distances[u, v] < _key[v])
                 {
-                    parent[v] = u;
-                    key[v] = distances[u, v];
+                    _parent[v] = u;
+                    _key[v] = distances[u, v];
                 }
             }
-        }
 
-        // Convert MST to DFS order for TSP approximation
-        var mstRoute = DfsTraversal(mstEdges, n);
-        agent.BuildMst(mstRoute);
+            // If all nodes added, compute DFS route and mark MST as built
+            if (_nodesAdded >= _totalNodes)
+            {
+                var dfsRoute = ComputeDfsRoute(agent.MstEdges!, n);
+                agent.CompleteMstBuilding(dfsRoute);
+            }
+        }
 
         await Task.CompletedTask;
     }
 
-    private List<int> DfsTraversal(List<(int from, int to)> edges, int n)
+    private List<int> ComputeDfsRoute(List<(int from, int to)> edges, int n)
     {
         // Build adjacency list
         var adj = new List<int>[n];

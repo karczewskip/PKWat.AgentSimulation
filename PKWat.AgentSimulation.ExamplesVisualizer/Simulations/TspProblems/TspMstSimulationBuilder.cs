@@ -20,9 +20,9 @@ public class TspMstSimulationBuilder(
         var simulation = simulationBuilder
             .CreateNewSimulation<TspEnvironment>()
             .AddInitializationStage<InitializeTspSpace>(s => s.SetSize(100.0, 100.0))
-            .AddInitializationStage<InitializeTspPoints>(s => s.SetPointCount(8))
+            .AddInitializationStage<InitializeTspPoints>(s => s.SetPointCount(100))
             .AddInitializationStage<InitializeMstAgent>()
-            .AddInitializationStage<BuildMstWithPrim>()
+            .AddStage<BuildMstWithPrim>()
             .AddStage<AddNextMstNode>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .AddCrashCondition(c => 

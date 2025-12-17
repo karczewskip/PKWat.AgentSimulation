@@ -12,10 +12,17 @@ public class AddNextMstNode : ISimulationStage
         var environment = context.GetSimulationEnvironment<TspEnvironment>();
         var agent = context.GetAgents<MstAgent>().First();
 
+        // Only process DFS after MST is fully built
         if (!agent.IsMstBuilt || agent.IsComplete || agent.MstRoute == null)
             return;
 
-        // Add one node from MST route to current route
+        // Start DFS on first call
+        if (!agent.IsDfsStarted)
+        {
+            agent.StartDfs();
+        }
+
+        // Add one node from DFS route to current route per step
         if (agent.CurrentStep < agent.MstRoute.Count)
         {
             int nextNode = agent.MstRoute[agent.CurrentStep];
