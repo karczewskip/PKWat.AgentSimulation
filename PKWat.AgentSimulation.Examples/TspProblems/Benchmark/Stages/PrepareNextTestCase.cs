@@ -30,7 +30,6 @@ public class PrepareNextTestCase : ISimulationStage
 
         // Move to next test case
         environment.MoveToNextExample();
-        environment.LoadCurrentTestCase();
 
         await Task.CompletedTask;
     }

@@ -1,10 +1,11 @@
 namespace PKWat.AgentSimulation.Examples.TspProblems.Benchmark;
 
 using PKWat.AgentSimulation.Core.Environment;
+using PKWat.AgentSimulation.Core.RandomNumbers;
 
-public class TspBenchmarkEnvironment : DefaultSimulationEnvironment
+public class TspBenchmarkEnvironment(IRandomNumbersGenerator randomNumbersGenerator) : DefaultSimulationEnvironment
 {
-    private readonly Dictionary<int, List<List<TspPoint>>> _testCasesByPointCount = new();
+    private readonly List<TspPoint> _currentTestCase = new();
     private int _currentPointCount = 4;
     private int _currentExampleIndex = 0;
     private readonly int _examplesPerRound = 100;
@@ -12,7 +13,7 @@ public class TspBenchmarkEnvironment : DefaultSimulationEnvironment
     public int CurrentPointCount => _currentPointCount;
     public int CurrentExampleIndex => _currentExampleIndex;
     public int ExamplesPerRound => _examplesPerRound;
-    public List<TspPoint> CurrentPoints { get; private set; } = new();
+    public List<TspPoint> CurrentPoints => _currentTestCase;
     public double[,]? CurrentDistanceMatrix { get; private set; }
 
     public void SetStartingPointCount(int startingPointCount)
@@ -20,25 +21,16 @@ public class TspBenchmarkEnvironment : DefaultSimulationEnvironment
         _currentPointCount = startingPointCount;
     }
 
-    public void GenerateTestCasesForPointCount(int pointCount, Random random)
+    public void GenerateTestCasesForPointCount()
     {
-        // Skip if already generated
-        if (_testCasesByPointCount.ContainsKey(pointCount))
-            return;
-
-        var testCases = new List<List<TspPoint>>();
+        _currentTestCase.Clear();
         
-        for (int example = 0; example < _examplesPerRound; example++)
+        for (int i = 0; i < _currentPointCount; i++)
         {
-            var points = new List<TspPoint>();
-            for (int i = 0; i < pointCount; i++)
-            {
-                points.Add(TspPoint.Create(i, random.NextDouble() * 100, random.NextDouble() * 100));
-            }
-            testCases.Add(points);
+            _currentTestCase.Add(TspPoint.Create(i, randomNumbersGenerator.NextDouble() * 100, randomNumbersGenerator.NextDouble() * 100));
         }
-        
-        _testCasesByPointCount[pointCount] = testCases;
+
+        BuildDistanceMatrix();
     }
 
     public bool MoveToNextExample()
@@ -53,20 +45,6 @@ public class TspBenchmarkEnvironment : DefaultSimulationEnvironment
         }
         
         return false;
-    }
-
-    public void LoadCurrentTestCase()
-    {
-        if (!_testCasesByPointCount.ContainsKey(_currentPointCount))
-            return;
-
-        var testCases = _testCasesByPointCount[_currentPointCount];
-        
-        if (_currentExampleIndex < testCases.Count)
-        {
-            CurrentPoints = new List<TspPoint>(testCases[_currentExampleIndex]);
-            BuildDistanceMatrix();
-        }
     }
 
     private void BuildDistanceMatrix()
