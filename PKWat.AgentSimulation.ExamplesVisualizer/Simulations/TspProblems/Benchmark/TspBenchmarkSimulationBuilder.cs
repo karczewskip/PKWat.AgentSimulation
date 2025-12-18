@@ -16,7 +16,7 @@ public class TspBenchmarkSimulationBuilder(
     {
         drawer.InitializeIfNeeded(1000, 800);
 
-        var timeLimit = TimeSpan.FromSeconds(10);
+        var timeLimit = TimeSpan.FromSeconds(0.2);
 
         var simulation = simulationBuilder
             .CreateNewSimulation<TspBenchmarkEnvironment>()
@@ -35,7 +35,6 @@ public class TspBenchmarkSimulationBuilder(
                 a.InitializeAlgorithm(TspAlgorithmType.MstPrim);
                 a.SetTimeLimit(timeLimit);
             })
-            .AddInitializationStage<InitializeEnvironment>(s => s.SetStartingPointCount(3))
             .AddStage<GenerateTestCasesForCurrentPointCount>()
             .AddStage<RunAlgorithms>()
             .AddStage<PrepareNextTestCase>()

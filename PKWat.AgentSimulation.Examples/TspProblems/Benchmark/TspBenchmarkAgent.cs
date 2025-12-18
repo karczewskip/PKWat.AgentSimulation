@@ -59,22 +59,15 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         // Start timing for this test case
         StartNewRound(pointCount, exampleIndex);
 
-        // Check time limit before starting
-        if (CheckTimeLimit())
-            return;
-
         // Run the algorithm with cancellation support
         var solution = Algorithm.Solve(points, GetCancellationToken());
 
         // If solution is null, it means the algorithm was cancelled
-        if (solution == null)
+        if (solution != null)
         {
-            CheckTimeLimit(); // This will mark as timeout
-            return;
+            // Set the solution
+            SetBestSolution(solution);
         }
-
-        // Set the solution
-        SetBestSolution(solution);
         
         // Mark as complete
         MarkComplete();
@@ -134,18 +127,6 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
                 ExceededTimeLimit = true
             });
         }
-    }
-
-    private bool CheckTimeLimit()
-    {
-        if (Stopwatch.Elapsed > TimeLimit)
-        {
-            _cancellationTokenSource?.Cancel();
-            HasExceededTimeLimit = true;
-            MarkComplete();
-            return true;
-        }
-        return false;
     }
 }
 
