@@ -53,7 +53,33 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         TimeLimit = timeLimit;
     }
 
-    public void StartNewRound(int pointCount, int exampleIndex)
+    public void ExecuteTestCase(List<TspPoint> points, int pointCount, int exampleIndex)
+    {
+        // Start timing for this test case
+        StartNewRound(pointCount, exampleIndex);
+
+        // Check time limit before starting
+        if (CheckTimeLimit())
+            return;
+
+        // Run the algorithm with cancellation support
+        var solution = Algorithm.Solve(points, GetCancellationToken());
+
+        // If solution is null, it means the algorithm was cancelled
+        if (solution == null)
+        {
+            CheckTimeLimit(); // This will mark as timeout
+            return;
+        }
+
+        // Set the solution
+        SetBestSolution(solution);
+        
+        // Mark as complete
+        MarkComplete();
+    }
+
+    private void StartNewRound(int pointCount, int exampleIndex)
     {
         CurrentPointCount = pointCount;
         CurrentExampleIndex = exampleIndex;
@@ -64,7 +90,7 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         Stopwatch.Restart();
     }
 
-    public CancellationToken GetCancellationToken()
+    private CancellationToken GetCancellationToken()
     {
         return _cancellationTokenSource?.Token ?? CancellationToken.None;
     }
@@ -74,12 +100,12 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         IsComplete = false;
     }
 
-    public void SetBestSolution(TspSolution solution)
+    private void SetBestSolution(TspSolution solution)
     {
         BestSolution = solution;
     }
 
-    public void MarkComplete()
+    private void MarkComplete()
     {
         IsComplete = true;
         Stopwatch.Stop();
@@ -109,7 +135,7 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         }
     }
 
-    public bool CheckTimeLimit()
+    private bool CheckTimeLimit()
     {
         if (Stopwatch.Elapsed > TimeLimit)
         {
