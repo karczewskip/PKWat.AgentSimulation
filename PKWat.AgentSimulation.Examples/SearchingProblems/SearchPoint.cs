@@ -20,7 +20,7 @@ public class SearchPoint
 
     public double DistanceTo(SearchPoint other)
     {
-        return Math.Sqrt(Math.Pow(X - other.X, 2) + Math.Pow(Y - other.Y, 2));
+        return System.Math.Sqrt(System.Math.Pow(X - other.X, 2) + System.Math.Pow(Y - other.Y, 2));
     }
 
     public void UpdateValue(double newValue)

@@ -1,4 +1,4 @@
-namespace PKWat.AgentSimulation.Examples.TspProblems;
+namespace PKWat.AgentSimulation.Math.Algorithms.TSP;
 
 public class TspSolution
 {

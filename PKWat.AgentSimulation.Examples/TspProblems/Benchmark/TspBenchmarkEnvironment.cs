@@ -2,19 +2,27 @@ namespace PKWat.AgentSimulation.Examples.TspProblems.Benchmark;
 
 using PKWat.AgentSimulation.Core.Environment;
 using PKWat.AgentSimulation.Core.RandomNumbers;
+using PKWat.AgentSimulation.Math.Algorithms.TSP;
 
-public class TspBenchmarkEnvironment(IRandomNumbersGenerator randomNumbersGenerator) : DefaultSimulationEnvironment
+public class TspBenchmarkEnvironment : DefaultSimulationEnvironment
 {
+    private readonly TspTestCaseGenerator _testCaseGenerator;
     private readonly List<TspPoint> _currentTestCase = new();
     private int _currentPointCount = 4;
     private int _currentExampleIndex = 0;
     private readonly int _examplesPerRound = 100;
-    
+    private readonly double _maxCoordinate = 100.0;
+
     public int CurrentPointCount => _currentPointCount;
     public int CurrentExampleIndex => _currentExampleIndex;
     public int ExamplesPerRound => _examplesPerRound;
     public List<TspPoint> CurrentPoints => _currentTestCase;
     public double[,]? CurrentDistanceMatrix { get; private set; }
+
+    public TspBenchmarkEnvironment(IRandomNumbersGenerator randomNumbersGenerator)
+    {
+        _testCaseGenerator = new TspTestCaseGenerator(randomNumbersGenerator);
+    }
 
     public void SetStartingPointCount(int startingPointCount)
     {
@@ -25,10 +33,8 @@ public class TspBenchmarkEnvironment(IRandomNumbersGenerator randomNumbersGenera
     {
         _currentTestCase.Clear();
         
-        for (int i = 0; i < _currentPointCount; i++)
-        {
-            _currentTestCase.Add(TspPoint.Create(i, randomNumbersGenerator.NextDouble() * 100, randomNumbersGenerator.NextDouble() * 100));
-        }
+        var points = _testCaseGenerator.GenerateTestCase(_currentPointCount, _maxCoordinate);
+        _currentTestCase.AddRange(points);
 
         BuildDistanceMatrix();
     }

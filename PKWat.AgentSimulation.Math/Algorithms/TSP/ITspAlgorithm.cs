@@ -1,4 +1,4 @@
-namespace PKWat.AgentSimulation.Examples.TspProblems.Benchmark.Algorithms;
+namespace PKWat.AgentSimulation.Math.Algorithms.TSP;
 
 public interface ITspAlgorithm
 {

@@ -1,4 +1,4 @@
-namespace PKWat.AgentSimulation.Examples.TspProblems;
+namespace PKWat.AgentSimulation.Math.Algorithms.TSP;
 
 public class TspPoint
 {
@@ -22,6 +22,6 @@ public class TspPoint
     {
         double dx = X - other.X;
         double dy = Y - other.Y;
-        return Math.Sqrt(dx * dx + dy * dy);
+        return System.Math.Sqrt(dx * dx + dy * dy);
     }
 }

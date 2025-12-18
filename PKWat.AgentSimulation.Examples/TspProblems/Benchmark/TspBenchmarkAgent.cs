@@ -1,7 +1,7 @@
 namespace PKWat.AgentSimulation.Examples.TspProblems.Benchmark;
 
 using PKWat.AgentSimulation.Core.Agent;
-using PKWat.AgentSimulation.Examples.TspProblems.Benchmark.Algorithms;
+using PKWat.AgentSimulation.Math.Algorithms.TSP;
 using System.Diagnostics;
 
 public enum TspAlgorithmType

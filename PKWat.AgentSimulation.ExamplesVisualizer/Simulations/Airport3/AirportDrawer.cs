@@ -133,7 +133,7 @@ public class AirportDrawer : IVisualizationDrawer
     private DrawingCoordinates GetCoordinatesForDepartingAirplane(Airplane airplane, DrawingCoordinates departureCoordinates, TimeSpan now)
     {
         var landingPlace = GetLandingPlace(airplane);
-        var lerp = landingPlace.Lerp(departureCoordinates, CalculateProgress(now, airplane.StartedDepartureTime, airplane.PlannedFinishedDepartureTime), convertY: x => 1 - Math.Cos(Math.PI * x / 2));
+        var lerp = landingPlace.Lerp(departureCoordinates, CalculateProgress(now, airplane.StartedDepartureTime, airplane.PlannedFinishedDepartureTime), convertY: x => 1 - System.Math.Cos(System.Math.PI * x / 2));
         return new DrawingCoordinates(lerp.X, lerp.Y);
     }
 

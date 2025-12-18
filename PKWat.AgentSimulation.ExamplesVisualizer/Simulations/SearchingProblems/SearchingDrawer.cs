@@ -71,7 +71,7 @@ public class SearchingDrawer : IVisualizationDrawer
                 double value = CalculateObjectiveFunction(gridX, gridY);
                 
                 // Map value to color (blue=low, red=high)
-                int colorValue = (int)Math.Clamp(value * 2.55, 0, 255);
+                int colorValue = (int)System.Math.Clamp(value * 2.55, 0, 255);
                 Color color = Color.FromArgb(50, colorValue, 0, 255 - colorValue);
                 
                 using var brush = new SolidBrush(color);
@@ -91,7 +91,7 @@ public class SearchingDrawer : IVisualizationDrawer
         foreach (var point in environment.Points)
         {
             // Color based on value (blue=low, yellow=high)
-            int intensity = (int)Math.Clamp(point.Value * 2.55, 0, 255);
+            int intensity = (int)System.Math.Clamp(point.Value * 2.55, 0, 255);
             Color color = Color.FromArgb(120, intensity, intensity, 255 - intensity);
             
             using var brush = new SolidBrush(color);
@@ -161,11 +161,11 @@ public class SearchingDrawer : IVisualizationDrawer
         PointF[] starPoints = new PointF[10];
         for (int i = 0; i < 10; i++)
         {
-            double angle = i * Math.PI / 5 - Math.PI / 2;
+            double angle = i * System.Math.PI / 5 - System.Math.PI / 2;
             float radius = (i % 2 == 0) ? starSize : starSize / 2.5f;
             starPoints[i] = new PointF(
-                x + (float)(radius * Math.Cos(angle)),
-                y + (float)(radius * Math.Sin(angle)));
+                x + (float)(radius * System.Math.Cos(angle)),
+                y + (float)(radius * System.Math.Sin(angle)));
         }
 
         graphic.FillPolygon(brush, starPoints);
@@ -194,6 +194,6 @@ public class SearchingDrawer : IVisualizationDrawer
         // Same objective function as in the simulation
         double centerX = 50.0;
         double centerY = 50.0;
-        return 100.0 - Math.Pow(x - centerX, 2) / 25.0 - Math.Pow(y - centerY, 2) / 25.0;
+        return 100.0 - System.Math.Pow(x - centerX, 2) / 25.0 - System.Math.Pow(y - centerY, 2) / 25.0;
     }
 }

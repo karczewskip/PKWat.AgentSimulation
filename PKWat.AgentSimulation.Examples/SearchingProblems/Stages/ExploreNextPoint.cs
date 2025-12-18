@@ -21,8 +21,8 @@ public class ExploreNextPoint(IRandomNumbersGenerator randomNumbersGenerator) : 
             double newY = agent.CurrentY + randomNumbersGenerator.NextDouble(-stepSize, stepSize);
 
             // Keep within bounds
-            newX = Math.Clamp(newX, 0, environment.SearchSpaceWidth);
-            newY = Math.Clamp(newY, 0, environment.SearchSpaceHeight);
+            newX = System.Math.Clamp(newX, 0, environment.SearchSpaceWidth);
+            newY = System.Math.Clamp(newY, 0, environment.SearchSpaceHeight);
 
             // Evaluate the new point
             double newValue = CalculateObjectiveFunction(newX, newY);
@@ -45,14 +45,14 @@ public class ExploreNextPoint(IRandomNumbersGenerator randomNumbersGenerator) : 
         // Same objective function as initialization
         double centerX = 50.0;
         double centerY = 50.0;
-        return 100.0 - Math.Pow(x - centerX, 2) / 25.0 - Math.Pow(y - centerY, 2) / 25.0;
+        return 100.0 - System.Math.Pow(x - centerX, 2) / 25.0 - System.Math.Pow(y - centerY, 2) / 25.0;
     }
 
     private bool AcceptWorseWithProbability(double currentValue, double newValue, long iteration)
     {
         // Simulated annealing: accept worse solutions with decreasing probability
-        double temperature = Math.Max(1.0, 100.0 - iteration);
-        double acceptanceProbability = Math.Exp((newValue - currentValue) / temperature);
+        double temperature = System.Math.Max(1.0, 100.0 - iteration);
+        double acceptanceProbability = System.Math.Exp((newValue - currentValue) / temperature);
         return randomNumbersGenerator.NextDouble() < acceptanceProbability;
     }
 }

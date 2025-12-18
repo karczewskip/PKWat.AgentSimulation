@@ -1,6 +1,7 @@
 namespace PKWat.AgentSimulation.Examples.TspProblems;
 
 using PKWat.AgentSimulation.Core.Environment;
+using PKWat.AgentSimulation.Math.Algorithms.TSP;
 
 public class TspEnvironment : DefaultSimulationEnvironment
 {

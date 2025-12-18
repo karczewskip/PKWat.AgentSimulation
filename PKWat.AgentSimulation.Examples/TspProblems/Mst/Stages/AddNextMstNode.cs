@@ -3,6 +3,7 @@ namespace PKWat.AgentSimulation.Examples.TspProblems.Mst.Stages;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.Stage;
 using PKWat.AgentSimulation.Examples.TspProblems.Agents;
+using PKWat.AgentSimulation.Math.Algorithms.TSP;
 using System.Threading.Tasks;
 
 public class AddNextMstNode : ISimulationStage

@@ -36,6 +36,6 @@ public class InitializeSearchAgents(IRandomNumbersGenerator randomNumbersGenerat
     {
         double centerX = 50.0;
         double centerY = 50.0;
-        return 100.0 - Math.Pow(x - centerX, 2) / 25.0 - Math.Pow(y - centerY, 2) / 25.0;
+        return 100.0 - System.Math.Pow(x - centerX, 2) / 25.0 - System.Math.Pow(y - centerY, 2) / 25.0;
     }
 }
