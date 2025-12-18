@@ -35,9 +35,8 @@ public class TspBenchmarkSimulationBuilder(
                 a.InitializeAlgorithm(TspAlgorithmType.MstPrim);
                 a.SetTimeLimit(timeLimit);
             })
-            .AddStage<GenerateTestCasesForCurrentPointCount>()
-            .AddStage<RunAlgorithms>()
             .AddStage<PrepareNextTestCase>()
+            .AddStage<RunAlgorithms>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .AddCrashCondition(c =>
             {
@@ -51,7 +50,6 @@ public class TspBenchmarkSimulationBuilder(
 
                 return SimulationCrashResult.NoCrash;
             })
-            .SetRandomSeed(42)
             .Build();
 
         return simulation;

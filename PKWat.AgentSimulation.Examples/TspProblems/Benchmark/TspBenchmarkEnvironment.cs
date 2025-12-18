@@ -33,18 +33,18 @@ public class TspBenchmarkEnvironment(IRandomNumbersGenerator randomNumbersGenera
         BuildDistanceMatrix();
     }
 
-    public bool MoveToNextExample()
+    public void MoveToNextExample()
     {
-        _currentExampleIndex++;
-        
-        if (_currentExampleIndex >= _examplesPerRound)
+        if (_currentTestCase.Any())
         {
-            _currentExampleIndex = 0;
-            _currentPointCount++;
-            return true;
+            _currentExampleIndex = (_currentExampleIndex + 1) % _examplesPerRound;
+            if (_currentExampleIndex == 0)
+            {
+                _currentPointCount++;
+            }
         }
-        
-        return false;
+
+        GenerateTestCasesForPointCount();
     }
 
     private void BuildDistanceMatrix()

@@ -16,12 +16,6 @@ public class PrepareNextTestCase : ISimulationStage
         if (activeAgents.Count == 0)
             return;
 
-        // Check if all active agents have completed the current test case
-        bool allComplete = activeAgents.All(a => a.IsComplete);
-        
-        if (!allComplete)
-            return;
-
         // Reset completion flags for the next test case
         foreach (var agent in activeAgents)
         {
