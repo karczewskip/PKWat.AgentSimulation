@@ -37,14 +37,15 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         TimeLimit = TimeSpan.FromSeconds(60);
     }
 
-    public void InitializeAlgorithm()
+    public void InitializeAlgorithm(TspAlgorithmType algorithmType)
     {
-        Algorithm = AlgorithmType switch
+        AlgorithmType = algorithmType;
+        Algorithm = algorithmType switch
         {
             TspAlgorithmType.BruteForce => new BruteForceAlgorithm(),
             TspAlgorithmType.HeldKarp => new HeldKarpAlgorithm(),
             TspAlgorithmType.MstPrim => new MstPrimAlgorithm(),
-            _ => throw new InvalidOperationException($"Unknown algorithm type: {AlgorithmType}")
+            _ => throw new InvalidOperationException($"Unknown algorithm type: {algorithmType}")
         };
     }
 
@@ -79,6 +80,11 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         MarkComplete();
     }
 
+    public void ResetCompletion()
+    {
+        IsComplete = false;
+    }
+
     private void StartNewRound(int pointCount, int exampleIndex)
     {
         CurrentPointCount = pointCount;
@@ -93,11 +99,6 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
     private CancellationToken GetCancellationToken()
     {
         return _cancellationTokenSource?.Token ?? CancellationToken.None;
-    }
-
-    public void ResetCompletion()
-    {
-        IsComplete = false;
     }
 
     private void SetBestSolution(TspSolution solution)

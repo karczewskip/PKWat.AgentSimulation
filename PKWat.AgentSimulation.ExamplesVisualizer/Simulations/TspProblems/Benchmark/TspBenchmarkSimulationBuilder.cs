@@ -16,17 +16,26 @@ public class TspBenchmarkSimulationBuilder(
     {
         drawer.InitializeIfNeeded(1000, 800);
 
+        var timeLimit = TimeSpan.FromSeconds(10);
+
         var simulation = simulationBuilder
             .CreateNewSimulation<TspBenchmarkEnvironment>()
-            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.BruteForce)
-            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.HeldKarp)
-            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.MstPrim)
-            .AddInitializationStage<InitializeBenchmark>(s =>
+            .AddAgent<TspBenchmarkAgent>(a =>
             {
-                s.SetMaxPointCount(15);
-                s.SetStartingPointCount(3);
-                s.SetTimeLimit(TimeSpan.FromSeconds(1));
+                a.InitializeAlgorithm(TspAlgorithmType.BruteForce);
+                a.SetTimeLimit(timeLimit);
             })
+            .AddAgent<TspBenchmarkAgent>(a =>
+            {
+                a.InitializeAlgorithm(TspAlgorithmType.HeldKarp);
+                a.SetTimeLimit(timeLimit);
+            })
+            .AddAgent<TspBenchmarkAgent>(a =>
+            {
+                a.InitializeAlgorithm(TspAlgorithmType.MstPrim);
+                a.SetTimeLimit(timeLimit);
+            })
+            .AddInitializationStage<InitializeEnvironment>(s => s.SetStartingPointCount(3))
             .AddStage<GenerateTestCasesForCurrentPointCount>()
             .AddStage<RunAlgorithms>()
             .AddStage<PrepareNextTestCase>()
