@@ -20,12 +20,20 @@ public class TspBenchmarkSimulationBuilder
 
         var simulation = _simulationBuilder
             .CreateNewSimulation<TspBenchmarkEnvironment>()
-            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.BruteForce)
-            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.HeldKarp)
-            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.MstPrim)
-            .AddInitializationStage<InitializeBenchmark>(s =>
+            .AddAgent<TspBenchmarkAgent>(a =>
             {
-                s.SetTimeLimit(actualTimeLimit);
+                a.AlgorithmType = TspAlgorithmType.BruteForce;
+                a.SetTimeLimit(actualTimeLimit);
+            })
+            .AddAgent<TspBenchmarkAgent>(a =>
+            {
+                a.AlgorithmType = TspAlgorithmType.HeldKarp;
+                a.SetTimeLimit(actualTimeLimit);
+            })
+            .AddAgent<TspBenchmarkAgent>(a => 
+            { 
+                a.AlgorithmType = TspAlgorithmType.MstPrim; 
+                a.SetTimeLimit(actualTimeLimit); 
             })
             .AddStage<RunBruteForce>()
             .AddStage<RunHeldKarp>()

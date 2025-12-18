@@ -110,7 +110,7 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
         y += 30;
         
         // Header
-        string header = "Points  BruteForce              HeldKarp                MstPrim                 Best Dist   Best Time";
+        string header = "Points  BruteForce              HeldKarp                MstPrim                 Best Dist   Best Time   MST/HK";
         g.DrawString(header, font, brush, 10, y);
         y += 18;
         
@@ -140,6 +140,8 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
             string? bestDistanceAlgorithm = null;
             double? minTime = null;
             string? bestTimeAlgorithm = null;
+            double? heldKarpDist = null;
+            double? mstPrimDist = null;
 
             // Add stats for each algorithm
             foreach (var agent in agents.OrderBy(a => a.AlgorithmType))
@@ -157,6 +159,12 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
                     {
                         double avgTime = completed.Average(r => r.ExecutionTime.TotalSeconds);
                         double avgDist = completed.Average(r => r.Distance);
+                        
+                        // Track HeldKarp and MstPrim distances for comparison
+                        if (agent.AlgorithmType == TspAlgorithmType.HeldKarp)
+                            heldKarpDist = avgDist;
+                        if (agent.AlgorithmType == TspAlgorithmType.MstPrim)
+                            mstPrimDist = avgDist;
                         
                         if (!minDistance.HasValue || avgDist < minDistance.Value)
                         {
@@ -197,7 +205,18 @@ public class TspBenchmarkDrawer : IVisualizationDrawer
             // Add best time algorithm
             if (bestTimeAlgorithm != null)
             {
-                line += bestTimeAlgorithm;
+                line += $"{bestTimeAlgorithm,-12}";
+            }
+            else
+            {
+                line += "            ";
+            }
+
+            // Add MST/HeldKarp comparison percentage
+            if (heldKarpDist.HasValue && mstPrimDist.HasValue && heldKarpDist.Value > 0)
+            {
+                double percentageWorse = ((mstPrimDist.Value - heldKarpDist.Value) / heldKarpDist.Value) * 100;
+                line += $"+{percentageWorse:F1}%";
             }
 
             // Draw with color based on completion

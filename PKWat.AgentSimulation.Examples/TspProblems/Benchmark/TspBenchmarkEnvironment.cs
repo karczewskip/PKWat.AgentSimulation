@@ -5,10 +5,9 @@ using PKWat.AgentSimulation.Core.Environment;
 public class TspBenchmarkEnvironment : DefaultSimulationEnvironment
 {
     private readonly Dictionary<int, List<List<TspPoint>>> _testCasesByPointCount = new();
-    private int _currentPointCount = 3;
+    private int _currentPointCount = 4;
     private int _currentExampleIndex = 0;
-    private readonly int _examplesPerRound = 10;
-    private int _startingPointCount = 3;
+    private readonly int _examplesPerRound = 100;
     
     public int CurrentPointCount => _currentPointCount;
     public int CurrentExampleIndex => _currentExampleIndex;
@@ -18,7 +17,6 @@ public class TspBenchmarkEnvironment : DefaultSimulationEnvironment
 
     public void SetStartingPointCount(int startingPointCount)
     {
-        _startingPointCount = startingPointCount;
         _currentPointCount = startingPointCount;
     }
 
