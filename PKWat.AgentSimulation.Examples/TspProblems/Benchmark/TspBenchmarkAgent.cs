@@ -1,6 +1,7 @@
 namespace PKWat.AgentSimulation.Examples.TspProblems.Benchmark;
 
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.Examples.TspProblems.Benchmark.Algorithms;
 using System.Diagnostics;
 
 public enum TspAlgorithmType
@@ -13,6 +14,7 @@ public enum TspAlgorithmType
 public class TspBenchmarkAgent : SimpleSimulationAgent
 {
     public TspAlgorithmType AlgorithmType { get; set; }
+    public ITspAlgorithm Algorithm { get; private set; } = null!;
     public TspSolution? BestSolution { get; private set; }
     public bool IsComplete { get; private set; }
     public bool HasExceededTimeLimit { get; private set; }
@@ -21,6 +23,7 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
     public TimeSpan TimeLimit { get; private set; }
     public Stopwatch Stopwatch { get; private set; }
     public List<BenchmarkResult> Results { get; private set; }
+    private CancellationTokenSource? _cancellationTokenSource;
     
     public TspBenchmarkAgent()
     {
@@ -34,6 +37,17 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         TimeLimit = TimeSpan.FromSeconds(60);
     }
 
+    public void InitializeAlgorithm()
+    {
+        Algorithm = AlgorithmType switch
+        {
+            TspAlgorithmType.BruteForce => new BruteForceAlgorithm(),
+            TspAlgorithmType.HeldKarp => new HeldKarpAlgorithm(),
+            TspAlgorithmType.MstPrim => new MstPrimAlgorithm(),
+            _ => throw new InvalidOperationException($"Unknown algorithm type: {AlgorithmType}")
+        };
+    }
+
     public void SetTimeLimit(TimeSpan timeLimit)
     {
         TimeLimit = timeLimit;
@@ -45,7 +59,14 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
         CurrentExampleIndex = exampleIndex;
         BestSolution = TspSolution.Empty();
         IsComplete = false;
+        _cancellationTokenSource?.Dispose();
+        _cancellationTokenSource = new CancellationTokenSource();
         Stopwatch.Restart();
+    }
+
+    public CancellationToken GetCancellationToken()
+    {
+        return _cancellationTokenSource?.Token ?? CancellationToken.None;
     }
 
     public void ResetCompletion()
@@ -92,6 +113,7 @@ public class TspBenchmarkAgent : SimpleSimulationAgent
     {
         if (Stopwatch.Elapsed > TimeLimit)
         {
+            _cancellationTokenSource?.Cancel();
             HasExceededTimeLimit = true;
             MarkComplete();
             return true;

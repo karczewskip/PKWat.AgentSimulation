@@ -16,28 +16,19 @@ public class TspBenchmarkSimulationBuilder(
     {
         drawer.InitializeIfNeeded(1000, 800);
 
-        var actualTimeLimit = TimeSpan.FromSeconds(1);
         var simulation = simulationBuilder
             .CreateNewSimulation<TspBenchmarkEnvironment>()
-            .AddAgent<TspBenchmarkAgent>(a =>
+            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.BruteForce)
+            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.HeldKarp)
+            .AddAgent<TspBenchmarkAgent>(a => a.AlgorithmType = TspAlgorithmType.MstPrim)
+            .AddInitializationStage<InitializeBenchmark>(s =>
             {
-                a.AlgorithmType = TspAlgorithmType.BruteForce;
-                a.SetTimeLimit(actualTimeLimit);
-            })
-            .AddAgent<TspBenchmarkAgent>(a =>
-            {
-                a.AlgorithmType = TspAlgorithmType.HeldKarp;
-                a.SetTimeLimit(actualTimeLimit);
-            })
-            .AddAgent<TspBenchmarkAgent>(a =>
-            {
-                a.AlgorithmType = TspAlgorithmType.MstPrim;
-                a.SetTimeLimit(actualTimeLimit);
+                s.SetMaxPointCount(15);
+                s.SetStartingPointCount(3);
+                s.SetTimeLimit(TimeSpan.FromSeconds(1));
             })
             .AddStage<GenerateTestCasesForCurrentPointCount>()
-            .AddStage<RunBruteForce>()
-            .AddStage<RunHeldKarp>()
-            .AddStage<RunMstPrim>()
+            .AddStage<RunAlgorithms>()
             .AddStage<PrepareNextTestCase>()
             .AddCallback(c => drawing(drawer.Draw(c)))
             .AddCrashCondition(c =>
