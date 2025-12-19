@@ -39,14 +39,14 @@ public class TspBenchmark
     [ParamsSource(nameof(PointCounts))]
     public int NumberOfPoints { get; set; }
 
-    public IEnumerable<int> PointCounts => Enumerable.Range(start: 4, count: 3);
+    public IEnumerable<int> PointCounts => Enumerable.Range(start: 4, count: 16);
 
     // This runs once before the benchmarks for a specific Params set.
     // It is NOT included in the time/memory measurement of [Benchmark] methods.
     [GlobalSetup]
     public void Setup()
     {
-        var random = new Random(42); // Seeded for reproducibility
+        var random = new Random();
         _points = Enumerable.Range(0, NumberOfPoints)
             .Select(id => TspPoint.Create(id, random.NextDouble() * 1000, random.NextDouble() * 1000))
             .ToList();
@@ -68,7 +68,7 @@ public class TspBenchmark
     public TspSolution? BruteForceBenchmark()
     {
         // Warning: Brute force will hang for large N!
-        if (NumberOfPoints > 12) return null;
+        if (NumberOfPoints > 10) return null;
         return _bruteForceSolver.Solve(_points, _cts.Token);
     }
 }
