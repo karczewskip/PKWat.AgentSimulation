@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Genet
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Math.Benchmark", "PKWat.AgentSimulation.Math.Benchmark\PKWat.AgentSimulation.Math.Benchmark.csproj", "{B20EF5F2-290D-4876-9DBB-C9B0460E97E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Math.StatisticsTests", "PKWat.AgentSimulation.Math.StatisticsTests\PKWat.AgentSimulation.Math.StatisticsTests.csproj", "{DD89EA24-174F-434E-882F-BA0C4283785C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{B20EF5F2-290D-4876-9DBB-C9B0460E97E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B20EF5F2-290D-4876-9DBB-C9B0460E97E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B20EF5F2-290D-4876-9DBB-C9B0460E97E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD89EA24-174F-434E-882F-BA0C4283785C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD89EA24-174F-434E-882F-BA0C4283785C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD89EA24-174F-434E-882F-BA0C4283785C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD89EA24-174F-434E-882F-BA0C4283785C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
