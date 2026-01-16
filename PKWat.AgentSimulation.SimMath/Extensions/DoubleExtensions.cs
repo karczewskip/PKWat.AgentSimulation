@@ -1,4 +1,4 @@
-﻿namespace PKWat.AgentSimulation.Math.Extensions
+﻿namespace PKWat.AgentSimulation.SimMath.Extensions
 {
     public static class DoubleExtensions
     {

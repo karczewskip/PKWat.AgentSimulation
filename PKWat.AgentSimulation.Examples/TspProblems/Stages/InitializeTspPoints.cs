@@ -3,7 +3,7 @@ namespace PKWat.AgentSimulation.Examples.TspProblems.Stages;
 using PKWat.AgentSimulation.Core;
 using PKWat.AgentSimulation.Core.RandomNumbers;
 using PKWat.AgentSimulation.Core.Stage;
-using PKWat.AgentSimulation.Math.Algorithms.TSP;
+using PKWat.AgentSimulation.SimMath.Algorithms.TSP;
 using System.Threading.Tasks;
 
 public class InitializeTspPoints(IRandomNumbersGenerator randomNumbersGenerator) : ISimulationStage

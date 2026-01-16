@@ -1,4 +1,4 @@
-﻿namespace PKWat.AgentSimulation.Math;
+﻿namespace PKWat.AgentSimulation.SimMath;
 
 using System;
 

@@ -1,4 +1,4 @@
-namespace PKWat.AgentSimulation.Math.Algorithms.TSP;
+namespace PKWat.AgentSimulation.SimMath.Algorithms.TSP;
 
 public class BruteForceAlgorithm : ITspAlgorithm
 {

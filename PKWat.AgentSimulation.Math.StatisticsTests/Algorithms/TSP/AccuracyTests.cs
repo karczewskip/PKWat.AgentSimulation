@@ -1,4 +1,4 @@
-﻿using PKWat.AgentSimulation.Math.Algorithms.TSP;
+﻿using PKWat.AgentSimulation.SimMath.Algorithms.TSP;
 using System;
 using System.Collections.Generic;
 using System.Linq;

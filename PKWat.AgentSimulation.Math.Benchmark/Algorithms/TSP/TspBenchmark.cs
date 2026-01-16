@@ -4,7 +4,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Running;
-using PKWat.AgentSimulation.Math.Algorithms.TSP;
+using PKWat.AgentSimulation.SimMath.Algorithms.TSP;
 
 // Define a custom configuration to ensure all exporters are active
 public class TspBenchmarkConfig : ManualConfig
