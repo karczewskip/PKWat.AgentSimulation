@@ -32,7 +32,7 @@ public class DESolverAgent : SimpleSimulationAgent
 
     public void CalculateNextStep(double stepSize)
     {
-        CurrentY = _solver.CalculateNextY(CurrentX, CurrentY, stepSize, DerivativeFunction!);
+        CurrentY = _solver.CalculateNextState(CurrentX, [CurrentY], stepSize, (t, s) => [DerivativeFunction(t , s[0])])[0];
         CurrentX += stepSize;
         SolutionPoints.Add((CurrentX, CurrentY));
     }

@@ -1,15 +1,22 @@
 namespace PKWat.AgentSimulation.SimMath.Algorithms.Pendulum;
 
+using PKWat.AgentSimulation.SimMath.Algorithms.DifferentialEquations;
+
 public class EulerPendulumSolver : IPendulumSolver
 {
+    private readonly EulerMethod _eulerMethod = new();
+
     public PendulumState CalculateNextState(PendulumState currentState, double time, double dt, double g, double L)
     {
-        double dTheta = currentState.Omega;
-        double dOmega = -(g / L) * Math.Sin(currentState.Theta);
-        
-        double newTheta = currentState.Theta + dTheta * dt;
-        double newOmega = currentState.Omega + dOmega * dt;
-        
-        return new PendulumState(newTheta, newOmega);
+        double[] state = [currentState.Theta, currentState.Omega];
+
+        double[] newState = _eulerMethod.CalculateNextState(
+            time,
+            state,
+            dt,
+            (t, s) => [s[1], -(g / L) * Math.Sin(s[0])]
+        );
+
+        return new PendulumState(newState[0], newState[1]);
     }
 }
