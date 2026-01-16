@@ -33,8 +33,22 @@ public class DifferentialEquationDrawer : IVisualizationDrawer
         graphic.Clear(Color.White);
         graphic.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+        var analyticalAgent = context.GetAgents<AnalyticalSolverAgent>().FirstOrDefault();
+        var eulerAgent = context.GetAgents<EulerMethodAgent>().FirstOrDefault();
+        var rkAgent = context.GetAgents<RungeKuttaMethodAgent>().FirstOrDefault();
+
+        // Calculate Y range for all agents
+        var allPoints = new List<(double X, double Y)>();
+        if (analyticalAgent != null) allPoints.AddRange(analyticalAgent.SolutionPoints);
+        if (eulerAgent != null) allPoints.AddRange(eulerAgent.SolutionPoints);
+        if (rkAgent != null) allPoints.AddRange(rkAgent.SolutionPoints);
+
+        double maxY = allPoints.Any() ? allPoints.Max(p => p.Y) : 1;
+        double minY = allPoints.Any() ? System.Math.Min(0, allPoints.Min(p => p.Y)) : 0;
+
         DrawAxes(graphic, environment);
-        DrawSolutions(graphic, context, environment);
+        DrawYAxisLabels(graphic, minY, maxY);
+        DrawSolutions(graphic, context, environment, minY, maxY);
         DrawLegend(graphic, context);
 
         var bitmapSource = _bmp.ConvertToBitmapSource();
@@ -54,6 +68,7 @@ public class DifferentialEquationDrawer : IVisualizationDrawer
         graphic.DrawString("x", font, Brushes.Black, Width - Padding + 10, Height - Padding - 10);
         graphic.DrawString("y", font, Brushes.Black, Padding - 20, Padding - 10);
 
+        // X-axis labels
         for (int i = 0; i <= 10; i++)
         {
             double x = environment.StartX + i * (environment.EndX - environment.StartX) / 10;
@@ -62,7 +77,25 @@ public class DifferentialEquationDrawer : IVisualizationDrawer
         }
     }
 
-    private void DrawSolutions(Graphics graphic, ISimulationContext context, DifferentialEquationEnvironment environment)
+    private void DrawYAxisLabels(Graphics graphic, double minY, double maxY)
+    {
+        using var font = new Font("Arial", 9);
+        
+        for (int i = 0; i <= 10; i++)
+        {
+            double y = minY + i * (maxY - minY) / 10;
+            int screenY = Height - Padding - (int)((Height - 2 * Padding) * i / 10.0);
+            
+            string label = y.ToString("F1");
+            var labelSize = graphic.MeasureString(label, font);
+            graphic.DrawString(label, font, Brushes.Black, Padding - labelSize.Width - 5, screenY - labelSize.Height / 2);
+            
+            using var tickPen = new Pen(Color.Black, 1);
+            graphic.DrawLine(tickPen, Padding - 3, screenY, Padding, screenY);
+        }
+    }
+
+    private void DrawSolutions(Graphics graphic, ISimulationContext context, DifferentialEquationEnvironment environment, double minY, double maxY)
     {
         var analyticalAgent = context.GetAgents<AnalyticalSolverAgent>().FirstOrDefault();
         var eulerAgent = context.GetAgents<EulerMethodAgent>().FirstOrDefault();
@@ -70,27 +103,25 @@ public class DifferentialEquationDrawer : IVisualizationDrawer
 
         if (analyticalAgent != null && analyticalAgent.SolutionPoints.Count > 1)
         {
-            DrawCurve(graphic, analyticalAgent.SolutionPoints, environment, Color.Blue, 3);
+            DrawCurve(graphic, analyticalAgent.SolutionPoints, environment, Color.Blue, 3, minY, maxY);
         }
 
         if (eulerAgent != null && eulerAgent.SolutionPoints.Count > 1)
         {
-            DrawCurve(graphic, eulerAgent.SolutionPoints, environment, Color.Red, 2);
+            DrawCurve(graphic, eulerAgent.SolutionPoints, environment, Color.Red, 2, minY, maxY);
         }
 
         if (rkAgent != null && rkAgent.SolutionPoints.Count > 1)
         {
-            DrawCurve(graphic, rkAgent.SolutionPoints, environment, Color.Green, 2);
+            DrawCurve(graphic, rkAgent.SolutionPoints, environment, Color.Green, 2, minY, maxY);
         }
     }
 
-    private void DrawCurve(Graphics graphic, List<(double X, double Y)> points, DifferentialEquationEnvironment environment, Color color, int width)
+    private void DrawCurve(Graphics graphic, List<(double X, double Y)> points, DifferentialEquationEnvironment environment, Color color, int width, double minY, double maxY)
     {
         if (points.Count < 2)
             return;
 
-        double maxY = points.Max(p => p.Y);
-        double minY = System.Math.Min(0, points.Min(p => p.Y));
         double rangeY = maxY - minY;
         if (rangeY == 0) rangeY = 1;
 
