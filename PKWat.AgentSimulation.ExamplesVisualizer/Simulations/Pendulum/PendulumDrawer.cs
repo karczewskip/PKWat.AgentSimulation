@@ -15,10 +15,27 @@ public class PendulumDrawer : IVisualizationDrawer
     private const int PendulumSize = 350;
     private Bitmap? _bmp;
 
+    private static readonly Color[] ColorPalette =
+    [
+        Color.Blue,
+        Color.Red,
+        Color.Green,
+        Color.Orange,
+        Color.Purple,
+        Color.Brown,
+        Color.Magenta,
+        Color.Teal
+    ];
+
     public void Initialize()
     {
         _bmp = new Bitmap(Width, Height);
         _bmp.SetResolution(96, 96);
+    }
+
+    private Color GetAgentColor(int agentIndex)
+    {
+        return ColorPalette[agentIndex % ColorPalette.Length];
     }
 
     public BitmapSource Draw(ISimulationContext context)
@@ -54,13 +71,6 @@ public class PendulumDrawer : IVisualizationDrawer
         int spacing = 120;
         int startY = 100;
 
-        var colors = new Dictionary<string, Color>
-        {
-            { "Analytical", Color.Blue },
-            { "Euler", Color.Red },
-            { "RK4", Color.Green }
-        };
-
         using var font = new Font("Arial", 10, FontStyle.Bold);
         using var titleFont = new Font("Arial", 12, FontStyle.Bold);
 
@@ -71,7 +81,7 @@ public class PendulumDrawer : IVisualizationDrawer
             var agent = agents[i];
             int yPos = startY + i * spacing;
 
-            Color color = colors.ContainsKey(agent.SolverName) ? colors[agent.SolverName] : Color.Black;
+            Color color = GetAgentColor(i);
 
             // Draw title
             graphic.DrawString(agent.SolverName, font, new SolidBrush(color), centerX - 40, yPos - 30);
@@ -148,21 +158,14 @@ public class PendulumDrawer : IVisualizationDrawer
         DrawGraphGrid(graphic, graphLeft, graphWidth, graphTop, graphHeight, maxTime, minTheta, maxTheta);
 
         // Draw curves
-        var colors = new Dictionary<string, (Color color, int width)>
+        for (int i = 0; i < agents.Count; i++)
         {
-            { "Analytical", (Color.Blue, 3) },
-            { "Euler", (Color.Red, 2) },
-            { "RK4", (Color.Green, 2) }
-        };
-
-        foreach (var agent in agents)
-        {
+            var agent = agents[i];
             if (agent.StateHistory.Count < 2)
                 continue;
 
-            var (color, width) = colors.ContainsKey(agent.SolverName) 
-                ? colors[agent.SolverName] 
-                : (Color.Black, 2);
+            Color color = GetAgentColor(i);
+            int width = i == 0 ? 3 : 2;
 
             DrawGraphCurve(graphic, agent.StateHistory, graphLeft, graphWidth, graphTop, graphHeight, 
                 maxTime, minTheta, rangeTheta, color, width);
@@ -228,18 +231,12 @@ public class PendulumDrawer : IVisualizationDrawer
     private void DrawGraphLegend(Graphics graphic, List<PendulumSolverAgent> agents, int x, int y)
     {
         using var font = new Font("Arial", 10, FontStyle.Bold);
-        var colors = new Dictionary<string, Color>
-        {
-            { "Analytical", Color.Blue },
-            { "Euler", Color.Red },
-            { "RK4", Color.Green }
-        };
-
         int lineHeight = 25;
 
-        foreach (var agent in agents)
+        for (int i = 0; i < agents.Count; i++)
         {
-            Color color = colors.ContainsKey(agent.SolverName) ? colors[agent.SolverName] : Color.Black;
+            var agent = agents[i];
+            Color color = GetAgentColor(i);
             
             using var pen = new Pen(color, 3);
             graphic.DrawLine(pen, x, y + 7, x + 30, y + 7);
