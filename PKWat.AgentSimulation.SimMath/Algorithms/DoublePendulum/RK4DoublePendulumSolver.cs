@@ -71,7 +71,21 @@ public class RK4DoublePendulumSolver : IDoublePendulumSolver
             derivatives
         );
 
-        // 4. Unpack back to object
-        return new DoublePendulumState(newState[0], newState[1], newState[2], newState[3]);
+        // 4. Unpack back to object AND NORMALIZE ANGLES
+        // Tutaj jest bezpiecznie, bo RK4 już zakończyło pracę
+        double newTheta1 = NormalizeAngle(newState[0]);
+        double newOmega1 = newState[1];
+        double newTheta2 = NormalizeAngle(newState[2]);
+        double newOmega2 = newState[3];
+
+        return new DoublePendulumState(newTheta1, newOmega1, newTheta2, newOmega2);
+    }
+
+    private double NormalizeAngle(double angle)
+    {
+        // Odejmujemy lub dodajemy 2*PI tak długo, aż trafimy w zakres [-PI, PI]
+        while (angle > Math.PI) angle -= 2.0 * Math.PI;
+        while (angle <= -Math.PI) angle += 2.0 * Math.PI;
+        return angle;
     }
 }
