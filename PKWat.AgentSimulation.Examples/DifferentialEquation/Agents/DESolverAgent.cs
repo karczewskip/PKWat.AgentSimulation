@@ -7,6 +7,7 @@ public abstract class DESolverAgent : SimpleSimulationAgent
     public double CurrentX { get; protected set; }
     public double CurrentY { get; protected set; }
     public List<(double X, double Y)> SolutionPoints { get; } = new();
+    protected Func<double, double, double>? DerivativeFunction { get; private set; }
 
     public void Initialize(double startX, double initialY)
     {
@@ -16,7 +17,12 @@ public abstract class DESolverAgent : SimpleSimulationAgent
         SolutionPoints.Add((startX, initialY));
     }
 
-    public abstract void CalculateNextStep(double stepSize, Func<double, double, double> derivativeFunc);
+    public void SetDerivativeFunction(Func<double, double, double> derivativeFunc)
+    {
+        DerivativeFunction = derivativeFunc;
+    }
+
+    public abstract void CalculateNextStep(double stepSize);
 
     public bool HasReachedEnd(double endX)
     {

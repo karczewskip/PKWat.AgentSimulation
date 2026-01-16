@@ -15,7 +15,7 @@ public class CalculateNextStep : ISimulationStage
         {
             if (!agent.HasReachedEnd(environment.EndX))
             {
-                agent.CalculateNextStep(environment.StepSize, environment.DerivativeFunction);
+                agent.CalculateNextStep(environment.StepSize);
             }
         }
 

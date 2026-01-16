@@ -16,9 +16,11 @@ public class InitializeSolvers : ISimulationStage
 
         var eulerAgent = context.GetAgents<EulerMethodAgent>().First();
         eulerAgent.Initialize(environment.StartX, environment.InitialY);
+        eulerAgent.SetDerivativeFunction(environment.DerivativeFunction);
 
         var rkAgent = context.GetAgents<RungeKuttaMethodAgent>().First();
         rkAgent.Initialize(environment.StartX, environment.InitialY);
+        rkAgent.SetDerivativeFunction(environment.DerivativeFunction);
 
         return Task.CompletedTask;
     }

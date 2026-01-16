@@ -9,7 +9,7 @@ public class AnalyticalSolverAgent : DESolverAgent
         _analyticalSolution = solution;
     }
 
-    public override void CalculateNextStep(double stepSize, Func<double, double, double> derivativeFunc)
+    public override void CalculateNextStep(double stepSize)
     {
         CurrentX += stepSize;
         CurrentY = _analyticalSolution!(CurrentX);

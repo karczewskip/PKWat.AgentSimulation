@@ -24,6 +24,7 @@ public class DifferentialEquationSimulationBuilder(ISimulationBuilder simulation
             .AddAgent<RungeKuttaMethodAgent>()
             .AddCrashCondition(crashCondition.CheckCondition)
             .AddCallback(c => drawing(drawer.Draw(c)))
+            .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(50))
             .SetRandomSeed(42)
             .Build();
 
