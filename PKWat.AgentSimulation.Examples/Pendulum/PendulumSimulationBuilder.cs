@@ -31,6 +31,7 @@ public class PendulumSimulationBuilder
             .AddInitializationStage<InitializePendulumSolvers>()
             .AddStage<CalculatePendulumStep>()
             .AddAgent<AnalyticalPendulumAgent>()
+            .AddAgent<ExactAnalyticalPendulumAgent>()
             .AddAgent<EulerPendulumAgent>()
             .AddAgent<RK4PendulumAgent>()
             .AddCrashCondition(completionCondition.CheckCondition)

@@ -29,6 +29,10 @@ public class PendulumSolverAgent : SimpleSimulationAgent
         {
             analyticalSolver.Initialize(initialTheta);
         }
+        else if (_solver is ExactAnalyticalPendulumSolver exactAnalyticalSolver)
+        {
+            exactAnalyticalSolver.Initialize(initialTheta);
+        }
     }
 
     public void CalculateNextStep(double dt, double g, double L)

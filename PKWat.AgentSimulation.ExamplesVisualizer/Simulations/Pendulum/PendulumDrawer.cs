@@ -165,7 +165,7 @@ public class PendulumDrawer : IVisualizationDrawer
                 continue;
 
             Color color = GetAgentColor(i);
-            int width = i == 0 ? 3 : 2;
+            int width = agents.Count - i + 1;
 
             DrawGraphCurve(graphic, agent.StateHistory, graphLeft, graphWidth, graphTop, graphHeight, 
                 maxTime, minTheta, rangeTheta, color, width);

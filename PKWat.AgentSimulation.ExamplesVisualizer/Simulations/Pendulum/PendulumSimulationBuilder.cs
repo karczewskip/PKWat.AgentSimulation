@@ -16,7 +16,7 @@ public class PendulumSimulationBuilder(ISimulationBuilder simulationBuilder, Pen
 
         double gravity = 9.81;
         double length = 1.0;
-        double initialTheta = Math.PI / 4;
+        double initialTheta = Math.PI / 2;
         double initialOmega = 0.0;
         double timeStep = 0.01;
         double totalTime = 10.0;
@@ -26,6 +26,7 @@ public class PendulumSimulationBuilder(ISimulationBuilder simulationBuilder, Pen
             .AddInitializationStage<InitializePendulumParameters>(s => 
                 s.SetParameters(gravity, length, initialTheta, initialOmega, timeStep, totalTime))
             .AddAgent<AnalyticalPendulumAgent>()
+            .AddAgent<ExactAnalyticalPendulumAgent>()
             .AddAgent<EulerPendulumAgent>()
             .AddAgent<RK4PendulumAgent>()
             .AddInitializationStage<InitializePendulumSolvers>()
