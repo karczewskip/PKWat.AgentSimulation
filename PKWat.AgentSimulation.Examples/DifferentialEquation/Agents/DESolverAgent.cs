@@ -22,7 +22,14 @@ public abstract class DESolverAgent : SimpleSimulationAgent
         DerivativeFunction = derivativeFunc;
     }
 
-    public abstract void CalculateNextStep(double stepSize);
+    public void CalculateNextStep(double stepSize)
+    {
+        CurrentX += stepSize;
+        CurrentY = CalculateNextY(stepSize);
+        SolutionPoints.Add((CurrentX, CurrentY));
+    }
+
+    protected abstract double CalculateNextY(double stepSize);
 
     public bool HasReachedEnd(double endX)
     {

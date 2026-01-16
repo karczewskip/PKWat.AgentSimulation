@@ -9,10 +9,8 @@ public class AnalyticalSolverAgent : DESolverAgent
         _analyticalSolution = solution;
     }
 
-    public override void CalculateNextStep(double stepSize)
+    protected override double CalculateNextY(double stepSize)
     {
-        CurrentX += stepSize;
-        CurrentY = _analyticalSolution!(CurrentX);
-        SolutionPoints.Add((CurrentX, CurrentY));
+        return _analyticalSolution!(CurrentX);
     }
 }
