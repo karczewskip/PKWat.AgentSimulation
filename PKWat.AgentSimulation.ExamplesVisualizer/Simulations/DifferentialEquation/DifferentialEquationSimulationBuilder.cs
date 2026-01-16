@@ -16,12 +16,12 @@ public class DifferentialEquationSimulationBuilder(ISimulationBuilder simulation
 
         var simulation = simulationBuilder
             .CreateNewSimulation<DifferentialEquationEnvironment>()
-            .AddInitializationStage<InitializeParameters>(s => s.SetParameters(0.1, 0.0, 5.0, 1.0))
-            .AddInitializationStage<InitializeSolvers>()
-            .AddStage<CalculateNextStep>()
+            .AddInitializationStage<InitializeParameters>(s => s.SetParameters(1))
             .AddAgent<AnalyticalSolverAgent>()
             .AddAgent<EulerMethodAgent>()
             .AddAgent<RungeKuttaMethodAgent>()
+            .AddInitializationStage<InitializeSolvers>()
+            .AddStage<CalculateNextStep>()
             .AddCrashCondition(crashCondition.CheckCondition)
             .AddCallback(c => drawing(drawer.Draw(c)))
             .SetWaitingTimeBetweenSteps(TimeSpan.FromMilliseconds(50))

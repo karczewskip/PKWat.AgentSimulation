@@ -14,13 +14,13 @@ public class DifferentialEquationSimulationBuilder
         _simulationBuilder = simulationBuilder;
     }
 
-    public ISimulation Build(double stepSize = 0.1, double startX = 0.0, double endX = 10.0, double initialY = 1.0)
+    public ISimulation Build(double stepSize = 0.1)
     {
         var crashCondition = new AllSolversCompletedCondition();
 
         var simulation = _simulationBuilder
             .CreateNewSimulation<DifferentialEquationEnvironment>()
-            .AddInitializationStage<InitializeParameters>(s => s.SetParameters(stepSize, startX, endX, initialY))
+            .AddInitializationStage<InitializeParameters>(s => s.SetParameters(stepSize))
             .AddInitializationStage<InitializeSolvers>()
             .AddStage<CalculateNextStep>()
             .AddAgent<AnalyticalSolverAgent>()
