@@ -1,10 +1,10 @@
 namespace PKWat.AgentSimulation.Examples.DifferentialEquation.Agents;
 
+using PKWat.AgentSimulation.SimMath.Algorithms.DifferentialEquations;
+
 public class EulerMethodAgent : DESolverAgent
 {
-    protected override double CalculateNextY(double stepSize)
+    public EulerMethodAgent() : base(new EulerMethod())
     {
-        double slope = DerivativeFunction!(CurrentX, CurrentY);
-        return CurrentY + stepSize * slope;
     }
 }

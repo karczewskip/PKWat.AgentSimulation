@@ -1,13 +1,21 @@
 namespace PKWat.AgentSimulation.Examples.DifferentialEquation.Agents;
 
 using PKWat.AgentSimulation.Core.Agent;
+using PKWat.AgentSimulation.SimMath.Algorithms.DifferentialEquations;
 
-public abstract class DESolverAgent : SimpleSimulationAgent
+public class DESolverAgent : SimpleSimulationAgent
 {
+    private readonly IDifferentialEquationSolver _solver;
+    
     public double CurrentX { get; protected set; }
     public double CurrentY { get; protected set; }
     public List<(double X, double Y)> SolutionPoints { get; } = new();
     protected Func<double, double, double>? DerivativeFunction { get; private set; }
+
+    public DESolverAgent(IDifferentialEquationSolver solver)
+    {
+        _solver = solver;
+    }
 
     public void Initialize(double startX, double initialY)
     {
@@ -24,12 +32,10 @@ public abstract class DESolverAgent : SimpleSimulationAgent
 
     public void CalculateNextStep(double stepSize)
     {
+        CurrentY = _solver.CalculateNextY(CurrentX, CurrentY, stepSize, DerivativeFunction!);
         CurrentX += stepSize;
-        CurrentY = CalculateNextY(stepSize);
         SolutionPoints.Add((CurrentX, CurrentY));
     }
-
-    protected abstract double CalculateNextY(double stepSize);
 
     public bool HasReachedEnd(double endX)
     {

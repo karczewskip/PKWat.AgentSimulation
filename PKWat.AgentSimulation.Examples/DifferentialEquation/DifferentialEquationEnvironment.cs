@@ -6,7 +6,7 @@ public class DifferentialEquationEnvironment : DefaultSimulationEnvironment
 {
     public double StepSize { get; private set; } = 0.1;
     public double StartX { get; private set; } = 0.0;
-    public double EndX { get; private set; } = 5.0;
+    public double EndX { get; private set; } = 4.0;
     public double InitialY { get; private set; } = 9.0;
 
     public void SetParameters(double stepSize)
@@ -17,7 +17,7 @@ public class DifferentialEquationEnvironment : DefaultSimulationEnvironment
     public double DerivativeFunction(double x, double y)
     {
         //return y - x * x;
-        return 2 * (x - 2);
+        return 2 * x - 4;
     }
 
     public double AnalyticalSolution(double x)

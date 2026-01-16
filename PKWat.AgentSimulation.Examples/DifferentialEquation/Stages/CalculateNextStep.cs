@@ -9,9 +9,18 @@ public class CalculateNextStep : ISimulationStage
     public Task Execute(ISimulationContext context)
     {
         var environment = context.GetSimulationEnvironment<DifferentialEquationEnvironment>();
-        var agents = context.GetAgents<DESolverAgent>();
+        
+        var deSolverAgents = context.GetAgents<DESolverAgent>();
+        foreach (var agent in deSolverAgents)
+        {
+            if (!agent.HasReachedEnd(environment.EndX))
+            {
+                agent.CalculateNextStep(environment.StepSize);
+            }
+        }
 
-        foreach (var agent in agents)
+        var analyticalAgents = context.GetAgents<AnalyticalSolverAgent>();
+        foreach (var agent in analyticalAgents)
         {
             if (!agent.HasReachedEnd(environment.EndX))
             {

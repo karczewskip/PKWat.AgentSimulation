@@ -16,7 +16,7 @@ public class DifferentialEquationSimulationBuilder(ISimulationBuilder simulation
 
         var simulation = simulationBuilder
             .CreateNewSimulation<DifferentialEquationEnvironment>()
-            .AddInitializationStage<InitializeParameters>(s => s.SetParameters(1))
+            .AddInitializationStage<InitializeParameters>(s => s.SetParameters(0.1))
             .AddAgent<AnalyticalSolverAgent>()
             .AddAgent<EulerMethodAgent>()
             .AddAgent<RungeKuttaMethodAgent>()
