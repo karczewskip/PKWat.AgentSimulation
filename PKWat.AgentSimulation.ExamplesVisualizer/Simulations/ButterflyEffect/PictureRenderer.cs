@@ -4,6 +4,7 @@
     using PKWat.AgentSimulation.Core.Agent;
     using PKWat.AgentSimulation.Drawing;
     using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.ButterflyEffect.Agents;
+    using PKWat.AgentSimulation.SimMath.Colors;
     using System.Drawing;
     using System.Windows.Media.Imaging;
 
