@@ -7,8 +7,6 @@ public class AntPair
     public int PairId { get; set; }
     public Color Color1 { get; set; }
     public Color Color2 { get; set; }
-    public Ant AntA { get; set; }
-    public Ant AntB { get; set; }
 
     public AntPair(int pairId, Color color1, Color color2)
     {

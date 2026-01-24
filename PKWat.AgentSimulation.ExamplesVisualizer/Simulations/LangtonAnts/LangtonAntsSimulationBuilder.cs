@@ -26,7 +26,8 @@ public class LangtonAntsSimulationBuilder : IExampleSimulationBuilder
                 s.UseSize(150, 150);
                 s.UsePairCount(4);
             })
-            .AddStage<CalculateAntMovement>()
+            .AddStage<CalculateOccupiedGrid>()
+            .AddStage<CalculateAntNewPosition>()
             .AddCallback(c => drawing(_drawer.Draw(c)))
             .SetRandomSeed(42)
             .Build();

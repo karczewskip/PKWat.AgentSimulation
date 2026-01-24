@@ -43,8 +43,9 @@ public class LangtonAntsDrawer : IVisualizationDrawer
             }
         }
 
+        var ants = context.GetAgents<Ant>();
         // Draw ants as black dots in the center of their cells
-        foreach (var ant in environment.AllAnts)
+        foreach (var ant in ants)
         {
             var centerX = ant.X * CellSize + CellSize / 2;
             var centerY = ant.Y * CellSize + CellSize / 2;
