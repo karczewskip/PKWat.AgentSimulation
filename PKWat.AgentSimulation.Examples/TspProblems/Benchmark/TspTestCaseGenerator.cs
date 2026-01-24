@@ -1,7 +1,7 @@
 namespace PKWat.AgentSimulation.Examples.TspProblems.Benchmark;
 
 using PKWat.AgentSimulation.Core.RandomNumbers;
-using PKWat.AgentSimulation.Math.Algorithms.TSP;
+using PKWat.AgentSimulation.SimMath.Algorithms.TSP;
 
 public class TspTestCaseGenerator
 {

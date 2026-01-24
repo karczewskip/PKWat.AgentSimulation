@@ -1,7 +1,7 @@
 namespace PKWat.AgentSimulation.Examples.TspProblems.Agents;
 
 using PKWat.AgentSimulation.Core.Agent;
-using PKWat.AgentSimulation.Math.Algorithms.TSP;
+using PKWat.AgentSimulation.SimMath.Algorithms.TSP;
 
 public class HeldKarpAgent : SimpleSimulationAgent
 {

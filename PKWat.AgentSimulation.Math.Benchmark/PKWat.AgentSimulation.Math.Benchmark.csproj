@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PKWat.AgentSimulation.Math\PKWat.AgentSimulation.Math.csproj" />
+    <ProjectReference Include="..\PKWat.AgentSimulation.SimMath\PKWat.AgentSimulation.SimMath.csproj" />
   </ItemGroup>
 
 </Project>
