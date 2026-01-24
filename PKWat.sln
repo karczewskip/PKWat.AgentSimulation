@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.Math.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.AgentSimulation.SimMath", "PKWat.AgentSimulation.SimMath\PKWat.AgentSimulation.SimMath.csproj", "{4EDE2965-6A2D-4070-9D40-788D679BC935}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PKWat.TSPCalculator", "PKWat.TSPCalculator\PKWat.TSPCalculator.csproj", "{60D5ACA7-7B1D-49BE-BFE6-6F79241DE017}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{4EDE2965-6A2D-4070-9D40-788D679BC935}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EDE2965-6A2D-4070-9D40-788D679BC935}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EDE2965-6A2D-4070-9D40-788D679BC935}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60D5ACA7-7B1D-49BE-BFE6-6F79241DE017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60D5ACA7-7B1D-49BE-BFE6-6F79241DE017}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60D5ACA7-7B1D-49BE-BFE6-6F79241DE017}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60D5ACA7-7B1D-49BE-BFE6-6F79241DE017}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
