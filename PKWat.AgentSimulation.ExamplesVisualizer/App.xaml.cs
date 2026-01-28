@@ -3,10 +3,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PKWat.AgentSimulation.Core;
-using PKWat.AgentSimulation.Drawing;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations;
 using PKWat.AgentSimulation.ExamplesVisualizer.Simulations.Airport;
 using PKWat.AgentSimulation.Genetics.PolynomialAproximation;
+using PKWat.AgentSimulation.SimMath.Colors;
 using System.Reflection;
 using System.Windows;
 

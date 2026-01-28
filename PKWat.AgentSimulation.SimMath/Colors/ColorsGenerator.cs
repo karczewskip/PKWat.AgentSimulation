@@ -1,4 +1,4 @@
-﻿namespace PKWat.AgentSimulation.Drawing;
+﻿namespace PKWat.AgentSimulation.SimMath.Colors;
 
 using System;
 using System.Drawing;
