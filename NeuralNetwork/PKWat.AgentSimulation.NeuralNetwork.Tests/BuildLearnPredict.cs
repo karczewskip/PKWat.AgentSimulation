@@ -36,14 +36,14 @@ public class BuildLearnPredict
         Assert.That(predictionBelow.IsAboveLine, Is.False, "Point (0, -10) should be classified as below the line");
 
         // Test another point above
-        var pointAbove2 = new KartezianPoint(5, 20); // y=20, line at y=2*5+1=11, above
+        var pointAbove2 = new KartezianPoint(5, 11.1); // y=20, line at y=2*5+1=11, above
         var predictionAbove2 = neuralNetwork.Predict(pointAbove2);
-        Assert.That(predictionAbove2.IsAboveLine, Is.True, "Point (5, 20) should be classified as above the line");
+        Assert.That(predictionAbove2.IsAboveLine, Is.True, "Point (5, 11.1) should be classified as above the line");
 
         // Test another point below
-        var pointBelow2 = new KartezianPoint(5, 5); // y=5, line at y=2*5+1=11, below
+        var pointBelow2 = new KartezianPoint(5, 10.9); // y=5, line at y=2*5+1=11, below
         var predictionBelow2 = neuralNetwork.Predict(pointBelow2);
-        Assert.That(predictionBelow2.IsAboveLine, Is.False, "Point (5, 5) should be classified as below the line");
+        Assert.That(predictionBelow2.IsAboveLine, Is.False, "Point (5, 10.9) should be classified as below the line");
     }
 
     private record KartezianPoint(double X, double Y) : INeuralNetworkInput
